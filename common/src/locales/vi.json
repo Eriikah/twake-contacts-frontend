@@ -1,7 +1,11 @@
 {
   "locale": "vi",
   "contacts": {
-    "title": "Danh bạ"
+    "title": "Danh bạ",
+    "myContacts": "Danh bạ của tôi",
+    "create": "Tạo",
+    "name": "Tên",
+    "email": "Email"
   },
   "error": {
     "title": "Đã xảy ra lỗi",
