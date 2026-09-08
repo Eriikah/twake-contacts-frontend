@@ -1,19 +1,12 @@
 import { davApi } from '@common/utils/apiUtils'
 import { AddressBook, Contact } from './contactsTypes'
-
-interface RawAddressBook {
-  'dav:name'?: string
-  numberOfContacts?: number
-  _links?: {
-    self?: { href?: string }
-  }
-}
-
-interface RawAddressBooksResponse {
-  _embedded?: {
-    'dav:addressbook'?: RawAddressBook[]
-  }
-}
+import {
+  DavAddressBookItem,
+  DavAddressBooksResponse,
+  DavContactItem,
+  DavContactsResponse,
+  JCalCard
+} from './davTypes'
 
 export async function fetchAddressBooks(
   userId: string
@@ -27,36 +20,10 @@ export async function fetchAddressBooks(
       subscribed: 'true'
     }
   })
-  const data: RawAddressBooksResponse = await response.json()
+  const data: DavAddressBooksResponse = await response.json()
 
-  const books = extractAddressBooks(data)
+  const books = data._embedded?.['dav:addressbook'] ?? []
   return books.map(normalizeAddressBook)
-}
-
-function extractAddressBooks(data: RawAddressBooksResponse): RawAddressBook[] {
-  return data._embedded?.['dav:addressbook'] ?? []
-}
-
-function normalizeAddressBook(raw: RawAddressBook): AddressBook {
-  const href = raw._links?.self?.href ?? ''
-  const id = href.split('/').pop()?.replace('.json', '') ?? ''
-  return {
-    id,
-    name: raw['dav:name'] ?? id,
-    contactsCount: raw.numberOfContacts ?? 0
-  }
-}
-
-type JCalProperty = [string, Record<string, unknown>, string, ...unknown[]]
-type JCalData = ['vcard', JCalProperty[]]
-
-interface RawContactsItem {
-  data: JCalData
-  _links?: { self?: { href?: string } }
-}
-
-interface RawContactsResponse {
-  _embedded?: { 'dav:item'?: RawContactsItem[] }
 }
 
 export async function fetchContactsForBook(
@@ -71,23 +38,35 @@ export async function fetchContactsForBook(
       userId
     }
   })
-  const data: RawContactsResponse = await response.json()
+  const data: DavContactsResponse = await response.json()
 
   const items = data._embedded?.['dav:item'] ?? []
   return items.map(normalizeContact)
 }
 
-function normalizeContact(item: RawContactsItem): Contact {
-  const href = item._links?.self?.href ?? ''
-  const id = href.split('/').pop()?.replace('.vcf', '') ?? ''
-  const props = item.data[1]
+export function getCardProperty(card: JCalCard, name: string): string | null {
+  const value = card[1].find(property => property[0] === name)?.[3]
+  return typeof value === 'string' ? value : null
+}
 
-  const fnProp = props.find(p => p[0] === 'fn')
-  const emailProp = props.find(p => p[0] === 'email')
+function extractId(href: string | undefined, extension: string): string {
+  return href?.split('/').pop()?.replace(extension, '') ?? ''
+}
 
+function normalizeAddressBook(raw: DavAddressBookItem): AddressBook {
+  const id = extractId(raw._links?.self?.href, '.json')
   return {
     id,
-    displayName: fnProp?.[3] ?? id,
-    email: emailProp?.[3] ?? null
+    name: raw['dav:name'] ?? id,
+    contactsCount: raw.numberOfContacts ?? 0
+  }
+}
+
+export function normalizeContact(item: DavContactItem): Contact {
+  const id = extractId(item._links?.self?.href, '.vcf')
+  return {
+    id,
+    displayName: getCardProperty(item.data, 'fn') ?? id,
+    email: getCardProperty(item.data, 'email')
   }
 }
