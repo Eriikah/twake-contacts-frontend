@@ -1,7 +1,11 @@
 {
   "locale": "ru-ru",
   "contacts": {
-    "title": "Контакты"
+    "title": "Контакты",
+    "myContacts": "Мои контакты",
+    "create": "Создать",
+    "name": "Имя",
+    "email": "Эл. почта"
   },
   "error": {
     "title": "Что-то пошло не так",

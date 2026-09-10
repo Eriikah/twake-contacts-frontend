@@ -1,7 +1,11 @@
 {
   "locale": "fr-fr",
   "contacts": {
-    "title": "Contacts"
+    "title": "Contacts",
+    "myContacts": "Mes contacts",
+    "create": "Créer",
+    "name": "Nom",
+    "email": "E-mail"
   },
   "error": {
     "title": "Une erreur s'est produite",
