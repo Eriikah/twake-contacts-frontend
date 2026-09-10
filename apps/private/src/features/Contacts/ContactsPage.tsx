@@ -16,7 +16,9 @@ export const ContactsPage: React.FC = () => {
   const { t } = useI18n()
   const dispatch = useAppDispatch()
   const openpaasId = useAppSelector(state => state.user.userData.openpaasId)
-  const contacts = useAppSelector(state => state.contacts.contacts)
+  const contacts = useAppSelector(state =>
+    Object.values(state.contacts.contactsByBook).flat()
+  )
   const loading = useAppSelector(state => state.contacts.loading)
   const error = useAppSelector(state => state.contacts.error)
 

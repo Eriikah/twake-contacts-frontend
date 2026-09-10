@@ -1,0 +1,8 @@
+- Dictionary-based data structure mapping address books to their contacts
+- Standard modals (no route-based modal pattern)
+- Shared addressbooks User ID persisted in the addressbooks dictonary 
+- Sidebar selection navigates to /contacts/:addressBookId
+- Contact selection navigates to /contacts/:addressBookId/:contactId
+- UI built with @linagora/twake-mui components, no local MUI overrides
+- Client-side routing via React Router — remove redux-first-history dependency
+- All user-facing strings must be internationalized from the start: no hardcoded strings, all 4 locales covered (en, fr, vi, ru)

@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Chip,
   ListItem,
   ListItemAvatar,
   ListItemText,
@@ -23,6 +24,10 @@ export const ContactRow: React.FC<ContactRowProps> = ({ contact }) => (
         <ListItemText primary={contact.displayName} />
       </ListItem>
     </TableCell>
-    <TableCell>{contact.email}</TableCell>
+    <TableCell>{contact.emails?.[0].value ?? '-'}</TableCell>
+    <TableCell>{contact.phones?.[0].value ?? '-'}</TableCell>
+    <TableCell>
+      {contact.org?.name ? <Chip label={contact.org?.name} /> : '-'}
+    </TableCell>
   </TableRow>
 )
