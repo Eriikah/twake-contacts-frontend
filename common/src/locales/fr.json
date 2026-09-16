@@ -55,5 +55,11 @@
   },
   "common": {
     "ok": "OK"
+  },
+  "mobile": {
+    "comingSoon": {
+      "title": "Version mobile bientôt disponible",
+      "subtitle": "Veuillez ouvrir Twake Contacts sur un ordinateur pour profiter de toutes les fonctionnalités. Une version mobile entièrement optimisée sera bientôt disponible."
+    }
   }
 }

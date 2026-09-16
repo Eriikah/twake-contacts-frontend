@@ -55,5 +55,11 @@
   },
   "common": {
     "ok": "OK"
+  },
+  "mobile": {
+    "comingSoon": {
+      "title": "Phiên bản di động sắp ra mắt",
+      "subtitle": "Vui lòng mở Twake Contacts trên máy tính để trải nghiệm tất cả tính năng. Phiên bản di động tối ưu sẽ sớm ra mắt."
+    }
   }
 }

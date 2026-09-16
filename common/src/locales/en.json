@@ -55,5 +55,11 @@
   },
   "common": {
     "ok": "Ok"
+  },
+  "mobile": {
+    "comingSoon": {
+      "title": "Mobile version coming soon",
+      "subtitle": "Please open Twake Contacts on a desktop to enjoy all features. A fully optimized mobile version is coming soon."
+    }
   }
 }
