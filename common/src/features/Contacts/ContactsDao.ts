@@ -1,14 +1,22 @@
 import { api } from '@common/utils/apiUtils'
+import { DomainInfo } from '@common/features/User/userDataTypes'
 import { AddressBook, Contact } from './contactsTypes'
-import { DavAddressBooksResponse, DavContactsResponse } from './davTypes'
+import {
+  DavAddressBookItem,
+  DavAddressBooksResponse,
+  DavContactsResponse
+} from './davTypes'
 import {
   denormalizeContact,
   normalizeAddressBook,
   normalizeContact
 } from './transformer/ContactsTransformer'
 
+const CONTACTS_NS = window.CONTACTS_NS ?? 'http://open-paas.org/contacts'
+
 export async function fetchAddressBooks(
-  userId: string
+  userId: string,
+  domains?: DomainInfo[]
 ): Promise<AddressBook[]> {
   const response = api.get(`dav/addressbooks/${userId}.json`, {
     searchParams: {
@@ -22,21 +30,86 @@ export async function fetchAddressBooks(
   const data: DavAddressBooksResponse = await response.json()
 
   const books = data._embedded?.['dav:addressbook'] ?? []
-  return books.map(normalizeAddressBook)
+  const userBooks = books.map(normalizeAddressBook)
+
+  if (domains && domains.length > 0) {
+    const domainBooks = await fetchDomainAddressBooks(domains)
+    return [...userBooks, ...domainBooks]
+  }
+
+  return userBooks
+}
+
+async function fetchDomainAddressBooks(
+  domains: DomainInfo[]
+): Promise<AddressBook[]> {
+  const domainBooks: AddressBook[] = []
+
+  await Promise.all(
+    domains.map(async domain => {
+      try {
+        const response = api(`dav/addressbooks/${domain.domainId}/dab.json`, {
+          method: 'PROPFIND',
+          json: {
+            properties: [
+              '{DAV:}displayname',
+              '{urn:ietf:params:xml:ns:carddav}addressbook-description',
+              '{DAV:}acl',
+              '{DAV:}invite',
+              '{DAV:}share-access',
+              '{DAV:}group',
+              `{${CONTACTS_NS}}subscription-type`,
+              `{${CONTACTS_NS}}source`,
+              `{${CONTACTS_NS}}type`,
+              `{${CONTACTS_NS}}state`,
+              `{${CONTACTS_NS}}numberOfContacts`,
+              'acl'
+            ]
+          }
+        })
+        const data: DavAddressBookItem = await response.json()
+        domainBooks.push(normalizeDomainAddressBook(data, domain.domainId))
+      } catch {
+        console.warn(
+          `Failed to fetch domain addressbook for domain ${domain.domainId}:`
+        )
+      }
+    })
+  )
+
+  return domainBooks
+}
+
+function normalizeDomainAddressBook(
+  raw: DavAddressBookItem,
+  domainId: string
+): AddressBook {
+  const acl = raw['{DAV:}acl'] ?? []
+  return {
+    id: 'dab',
+    userId: domainId,
+    name: raw['{DAV:}displayname'] ?? '',
+    contactsCount: raw[`{${CONTACTS_NS}}numberOfContacts`] ?? 0,
+    acl,
+    canWrite: acl.some(p => p === '{DAV:}write-content' || p === '{DAV:}bind')
+  }
 }
 
 export async function fetchContactsForBook(
-  userId: string,
-  bookId: string
+  book: AddressBook,
+  userId: string
 ): Promise<Contact[]> {
-  const response = api.get(`dav/addressbooks/${userId}/${bookId}.json`, {
-    searchParams: {
-      limit: '500',
-      offset: '0',
-      sort: 'fn',
-      userId
-    }
-  })
+  const isDomainBook = book.id === 'dab'
+
+  const url = isDomainBook
+    ? `dav/addressbooks/${book.userId}/domain-members.json`
+    : `dav/addressbooks/${book.userId}/${book.id}.json`
+
+  const searchParams = isDomainBook
+    ? { limit: '500', offset: '0', sort: 'fn', userId }
+    : { limit: '500', offset: '0', sort: 'fn' }
+
+  const response = api.get(url, { searchParams })
   const data: DavContactsResponse = await response.json()
 
   const items = data._embedded?.['dav:item'] ?? []
