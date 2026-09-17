@@ -59,12 +59,6 @@ class IntersectionObserverMock {
 }
 
 ;(global as any).IntersectionObserver = IntersectionObserverMock
-jest.mock('@common/useScreenSizeDetection', () => ({
-  useScreenSizeDetection: jest.fn(() => ({
-    isTooSmall: false,
-    isTablet: false
-  }))
-}))
 // Suppress jsdom CSS selector parsing errors for Emotion/MUI
 if (typeof window !== 'undefined' && window.getComputedStyle) {
   const originalGetComputedStyle = window.getComputedStyle
@@ -82,7 +76,7 @@ if (typeof window !== 'undefined' && window.getComputedStyle) {
       ) {
         return {
           getPropertyValue: () => ''
-        } as CSSStyleDeclaration
+        } as unknown as CSSStyleDeclaration
       }
       throw error
     }

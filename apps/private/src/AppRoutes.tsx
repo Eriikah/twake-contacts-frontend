@@ -10,16 +10,23 @@ import { CreateContactPage } from './features/Contacts/CreateContactPage'
 import { EditContactPage } from './features/Contacts/EditContactPage'
 import HandleLogin from './features/User/HandleLogin'
 import { CallbackResume } from './features/User/LoginCallback'
+import { MobileWarning } from '@common/components/MobileWarning/MobileWarning'
+import { useBreakpoints } from '@linagora/twake-mui'
 
 export function AppRoutes(): JSX.Element {
   const error = useAppSelector(state => state.user.error)
   const navigate = useNavigate()
+  const { isMobile } = useBreakpoints()
 
   useEffect(() => {
     if (error) {
       void navigate('/error')
     }
   }, [error, navigate])
+
+  if (isMobile) {
+    return <MobileWarning />
+  }
 
   return (
     <>
