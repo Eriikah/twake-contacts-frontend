@@ -10,8 +10,9 @@ import {
 } from '@linagora/twake-mui'
 import { Contact } from '@common/features/Contacts/contactsTypes'
 import { useNavigate } from 'react-router-dom'
-import { ContactActionsMenu } from './ContactActionsMenu'
 import { getInitials } from './getInitials'
+import { useState } from 'react'
+import { ContactRowActions } from './ContactRowActions'
 
 interface ContactRowProps {
   contact: Contact
@@ -23,15 +24,22 @@ export const ContactRow: React.FC<ContactRowProps> = ({
   addressBookId
 }) => {
   const navigate = useNavigate()
+  const [isHovered, setIsHovered] = useState(false)
+
   const handleClick = (): void => {
-    navigate(`/contacts/${addressBookId}/${contact.id}`)
+    void navigate(`/contacts/${addressBookId}/${contact.id}`)
   }
   const handleMenuCellClick = (event: React.MouseEvent): void => {
     event.stopPropagation()
   }
 
   return (
-    <TableRow hover onClick={handleClick}>
+    <TableRow
+      hover
+      onClick={handleClick}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
       <TableCell>
         <ListItem disableGutters disablePadding>
           <ListItemAvatar>
@@ -50,7 +58,11 @@ export const ContactRow: React.FC<ContactRowProps> = ({
         </Stack>
       </TableCell>
       <TableCell align="right" onClick={handleMenuCellClick}>
-        <ContactActionsMenu contact={contact} addressBookId={addressBookId} />
+        <ContactRowActions
+          contact={contact}
+          addressBookId={addressBookId}
+          isHovered={isHovered}
+        />
       </TableCell>
     </TableRow>
   )
