@@ -11,6 +11,7 @@ import {
   normalizeAddressBook,
   normalizeContact
 } from './transformer/ContactsTransformer'
+import { SEARCH_LIMIT } from './constants'
 
 const CONTACTS_NS = window.CONTACTS_NS ?? 'http://open-paas.org/contacts'
 
@@ -133,4 +134,21 @@ export async function deleteContact(
   contactId: string
 ): Promise<void> {
   await api.delete(`dav/addressbooks/${userId}/${bookId}/${contactId}.vcf`)
+}
+
+export async function searchContacts(
+  userId: string,
+  search: string
+): Promise<Contact[]> {
+  const response = api.get(`dav/addressbooks/${userId}.json/contacts`, {
+    searchParams: {
+      limit: String(SEARCH_LIMIT),
+      page: '1',
+      search
+    }
+  })
+  const data: DavContactsResponse = await response.json()
+
+  const items = data._embedded?.['dav:item'] ?? []
+  return items.map(normalizeContact)
 }
