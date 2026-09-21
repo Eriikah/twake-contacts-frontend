@@ -26,11 +26,15 @@
       "addEmail": "Thêm email",
       "address": "Địa chỉ",
       "addAddress": "Thêm địa chỉ",
+      "addField": "Thêm",
+      "remove": "Xóa",
       "type": "Loại",
       "cancel": "Hủy",
       "save": "Lưu",
       "addressBook": "Sổ địa chỉ",
-      "editTitle": "Chỉnh sửa liên hệ"
+      "editTitle": "Chỉnh sửa liên hệ",
+      "newContact": "Liên hệ mới",
+      "invalidEmail": "Địa chỉ email không hợp lệ"
     },
     "types": {
       "cell": "Di động",
