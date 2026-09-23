@@ -6,7 +6,7 @@ import {
   updateContact
 } from '@common/features/Contacts/ContactsSlice'
 import { selectBook } from '@common/features/Contacts/contactsSelectors'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams, Navigate } from 'react-router-dom'
 import { useI18n } from 'twake-i18n'
 import {
   ContactForm,
@@ -27,6 +27,10 @@ export const EditContactPage: React.FC = () => {
       c => c.id === contactId
     )
   )
+
+  if (addressBookId === 'dab') {
+    return <Navigate to={`/contacts/${addressBookId}/${contactId}`} replace />
+  }
 
   if (!contact) {
     return (

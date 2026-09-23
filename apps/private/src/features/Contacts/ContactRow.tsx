@@ -17,11 +17,13 @@ import { ContactRowActions } from './ContactRowActions'
 interface ContactRowProps {
   contact: Contact
   addressBookId: string
+  readOnly?: boolean
 }
 
 export const ContactRow: React.FC<ContactRowProps> = ({
   contact,
-  addressBookId
+  addressBookId,
+  readOnly
 }) => {
   const navigate = useNavigate()
   const [isHovered, setIsHovered] = useState(false)
@@ -62,6 +64,7 @@ export const ContactRow: React.FC<ContactRowProps> = ({
           contact={contact}
           addressBookId={addressBookId}
           isHovered={isHovered}
+          readOnly={readOnly}
         />
       </TableCell>
     </TableRow>

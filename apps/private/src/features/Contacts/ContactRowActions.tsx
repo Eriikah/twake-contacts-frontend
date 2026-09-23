@@ -23,6 +23,7 @@ interface ContactRowActionsProps {
   addressBookId: string
   onDeleted?: () => void
   isHovered?: boolean
+  readOnly?: boolean
 }
 
 type OpenDialog = 'delete' | null
@@ -31,7 +32,8 @@ export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
   contact,
   addressBookId,
   onDeleted,
-  isHovered
+  isHovered,
+  readOnly
 }) => {
   const { t } = useI18n()
   const dispatch = useAppDispatch()
@@ -96,7 +98,7 @@ export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
             marginLeft: 'auto'
           }}
         >
-          {(isHovered || isMenuOpen) && (
+          {!readOnly && (isHovered || isMenuOpen) && (
             <>
               <Tooltip title={t('contacts.menu.edit')}>
                 <IconButton
@@ -110,28 +112,32 @@ export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
             </>
           )}
         </div>
-        <Tooltip title={t('contacts.menu.more')}>
-          <IconButton
-            size="xsmall"
-            aria-label={t('contacts.menu.more')}
-            onClick={handleMenuOpen}
-          >
-            <Icon icon={Dots} />
-          </IconButton>
-        </Tooltip>
-        <Menu
-          anchorEl={anchorEl}
-          open={isMenuOpen}
-          onClose={handleMenuClose}
-          onClick={e => e.stopPropagation()}
-        >
-          <MenuItem onClick={handleOpenDeleteDialog}>
-            <ListItemIcon>
-              <Icon icon={Trash} />
-            </ListItemIcon>
-            <ListItemText>{t('contacts.menu.delete')}</ListItemText>
-          </MenuItem>
-        </Menu>
+        {!readOnly && (
+          <>
+            <Tooltip title={t('contacts.menu.more')}>
+              <IconButton
+                size="xsmall"
+                aria-label={t('contacts.menu.more')}
+                onClick={handleMenuOpen}
+              >
+                <Icon icon={Dots} />
+              </IconButton>
+            </Tooltip>
+            <Menu
+              anchorEl={anchorEl}
+              open={isMenuOpen}
+              onClose={handleMenuClose}
+              onClick={e => e.stopPropagation()}
+            >
+              <MenuItem onClick={handleOpenDeleteDialog}>
+                <ListItemIcon>
+                  <Icon icon={Trash} />
+                </ListItemIcon>
+                <ListItemText>{t('contacts.menu.delete')}</ListItemText>
+              </MenuItem>
+            </Menu>
+          </>
+        )}
       </Stack>
       {openDialog === 'delete' && (
         <DeleteContactDialog

@@ -14,6 +14,7 @@ interface ContactActionsMenuProps {
   contact: Contact
   addressBookId: string
   onDeleted?: () => void
+  readOnly?: boolean
 }
 
 type OpenDialog = 'delete' | null
@@ -21,7 +22,8 @@ type OpenDialog = 'delete' | null
 export const ContactActionsMenu: React.FC<ContactActionsMenuProps> = ({
   contact,
   addressBookId,
-  onDeleted
+  onDeleted,
+  readOnly
 }) => {
   const { t } = useI18n()
   const dispatch = useAppDispatch()
@@ -61,15 +63,19 @@ export const ContactActionsMenu: React.FC<ContactActionsMenuProps> = ({
   return (
     <>
       <Stack direction="row" spacing={1}>
-        <Button variant="contained" onClick={handleEdit}>
-          {t('contacts.menu.edit')}
-        </Button>
-        <IconButton
-          aria-label={t('contacts.menu.delete')}
-          onClick={handleOpenDeleteDialog}
-        >
-          <Icon icon={Trash} />
-        </IconButton>
+        {!readOnly && (
+          <>
+            <Button variant="contained" onClick={handleEdit}>
+              {t('contacts.menu.edit')}
+            </Button>
+            <IconButton
+              aria-label={t('contacts.menu.delete')}
+              onClick={handleOpenDeleteDialog}
+            >
+              <Icon icon={Trash} />
+            </IconButton>
+          </>
+        )}
       </Stack>
       {openDialog === 'delete' && (
         <DeleteContactDialog

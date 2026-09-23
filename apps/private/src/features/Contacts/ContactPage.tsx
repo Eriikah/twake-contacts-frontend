@@ -100,8 +100,9 @@ export const ContactPage: React.FC = () => {
             <Typography variant="h4">{contact.displayName}</Typography>
             <ContactActionsMenu
               contact={contact}
-              addressBookId={addressBookId}
+              addressBookId={addressBookId ?? ''}
               onDeleted={handleDeleted}
+              readOnly={addressBookId === 'dab'}
             />
           </Stack>
           <List>

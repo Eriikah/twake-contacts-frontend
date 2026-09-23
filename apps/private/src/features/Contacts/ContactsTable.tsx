@@ -13,9 +13,13 @@ import { ContactRow } from './ContactRow'
 
 interface ContactsTableProps {
   entries: ContactEntry[]
+  readOnly?: boolean
 }
 
-export const ContactsTable: React.FC<ContactsTableProps> = ({ entries }) => {
+export const ContactsTable: React.FC<ContactsTableProps> = ({
+  entries,
+  readOnly
+}) => {
   const { t } = useI18n()
 
   return (
@@ -36,6 +40,7 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({ entries }) => {
               key={`${addressBookId}/${contact.id}`}
               contact={contact}
               addressBookId={addressBookId}
+              readOnly={readOnly}
             />
           ))}
         </TableBody>
