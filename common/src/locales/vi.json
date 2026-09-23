@@ -52,7 +52,10 @@
     "menu": {
       "more": "Thao tác khác",
       "edit": "Chỉnh sửa",
-      "delete": "Xóa"
+      "delete": "Xóa",
+      "chat": "Trò chuyện",
+      "mail": "Gửi email",
+      "calendar": "Tạo sự kiện"
     },
     "delete": {
       "title": "Xóa liên hệ này?",
