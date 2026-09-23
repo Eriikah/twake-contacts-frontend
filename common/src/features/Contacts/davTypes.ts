@@ -46,21 +46,22 @@ export type JCalProperty = [
 /** A vCard in jCal form: `['vcard', [property, ...]]`. */
 export type JCalCard = ['vcard', JCalProperty[]]
 
-interface DavSelfLink {
+interface DavLinks {
   self?: { href?: string }
+  next?: { href?: string }
 }
 
 /** One contact of an address book, as embedded under `dav:item`. */
 export interface DavContactItem {
   /** `href` ends in `<uid>.vcf` — the contact id. */
-  _links?: DavSelfLink
+  _links?: DavLinks
   etag?: string
   data: JCalCard
 }
 
 /** `GET /addressbooks/<userId>/<bookId>.json` */
 export interface DavContactsResponse {
-  _links?: DavSelfLink
+  _links?: DavLinks
   'dav:syncToken'?: number
   _embedded?: {
     'dav:item'?: DavContactItem[]
@@ -70,7 +71,7 @@ export interface DavContactsResponse {
 /** One address book, as embedded under `dav:addressbook`. */
 export interface DavAddressBookItem {
   /** `/addressbooks/<userId>/<bookId>.json`, `userId` being the owner of the book. */
-  _links?: DavSelfLink
+  _links?: DavLinks
   'dav:name'?: string
   numberOfContacts?: number
   'dav:acl'?: string[]

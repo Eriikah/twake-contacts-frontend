@@ -1,1 +1,2 @@
 export const SEARCH_LIMIT = 30
+export const CONTACTS_PAGINATION_LIMIT = 50

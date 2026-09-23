@@ -11,7 +11,7 @@ import {
   normalizeAddressBook,
   normalizeContact
 } from './transformer/ContactsTransformer'
-import { SEARCH_LIMIT } from './constants'
+import { CONTACTS_PAGINATION_LIMIT, SEARCH_LIMIT } from './constants'
 
 const CONTACTS_NS = window.CONTACTS_NS ?? 'http://open-paas.org/contacts'
 
@@ -98,8 +98,10 @@ function normalizeDomainAddressBook(
 
 export async function fetchContactsForBook(
   book: AddressBook,
-  userId: string
-): Promise<Contact[]> {
+  userId: string,
+  limit: number = CONTACTS_PAGINATION_LIMIT,
+  offset: number = 0
+): Promise<{ contacts: Contact[]; hasMore: boolean }> {
   const isDomainBook = book.id === 'dab'
 
   const url = isDomainBook
@@ -107,14 +109,17 @@ export async function fetchContactsForBook(
     : `dav/addressbooks/${book.userId}/${book.id}.json`
 
   const searchParams = isDomainBook
-    ? { limit: '500', offset: '0', sort: 'fn', userId }
-    : { limit: '500', offset: '0', sort: 'fn' }
+    ? { limit: limit.toString(), offset: offset.toString(), sort: 'fn', userId }
+    : { limit: limit.toString(), offset: offset.toString(), sort: 'fn' }
 
   const response = api.get(url, { searchParams })
   const data: DavContactsResponse = await response.json()
 
   const items = data._embedded?.['dav:item'] ?? []
-  return items.map(normalizeContact)
+  const contacts = items.map(normalizeContact)
+  const hasMore = data._links?.next?.href !== undefined
+
+  return { contacts, hasMore }
 }
 
 export async function saveContact(

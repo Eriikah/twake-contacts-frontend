@@ -64,6 +64,8 @@ export interface Contact {
 
 export interface AddressBookWithContacts extends AddressBook {
   contacts: Contact[]
+  offset: number
+  hasMore: boolean
 }
 
 export interface ContactsState {

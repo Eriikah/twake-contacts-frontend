@@ -1,8 +1,14 @@
 import { ReducerCreators } from '@reduxjs/toolkit'
 import { RejectedError, toRejectedError } from '@common/utils/errorUtils'
 import { DomainInfo } from '@common/features/User/userDataTypes'
-import { fetchAddressBooks, fetchContactsForBook } from '../ContactsDao'
-import { ContactsState, AddressBookWithContacts } from '../contactsTypes'
+import { fetchAddressBooks } from '../ContactsDao'
+import {
+  ContactsState,
+  AddressBookWithContacts,
+  Contact
+} from '../contactsTypes'
+import { CONTACTS_PAGINATION_LIMIT } from '../constants'
+import { fetchPaginatedContacts } from './fetchPaginatedContacts'
 
 export interface FetchContactsPayload {
   userId: string
@@ -19,17 +25,34 @@ export const fetchContactsThunk = (create: ReducerCreators<ContactsState>) =>
       try {
         const books = await fetchAddressBooks(userId, domains)
         const addressBooks: Record<string, AddressBookWithContacts> = {}
+        let remainingSlot = CONTACTS_PAGINATION_LIMIT
 
-        await Promise.all(
-          books.map(async book => {
-            const contacts = await fetchContactsForBook(book, userId)
+        for (const book of books) {
+          let validContacts: Contact[] = []
+          let hasMoreForBook = book.contactsCount > 0
+          let newOffset = 0
 
-            addressBooks[book.id] = {
-              ...book,
-              contacts: contacts?.length > 0 ? contacts : []
-            }
-          })
-        )
+          if (remainingSlot > 0 && book.contactsCount > 0) {
+            const requestedLimit = remainingSlot
+            const result = await fetchPaginatedContacts(
+              book,
+              userId,
+              requestedLimit,
+              0
+            )
+            validContacts = result.contacts
+            hasMoreForBook = result.hasMore
+            newOffset = result.offset
+            remainingSlot -= validContacts.length
+          }
+
+          addressBooks[book.id] = {
+            ...book,
+            contacts: validContacts,
+            offset: newOffset,
+            hasMore: hasMoreForBook
+          }
+        }
 
         return addressBooks
       } catch (err) {
