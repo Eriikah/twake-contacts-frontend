@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import {
+  Alert,
   Avatar,
   Button,
   Chip,
@@ -7,6 +9,7 @@ import {
   ListItem,
   ListItemIcon,
   ListItemText,
+  Snackbar,
   Stack,
   Typography
 } from '@linagora/twake-mui'
@@ -18,7 +21,8 @@ import {
   Location,
   Matrix,
   People,
-  Phone
+  Phone,
+  CrossSmall
 } from '@linagora/twake-icons'
 import { useAppSelector } from '@common/app/hooks'
 import { ContactAddress } from '@common/features/Contacts/contactsTypes'
@@ -37,38 +41,82 @@ interface ContactFieldProps {
   value: string
   type?: string | null
   copyLabel?: string
+  copyToastMessage?: string
 }
 
 const ContactField: React.FC<ContactFieldProps> = ({
   icon,
   value,
   type,
-  copyLabel
+  copyLabel,
+  copyToastMessage
 }) => {
+  const [snackbarOpen, setSnackbarOpen] = useState(false)
+  const { t } = useI18n()
+
   const handleCopy = (): void => {
     void navigator.clipboard.writeText(value)
+    if (copyToastMessage) {
+      setSnackbarOpen(true)
+    }
   }
+
+  const handleCloseSnackbar = (): void => {
+    setSnackbarOpen(false)
+  }
+
   return (
-    <ListItem
-      disableGutters
-      secondaryAction={
-        copyLabel && (
-          <IconButton size="small" aria-label={copyLabel} onClick={handleCopy}>
-            <Icon icon={Copy} />
-          </IconButton>
-        )
-      }
-    >
-      <ListItemIcon>
-        <Icon icon={icon} />
-      </ListItemIcon>
-      <ListItemText primary={value} />
-      {type && (
-        <Typography variant="body2" color="text.secondary">
-          {type}
-        </Typography>
+    <>
+      <ListItem
+        disableGutters
+        secondaryAction={
+          copyLabel && (
+            <IconButton
+              size="small"
+              aria-label={copyLabel}
+              onClick={handleCopy}
+            >
+              <Icon icon={Copy} />
+            </IconButton>
+          )
+        }
+      >
+        <ListItemIcon>
+          <Icon icon={icon} />
+        </ListItemIcon>
+        <ListItemText primary={value} />
+        {type && (
+          <Typography variant="body2" color="text.secondary">
+            {type}
+          </Typography>
+        )}
+      </ListItem>
+      {copyToastMessage && (
+        <Snackbar
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          open={snackbarOpen}
+          autoHideDuration={3000}
+          onClose={handleCloseSnackbar}
+        >
+          <Alert
+            severity="success"
+            onClose={handleCloseSnackbar}
+            sx={{ width: '100%' }}
+            action={
+              <IconButton
+                size="small"
+                aria-label={t('common.ok')}
+                onClick={handleCloseSnackbar}
+              >
+                <Icon icon={CrossSmall} />
+              </IconButton>
+            }
+          >
+            {copyToastMessage}
+          </Alert>
+        </Snackbar>
       )}
-    </ListItem>
+    </>
   )
 }
 
@@ -79,7 +127,7 @@ export const ContactPage: React.FC = () => {
   const contact = useAppSelector(
     state => state.contacts.addressBooks[addressBookId]?.contacts
   )?.find(c => c.id === contactId)
-  const handleDeleted = (): void => navigate(`/contacts/${addressBookId}`)
+  const handleDeleted = (): void => void navigate(`/contacts/${addressBookId}`)
 
   return (
     <Stack spacing={3}>
@@ -127,6 +175,7 @@ export const ContactPage: React.FC = () => {
                 value={phone.value}
                 type={phone.type}
                 copyLabel={t('contacts.copy')}
+                copyToastMessage={t('contacts.phoneWasCopied')}
               />
             ))}
             {contact.emails.map(email => (
@@ -136,6 +185,7 @@ export const ContactPage: React.FC = () => {
                 value={email.value}
                 type={email.type}
                 copyLabel={t('contacts.copy')}
+                copyToastMessage={t('contacts.emailWasCopied')}
               />
             ))}
             {contact.socialProfiles?.map(profile => (
@@ -145,6 +195,7 @@ export const ContactPage: React.FC = () => {
                 value={profile.value}
                 type={profile.type}
                 copyLabel={t('contacts.copy')}
+                copyToastMessage={t('contacts.socialProfileWasCopied')}
               />
             ))}
             {contact.addresses?.map(address => (
@@ -153,6 +204,7 @@ export const ContactPage: React.FC = () => {
                 icon={Location}
                 value={formatAddress(address)}
                 type={address.type}
+                copyToastMessage={t('contacts.addressWasCopied')}
               />
             ))}
           </List>

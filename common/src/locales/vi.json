@@ -11,6 +11,10 @@
     "team": "Nhóm",
     "back": "Quay lại",
     "copy": "Sao chép",
+    "phoneWasCopied": "Đã sao chép số điện thoại",
+    "socialProfileWasCopied": "Đã sao chép hồ sơ mạng xã hội",
+    "emailWasCopied": "Đã sao chép địa chỉ email",
+    "addressWasCopied": "Đã sao chép địa chỉ",
     "notFound": "Không tìm thấy liên hệ",
     "empty": {
       "title": "Chưa có liên hệ",
