@@ -11,6 +11,10 @@
     "team": "Équipe",
     "back": "Retour",
     "copy": "Copier",
+    "phoneWasCopied": "Numéro de téléphone copié",
+    "socialProfileWasCopied": "Profil social copié",
+    "emailWasCopied": "Adresse e-mail copiée",
+    "addressWasCopied": "Adresse copiée",
     "notFound": "Contact introuvable",
     "empty": {
       "title": "Aucun contact",

@@ -11,6 +11,10 @@
     "team": "Команда",
     "back": "Назад",
     "copy": "Копировать",
+    "phoneWasCopied": "Номер телефона скопирован",
+    "socialProfileWasCopied": "Профиль скопирован",
+    "emailWasCopied": "Адрес электронной почты скопирован",
+    "addressWasCopied": "Адрес скопирован",
     "notFound": "Контакт не найден",
     "empty": {
       "title": "Контактов пока нет",
