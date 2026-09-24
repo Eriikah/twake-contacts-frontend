@@ -51,6 +51,9 @@
     },
     "menu": {
       "more": "More actions",
+      "sendMail": "Send email",
+      "openChat": "Open chat",
+      "createEvent": "Create event",
       "edit": "Edit",
       "delete": "Delete",
       "chat": "Chat",
