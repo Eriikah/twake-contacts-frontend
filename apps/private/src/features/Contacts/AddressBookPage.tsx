@@ -31,7 +31,7 @@ export const AddressBookPage: React.FC = () => {
       {entries.length === 0 ? (
         <NoContactsEmptyState />
       ) : (
-        <ContactsTable entries={entries} />
+        <ContactsTable entries={entries} readOnly={addressBookId === 'dab'} />
       )}
     </Stack>
   )
