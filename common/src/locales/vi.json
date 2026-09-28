@@ -51,6 +51,9 @@
     },
     "menu": {
       "more": "Thao tác khác",
+      "sendMail": "Gửi email",
+      "openChat": "Mở trò chuyện",
+      "createEvent": "Tạo sự kiện",
       "edit": "Chỉnh sửa",
       "delete": "Xóa",
       "chat": "Trò chuyện",

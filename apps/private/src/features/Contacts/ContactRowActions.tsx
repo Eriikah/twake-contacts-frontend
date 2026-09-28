@@ -1,13 +1,5 @@
-import {
-  IconButton,
-  Stack,
-  Menu,
-  MenuItem,
-  ListItemIcon,
-  ListItemText,
-  Tooltip
-} from '@linagora/twake-mui'
-import { Icon, Trash, Pen, Dots } from '@linagora/twake-icons'
+import { IconButton, Stack, Tooltip } from '@linagora/twake-mui'
+import { Icon, Pen, Dots } from '@linagora/twake-icons'
 import { useAppDispatch, useAppSelector } from '@common/app/hooks'
 import { deleteContact } from '@common/features/Contacts/ContactsSlice'
 import { selectBook } from '@common/features/Contacts/contactsSelectors'
@@ -17,6 +9,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useI18n } from 'twake-i18n'
 import { DeleteContactDialog } from './DeleteContactDialog'
+import { ContactRowDropdownMenu } from './ContactRowDropdownMenu'
 
 interface ContactRowActionsProps {
   contact: Contact
@@ -108,14 +101,12 @@ export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
             <Icon icon={Dots} />
           </IconButton>
         </Tooltip>
-        <Menu anchorEl={anchorEl} open={isMenuOpen} onClose={handleMenuClose}>
-          <MenuItem onClick={handleOpenDeleteDialog}>
-            <ListItemIcon>
-              <Icon icon={Trash} />
-            </ListItemIcon>
-            <ListItemText>{t('contacts.menu.delete')}</ListItemText>
-          </MenuItem>
-        </Menu>
+        <ContactRowDropdownMenu
+          contact={contact}
+          anchorEl={anchorEl}
+          onClose={handleMenuClose}
+          onOpenDeleteDialog={handleOpenDeleteDialog}
+        />
       </Stack>
       {openDialog === 'delete' && (
         <DeleteContactDialog
