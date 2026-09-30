@@ -161,7 +161,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
       </Stack>
 
       <AvatarHeader displayName={displayName} title={title} />
-      <Stack spacing={3}>
+      <Stack spacing={3} className="u-maw-7">
         <NameFields
           givenName={values.givenName}
           familyName={values.familyName}
