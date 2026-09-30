@@ -61,7 +61,7 @@
       "delete": "Xóa",
       "chat": "Trò chuyện",
       "mail": "Gửi email",
-      "calendar": "Tạo sự kiện"
+      "schedule": "Lên lịch"
     },
     "delete": {
       "title": "Xóa liên hệ này?",

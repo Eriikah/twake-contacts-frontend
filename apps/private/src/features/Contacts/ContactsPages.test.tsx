@@ -194,14 +194,18 @@ describe('ContactPage', () => {
     expect(screen.getByTestId('contact-calendar-button')).toBeInTheDocument()
   })
 
-  it('hides quick action buttons when contact has no email', () => {
+  it('disable quick action buttons when contact has no email', () => {
     renderContacts('/contacts/book2/c2')
 
-    expect(screen.queryByTestId('contact-mail-button')).not.toBeInTheDocument()
-    expect(screen.queryByTestId('contact-chat-button')).not.toBeInTheDocument()
-    expect(
-      screen.queryByTestId('contact-calendar-button')
-    ).not.toBeInTheDocument()
+    expect(screen.queryByTestId('contact-mail-button')).toHaveProperty(
+      'disabled'
+    )
+    expect(screen.queryByTestId('contact-chat-button')).toHaveProperty(
+      'disabled'
+    )
+    expect(screen.queryByTestId('contact-calendar-button')).toHaveProperty(
+      'disabled'
+    )
   })
 
   it('shows a not found message for an unknown contact', () => {

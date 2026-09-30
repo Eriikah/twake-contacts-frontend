@@ -61,7 +61,7 @@
       "delete": "Supprimer",
       "chat": "Discuter",
       "mail": "Envoyer un email",
-      "calendar": "Créer un événement"
+      "schedule": "Planifier"
     },
     "delete": {
       "title": "Supprimer ce contact ?",
