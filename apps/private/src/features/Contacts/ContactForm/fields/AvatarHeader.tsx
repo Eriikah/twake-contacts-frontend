@@ -12,7 +12,9 @@ export const AvatarHeader: React.FC<AvatarHeaderProps> = ({
 }) => {
   return (
     <Stack direction="row" spacing={2} className="u-flex u-flex-items-center">
-      <Avatar size={94}>{getInitials(displayName)}</Avatar>
+      <Avatar size={94} color={displayName ? undefined : 'sunrise'}>
+        {getInitials(displayName)}
+      </Avatar>
       <Typography variant="h4">{displayName || title || ''}</Typography>
     </Stack>
   )
