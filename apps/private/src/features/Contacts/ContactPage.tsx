@@ -101,8 +101,12 @@ const ContactField: React.FC<ContactFieldProps> = ({
           )}
           {copyLabel && (
             <Tooltip title={copyLabel}>
-              <IconButton aria-label={copyLabel} onClick={handleCopy}>
-                <Icon icon={Copy} size={24} />
+              <IconButton
+                aria-label={copyLabel}
+                onClick={handleCopy}
+                size="small"
+              >
+                <Icon icon={Copy} />
               </IconButton>
             </Tooltip>
           )}
@@ -205,39 +209,36 @@ export const ContactPage: React.FC = () => {
         <>
           <AvatarHeader displayName={contact.displayName} />
           <Stack direction="row" spacing={2}>
-            {firstEmail && (
-              <Button
-                variant="ghost"
-                startIcon={<Icon icon={EmailOpen} />}
-                aria-label={t('contacts.menu.mail')}
-                data-testid="contact-mail-button"
-                onClick={handleSendMail}
-              >
-                {t('contacts.menu.mail')}
-              </Button>
-            )}
-            {chatTarget && (
-              <Button
-                variant="ghost"
-                aria-label={t('contacts.menu.chat')}
-                data-testid="contact-chat-button"
-                startIcon={<Icon icon={Discuss} />}
-                onClick={handleOpenChat}
-              >
-                {t('contacts.menu.chat')}
-              </Button>
-            )}
-            {firstEmail && (
-              <Button
-                variant="ghost"
-                aria-label={t('contacts.menu.calendar')}
-                data-testid="contact-calendar-button"
-                startIcon={<Icon icon={CalendarToday} />}
-                onClick={handleCreateEvent}
-              >
-                {t('contacts.menu.calendar')}
-              </Button>
-            )}
+            <Button
+              variant="ghost"
+              startIcon={<Icon icon={EmailOpen} />}
+              aria-label={t('contacts.menu.mail')}
+              data-testid="contact-mail-button"
+              onClick={handleSendMail}
+              disabled={!firstEmail}
+            >
+              {t('contacts.menu.mail')}
+            </Button>
+            <Button
+              variant="ghost"
+              aria-label={t('contacts.menu.chat')}
+              data-testid="contact-chat-button"
+              startIcon={<Icon icon={Discuss} />}
+              onClick={handleOpenChat}
+              disabled={!chatTarget}
+            >
+              {t('contacts.menu.chat')}
+            </Button>
+            <Button
+              variant="ghost"
+              aria-label={t('contacts.menu.schedule')}
+              data-testid="contact-calendar-button"
+              startIcon={<Icon icon={CalendarToday} />}
+              onClick={handleCreateEvent}
+              disabled={!firstEmail}
+            >
+              {t('contacts.menu.schedule')}
+            </Button>
           </Stack>
           <List>
             {contact.categories && (
