@@ -12,6 +12,7 @@ import { useParams } from 'react-router'
 import { useI18n } from 'twake-i18n'
 import { ContactsTable } from './ContactsTable'
 import { NoContactsEmptyState } from './NoContactsEmptyState'
+import { ImportContactsButton } from './ImportContactsButton'
 
 export const AddressBookPage: React.FC = () => {
   const { t } = useI18n()
@@ -61,9 +62,15 @@ export const AddressBookPage: React.FC = () => {
 
   return (
     <Stack spacing={2} className="u-flex-auto u-ov-hidden">
-      <Typography variant="h4" gutterBottom>
-        {title}
-      </Typography>
+      <Stack
+        direction="row"
+        className="u-flex-justify-between u-flex-items-center"
+      >
+        <Typography variant="h4">{title}</Typography>
+        {(addressBookId !== 'dab' || book?.canWrite) && (
+          <ImportContactsButton addressBookId={addressBookId} />
+        )}
+      </Stack>
       {renderContent()}
     </Stack>
   )
