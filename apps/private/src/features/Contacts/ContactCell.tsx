@@ -17,6 +17,7 @@ import {
 } from '@linagora/twake-utils'
 import React from 'react'
 import { useI18n } from 'twake-i18n'
+import { useAppSelector } from '@common/app/hooks'
 import { ContactRowActions } from './ContactRowActions'
 import { getInitials } from './getInitials'
 
@@ -41,6 +42,9 @@ export const ContactCell: React.FC<ContactCellProps> = ({
   cell
 }) => {
   const { t } = useI18n()
+  const workplaceFqdn = useAppSelector(
+    state => state.user.userData?.workplaceFqdn
+  )
   if (!row || !column) return null
   const { contact, addressBookId } = row as unknown as ContactEntry
   const readOnly = addressBookId === 'dab'
@@ -56,12 +60,14 @@ export const ContactCell: React.FC<ContactCellProps> = ({
       const mailUrl =
         firstEmail && window.MAIL_SPA_URL
           ? generateMailComposerUrl(window.MAIL_SPA_URL, [firstEmail], {
+              workplaceFqdn,
               workplaceFqdnFallback: window.WORKPLACE_FQDN_FALLBACK
             })
           : null
       const calendarUrl =
         firstEmail && window.CALENDAR_SPA_URL
           ? generateCalendarEventUrl(window.CALENDAR_SPA_URL, [firstEmail], {
+              workplaceFqdn,
               workplaceFqdnFallback: window.WORKPLACE_FQDN_FALLBACK
             })
           : null
@@ -69,6 +75,7 @@ export const ContactCell: React.FC<ContactCellProps> = ({
         chatTarget && window.CHAT_SPA_URL
           ? resolveChatSpaUrl(window.CHAT_SPA_URL, {
               target: chatTarget,
+              workplaceFqdn,
               workplaceFqdnFallback: window.WORKPLACE_FQDN_FALLBACK
             })
           : null
