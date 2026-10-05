@@ -80,10 +80,12 @@ const ContactField: React.FC<ContactFieldProps> = ({
         <ListItemIcon>
           <Icon icon={icon} />
         </ListItemIcon>
-        <ListItemText
-          primary={value}
-          slotProps={{ primary: { noWrap: true } }}
-        />
+        <Tooltip title={value}>
+          <ListItemText
+            primary={value}
+            slotProps={{ primary: { noWrap: true } }}
+          />
+        </Tooltip>
         <div className="u-flex u-flex-items-center u-row-xs u-ml-auto u-ml-1">
           {type && (
             <Typography variant="body2" color="text.secondary">
