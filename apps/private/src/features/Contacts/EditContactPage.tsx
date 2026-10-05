@@ -23,9 +23,15 @@ export const EditContactPage: React.FC = () => {
   const navigate = useNavigate()
   const { addressBookId = '', contactId } = useParams()
   const openpaasId = useAppSelector(state => state.user.userData.openpaasId)
-  const writableBooks = useAppSelector(selectWritableBooks).filter(
-    book => book.id !== 'dab'
+  const allWritableBooks = useAppSelector(selectWritableBooks)
+  const currentBook = useAppSelector(
+    state => state.contacts.addressBooks[addressBookId]
   )
+  const formBooks =
+    currentBook && !allWritableBooks.some(b => b.id === currentBook.id)
+      ? [...allWritableBooks, currentBook]
+      : allWritableBooks
+  const writableBooks = formBooks.filter(book => book.id !== 'dab')
   const contact = useAppSelector(state =>
     state.contacts.addressBooks[addressBookId]?.contacts.find(
       c => c.id === contactId

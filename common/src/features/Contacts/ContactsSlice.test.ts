@@ -270,7 +270,7 @@ describe('moveContact', () => {
     expect(store.getState().contacts.addressBooks.book2.contactsCount).toBe(1)
   })
 
-  it('does not duplicate the contact if it already exists in the target book', async () => {
+  it('replaces the contact if it already exists in the target book', async () => {
     jest.mocked(moveContactDao).mockResolvedValue()
     const store = setupStore({
       contacts: {
@@ -293,8 +293,59 @@ describe('moveContact', () => {
             contactsCount: 1,
             acl: [],
             canWrite: true,
+            contacts: [{ id: 'c1', displayName: 'Alice Old', emails: [] }],
+            offset: 1,
+            hasMore: false
+          }
+        },
+        loading: false,
+        error: null
+      }
+    })
+
+    await store.dispatch(
+      moveContact({
+        userId: 'u1',
+        fromAddressBookId: 'book1',
+        toAddressBookId: 'book2',
+        contact: { id: 'c1', displayName: 'Alice Updated', emails: [] }
+      })
+    )
+
+    expect(store.getState().contacts.addressBooks.book1.contacts).toHaveLength(
+      0
+    )
+    const targetContact =
+      store.getState().contacts.addressBooks.book2.contacts[0]
+    expect(targetContact.displayName).toBe('Alice Updated')
+    expect(store.getState().contacts.addressBooks.book2.contactsCount).toBe(1)
+  })
+
+  it('does not change contactsCount when it is null', async () => {
+    jest.mocked(moveContactDao).mockResolvedValue()
+    const store = setupStore({
+      contacts: {
+        addressBooks: {
+          book1: {
+            id: 'book1',
+            userId: 'u1',
+            name: 'Book 1',
+            contactsCount: null,
+            acl: [],
+            canWrite: true,
             contacts: [{ id: 'c1', displayName: 'Alice Roche', emails: [] }],
             offset: 1,
+            hasMore: false
+          },
+          book2: {
+            id: 'book2',
+            userId: 'u1',
+            name: 'Book 2',
+            contactsCount: null,
+            acl: [],
+            canWrite: true,
+            contacts: [],
+            offset: 0,
             hasMore: false
           }
         },
@@ -312,13 +363,12 @@ describe('moveContact', () => {
       })
     )
 
-    expect(store.getState().contacts.addressBooks.book1.contacts).toHaveLength(
-      0
-    )
-    expect(store.getState().contacts.addressBooks.book2.contacts).toHaveLength(
-      1
-    )
-    expect(store.getState().contacts.addressBooks.book2.contactsCount).toBe(1)
+    expect(
+      store.getState().contacts.addressBooks.book1.contactsCount
+    ).toBeNull()
+    expect(
+      store.getState().contacts.addressBooks.book2.contactsCount
+    ).toBeNull()
   })
 
   it('sets an error when the move fails', async () => {

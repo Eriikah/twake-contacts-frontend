@@ -1,13 +1,46 @@
 import { ReducerCreators } from '@reduxjs/toolkit'
 import { RejectedError, toRejectedError } from '@common/utils/errorUtils'
 import { moveContact } from '../ContactsDao'
-import { Contact, ContactsState } from '../contactsTypes'
+import {
+  AddressBookWithContacts,
+  Contact,
+  ContactsState
+} from '../contactsTypes'
 
 export interface MoveContactArgs {
   userId: string
   fromAddressBookId: string
   toAddressBookId: string
   contact: Contact
+}
+
+function removeContactFromBook(
+  book: AddressBookWithContacts,
+  contactId: string
+): void {
+  const previousLength = book.contacts.length
+  book.contacts = book.contacts.filter(contact => contact.id !== contactId)
+  if (book.contacts.length < previousLength) {
+    book.offset = Math.max(0, book.offset - 1)
+    if (typeof book.contactsCount === 'number') {
+      book.contactsCount -= 1
+    }
+  }
+}
+
+function addOrReplaceContactInBook(
+  book: AddressBookWithContacts,
+  contact: Contact
+): void {
+  const index = book.contacts.findIndex(c => c.id === contact.id)
+  if (index !== -1) {
+    book.contacts[index] = contact
+  } else {
+    book.contacts.push(contact)
+    if (typeof book.contactsCount === 'number') {
+      book.contactsCount += 1
+    }
+  }
 }
 
 export const moveContactThunk = (create: ReducerCreators<ContactsState>) =>
@@ -34,23 +67,10 @@ export const moveContactThunk = (create: ReducerCreators<ContactsState>) =>
         const fromBook = state.addressBooks[action.payload.fromAddressBookId]
         const toBook = state.addressBooks[action.payload.toAddressBookId]
         if (fromBook) {
-          const contacts = fromBook.contacts.filter(
-            contact => contact.id !== action.payload.contact.id
-          )
-          if (contacts.length < fromBook.contacts.length) {
-            fromBook.offset = Math.max(0, fromBook.offset - 1)
-          }
-          fromBook.contacts = contacts
-          fromBook.contactsCount -= 1
+          removeContactFromBook(fromBook, action.payload.contact.id)
         }
         if (toBook) {
-          const exists = toBook.contacts.some(
-            contact => contact.id === action.payload.contact.id
-          )
-          if (!exists) {
-            toBook.contacts.push(action.payload.contact)
-            toBook.contactsCount += 1
-          }
+          addOrReplaceContactInBook(toBook, action.payload.contact)
         }
       },
       rejected: (state, action) => {
