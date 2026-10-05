@@ -1,5 +1,6 @@
 export * from './createContactAsync'
 export * from './deleteContactAsync'
+export * from './moveContactAsync'
 export * from './updateContactAsync'
 export { fetchContactsThunk } from './fetchContactsAsync'
 export { fetchMoreContactsThunk } from './fetchMoreContactsAsync'

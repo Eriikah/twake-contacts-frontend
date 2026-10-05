@@ -149,6 +149,16 @@ export async function deleteContact(
   )
 }
 
+export async function moveContact(
+  userId: string,
+  fromBookId: string,
+  toBookId: string,
+  contact: Contact
+): Promise<void> {
+  await saveContact(userId, toBookId, contact)
+  await deleteContact(userId, fromBookId, contact.id)
+}
+
 export async function uploadImportFile(file: File): Promise<string> {
   const response = await api.post('api/files', {
     searchParams: {

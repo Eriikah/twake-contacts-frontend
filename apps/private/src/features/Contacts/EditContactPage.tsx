@@ -1,9 +1,10 @@
 import { useAppDispatch, useAppSelector } from '@common/app/hooks'
 import {
   deleteContact,
+  moveContact,
   updateContact
 } from '@common/features/Contacts/ContactsSlice'
-import { selectBook } from '@common/features/Contacts/contactsSelectors'
+import { selectWritableBooks } from '@common/features/Contacts/contactsSelectors'
 import { isHiddenAddressBook } from '@common/features/Contacts/contactsUtils'
 import { Icon, Left } from '@linagora/twake-icons'
 import { Button, Stack, Typography } from '@linagora/twake-mui'
@@ -22,7 +23,9 @@ export const EditContactPage: React.FC = () => {
   const navigate = useNavigate()
   const { addressBookId = '', contactId } = useParams()
   const openpaasId = useAppSelector(state => state.user.userData.openpaasId)
-  const book = useAppSelector(state => selectBook(state, addressBookId))
+  const writableBooks = useAppSelector(selectWritableBooks).filter(
+    book => book.id !== 'dab'
+  )
   const contact = useAppSelector(state =>
     state.contacts.addressBooks[addressBookId]?.contacts.find(
       c => c.id === contactId
@@ -62,15 +65,29 @@ export const EditContactPage: React.FC = () => {
 
   const handleSubmit = async (values: ContactFormValues): Promise<void> => {
     if (!openpaasId) return
+    const updatedContact = makeContactFromForm(values, contact)
     try {
       await dispatch(
         updateContact({
           userId: openpaasId,
           addressBookId,
-          contact: makeContactFromForm(values, contact)
+          contact: updatedContact
         })
       ).unwrap()
-      void navigate(backTo)
+
+      if (values.addressBookId && values.addressBookId !== addressBookId) {
+        await dispatch(
+          moveContact({
+            userId: openpaasId,
+            fromAddressBookId: addressBookId,
+            toAddressBookId: values.addressBookId,
+            contact: updatedContact
+          })
+        ).unwrap()
+        void navigate(`/contacts/${values.addressBookId}/${contactId}`)
+      } else {
+        void navigate(backTo)
+      }
     } catch {
       // error is surfaced by the contacts slice
     }
@@ -98,9 +115,8 @@ export const EditContactPage: React.FC = () => {
 
   return (
     <ContactForm
-      addressBooks={book ? [book] : []}
+      addressBooks={writableBooks ? writableBooks : []}
       initialValues={initialValues}
-      addressBookDisabled
       backTo={backTo}
       onSubmit={handleSubmit}
       contact={contact}
