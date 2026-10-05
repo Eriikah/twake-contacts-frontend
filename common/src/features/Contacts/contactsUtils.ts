@@ -1,5 +1,5 @@
 import { RejectedError } from '@common/utils/errorUtils'
-import { HIDDEN_ADDRESS_BOOK_IDS } from './constants'
+import { DEFAULT_ADDRESS_BOOK_ID, HIDDEN_ADDRESS_BOOK_IDS } from './constants'
 import { AddressBook, ContactAddress } from './contactsTypes'
 
 /** Joins the address components in postal order, e.g. "10 Avenue des Champs, 75008 Paris, France". */
@@ -35,4 +35,23 @@ export function getAddressBookDisplayName(
   if (!book) return ''
   if (book.id === 'dab') return t('contacts.domainAddressBook')
   return book.name
+}
+
+const isDefaultAddressBook = (book: AddressBook): boolean =>
+  book.id === DEFAULT_ADDRESS_BOOK_ID
+
+// default address book first, then by display name in natural order
+export function sortAddressBooks<T extends AddressBook>(
+  books: T[],
+  t: (key: string) => string
+): T[] {
+  return [...books].sort(
+    (a, b) =>
+      Number(isDefaultAddressBook(b)) - Number(isDefaultAddressBook(a)) ||
+      getAddressBookDisplayName(a, t).localeCompare(
+        getAddressBookDisplayName(b, t),
+        undefined,
+        { numeric: true }
+      )
+  )
 }
