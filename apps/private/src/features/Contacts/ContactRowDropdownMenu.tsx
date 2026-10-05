@@ -85,7 +85,7 @@ export const ContactRowDropdownMenu: React.FC<ContactRowDropdownMenuProps> = ({
       onClose={handleMenuClose}
       onClick={e => e.stopPropagation()}
     >
-      <MenuItem onClick={handleSendMail}>
+      <MenuItem onClick={handleSendMail} disabled={!firstEmail}>
         <ListItemIcon>
           <Icon icon={EmailOpen} />
         </ListItemIcon>
@@ -99,7 +99,7 @@ export const ContactRowDropdownMenu: React.FC<ContactRowDropdownMenuProps> = ({
           <ListItemText>{t('contacts.menu.openChat')}</ListItemText>
         </MenuItem>
       )}
-      <MenuItem onClick={handleCreateEvent}>
+      <MenuItem onClick={handleCreateEvent} disabled={!firstEmail}>
         <ListItemIcon>
           <Icon icon={CalendarToday} />
         </ListItemIcon>
