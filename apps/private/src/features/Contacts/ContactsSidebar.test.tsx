@@ -124,7 +124,12 @@ describe('ContactsSidebar', () => {
       )
     )
 
-    expect(screen.getAllByRole('link').map(link => link.textContent)).toEqual([
+    const items = [
+      screen.getByRole('link', { name: en.contacts.create }).textContent,
+      ...screen.getAllByRole('button').map(btn => btn.textContent)
+    ]
+
+    expect(items).toEqual([
       en.contacts.create,
       en.contacts.myContacts,
       '2 Team',

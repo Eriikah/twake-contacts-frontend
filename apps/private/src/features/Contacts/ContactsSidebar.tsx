@@ -1,34 +1,52 @@
+import { useState } from 'react'
 import { useAppSelector } from '@common/app/hooks'
 import {
   getAddressBookDisplayName,
   isHiddenAddressBook,
   sortAddressBooks
 } from '@common/features/Contacts/contactsUtils'
-import { Company, Contacts, Icon, Plus } from '@linagora/twake-icons'
+import { Company, Icon, Plus, ContactList } from '@linagora/twake-icons'
 import {
-  Button,
   Box,
   Nav,
   NavIcon,
   NavItem,
   NavLink,
   NavText,
-  Sidebar
+  Sidebar,
+  Button,
+  Tooltip,
+  NavDropdown
 } from '@linagora/twake-mui'
-import { Link, useParams } from 'react-router'
+import { Link, useNavigate, useParams } from 'react-router'
 import { useI18n } from 'twake-i18n'
+import { Peoples } from '@linagora/twake-icons'
+
+import {
+  AddressBook,
+  AddressBookWithContacts
+} from '@common/features/Contacts/contactsTypes'
 
 export const ContactsSidebar: React.FC = () => {
+  const [isMyContactsExpanded, setIsMyContactsExpanded] = useState(true)
   const { t } = useI18n()
   const { addressBookId } = useParams()
+  const navigate = useNavigate()
   const addressBooks = useAppSelector(state => state.contacts.addressBooks)
   const currentBook = addressBookId ? addressBooks[addressBookId] : undefined
   const canWriteCurrentBook =
     (currentBook?.canWrite && addressBookId !== 'dab') ?? false
   const otherBooks = sortAddressBooks(
-    Object.values(addressBooks).filter(book => !isHiddenAddressBook(book.id)),
+    Object.values(addressBooks).filter(
+      (book: AddressBookWithContacts) =>
+        !isHiddenAddressBook(book.id) && book.id !== 'dab'
+    ) as AddressBook[],
     t
   )
+
+  const domainBooks = Object.values(addressBooks).filter(
+    (book: AddressBookWithContacts) => book.id === 'dab'
+  ) as AddressBook[]
 
   const createLink =
     addressBookId && canWriteCurrentBook
@@ -52,24 +70,67 @@ export const ContactsSidebar: React.FC = () => {
       <Box className="u-flex-auto u-ov-auto u-mt-1-half">
         <Nav className="u-mv-0">
           <NavItem>
-            <NavLink
-              component={Link}
-              to="/contacts"
-              selected={addressBookId === undefined}
-            >
-              <NavIcon icon={Contacts} />
-              <NavText>{t('contacts.myContacts')}</NavText>
-            </NavLink>
+            {otherBooks.length === 0 ? (
+              <NavLink
+                selected={addressBookId === undefined}
+                onClick={() => {
+                  void navigate('/contacts')
+                }}
+              >
+                <NavIcon icon={ContactList} />
+                <NavText>{t('contacts.myContacts')}</NavText>
+              </NavLink>
+            ) : (
+              <NavDropdown
+                open={isMyContactsExpanded}
+                onToggle={() => setIsMyContactsExpanded(!isMyContactsExpanded)}
+                selected={addressBookId === undefined}
+                onClick={() => {
+                  void navigate('/contacts')
+                }}
+              >
+                <NavIcon icon={ContactList} />
+                <NavText>{t('contacts.myContacts')}</NavText>
+              </NavDropdown>
+            )}
           </NavItem>
-          {otherBooks.map(book => (
+
+          {isMyContactsExpanded &&
+            otherBooks.map(book => (
+              <NavItem key={book.id} variant="secondary">
+                <NavLink
+                  onClick={() => {
+                    void navigate(`/contacts/${book.id}`)
+                  }}
+                  selected={addressBookId === book.id}
+                >
+                  <NavIcon icon={Peoples} />
+                  <Tooltip title={getAddressBookDisplayName(book, t)}>
+                    <NavText
+                      className="u-midellipsis"
+                      secondaryText={book.ownerDisplayName}
+                    >
+                      {getAddressBookDisplayName(book, t)}
+                    </NavText>
+                  </Tooltip>
+                </NavLink>
+              </NavItem>
+            ))}
+
+          {domainBooks.map(book => (
             <NavItem key={book.id}>
               <NavLink
-                component={Link}
-                to={`/contacts/${book.id}`}
+                onClick={() => {
+                  void navigate(`/contacts/${book.id}`)
+                }}
                 selected={addressBookId === book.id}
               >
                 <NavIcon icon={Company} />
-                <NavText>{getAddressBookDisplayName(book, t)}</NavText>
+                <NavText>
+                  <span className="u-ellipsis">
+                    {getAddressBookDisplayName(book, t)}
+                  </span>
+                </NavText>
               </NavLink>
             </NavItem>
           ))}

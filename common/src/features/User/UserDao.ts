@@ -19,3 +19,13 @@ export async function patchConfigurations(
     json: modules
   })
 }
+
+export async function fetchUserById(id: string): Promise<OpenPaasUserData> {
+  const entity: { user?: OpenPaasUserData } = await api
+    .get(`api/entity/${id}`)
+    .json()
+  if (!entity.user) {
+    throw new Error(`User entity not found for id ${id}`)
+  }
+  return normalizeOpenPaasUser(entity.user)
+}

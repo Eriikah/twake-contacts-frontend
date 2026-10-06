@@ -1,5 +1,6 @@
 import { api } from '@common/utils/apiUtils'
 import { encodeDavSegment } from '@linagora/twake-utils'
+import { fetchUserById } from '@common/features/User/UserDao'
 import { DomainInfo } from '@common/features/User/userDataTypes'
 import { AddressBook, Contact, ContactEntry } from './contactsTypes'
 import {
@@ -32,7 +33,9 @@ export async function fetchAddressBooks(
   const data: DavAddressBooksResponse = await response.json()
 
   const books = data._embedded?.['dav:addressbook'] ?? []
-  const userBooks = books.map(normalizeAddressBook)
+  const userBooks = await Promise.all(
+    books.map(rawBook => enrichAddressBookOwner(rawBook, userId))
+  )
 
   if (domains && domains.length > 0) {
     const domainBooks = await fetchDomainAddressBooks(domains)
@@ -40,6 +43,37 @@ export async function fetchAddressBooks(
   }
 
   return userBooks
+}
+
+async function enrichAddressBookOwner(
+  rawBook: DavAddressBookItem,
+  userId: string
+): Promise<AddressBook> {
+  const book = normalizeAddressBook(rawBook)
+  const source =
+    rawBook['{http://open-paas.org/contacts}source'] ||
+    rawBook['openpaas:source']
+
+  if (!source) return book
+
+  // e.g. /addressbooks/6498ffa1d48f620025cc9dc2/431ae469-dfee-4b0a-a976-e04a12661b34.json
+  const parts = source.split('/')
+  if (parts.length < 3) return book
+
+  const ownerId = parts[2]
+  if (!ownerId || ownerId === userId) return book
+
+  try {
+    const user = await fetchUserById(ownerId)
+    const name = [user.firstname, user.lastname].filter(Boolean).join(' ')
+    if (name) {
+      book.ownerDisplayName = name
+    }
+  } catch {
+    console.warn(`Failed to fetch owner for address book ${book.id}`)
+  }
+
+  return book
 }
 
 async function fetchDomainAddressBooks(
@@ -150,15 +184,17 @@ export async function deleteContact(
 }
 
 export async function uploadImportFile(file: File): Promise<string> {
-  const response = await api.post('api/files', {
-    searchParams: {
-      mimetype: 'text/vcard',
-      name: file.name,
-      size: String(file.size)
-    },
-    body: file
-  })
-  const data = await response.json()
+  const data = await api
+    .post('api/files', {
+      searchParams: {
+        mimetype: 'text/vcard',
+        name: file.name,
+        size: String(file.size)
+      },
+      body: file
+    })
+    .json<{ _id: string }>()
+
   return data._id
 }
 
