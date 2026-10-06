@@ -40,6 +40,7 @@ import { Link, useNavigate, useParams } from 'react-router'
 import { useI18n } from 'twake-i18n'
 import { ContactActionsMenu } from './ContactActionsMenu'
 import { AvatarHeader } from './ContactForm/fields/AvatarHeader'
+import { ContactDetailsSkeleton } from './ContactSkeletons'
 
 interface ContactFieldProps {
   icon: React.ComponentType
@@ -144,6 +145,7 @@ export const ContactPage: React.FC = () => {
   const workplaceFqdn = useAppSelector(
     state => state.user.userData?.workplaceFqdn
   )
+  const loading = useAppSelector(state => state.contacts.loading)
   const handleDeleted = (): void =>
     void navigate(
       isHiddenAddressBook(addressBookId)
@@ -170,6 +172,10 @@ export const ContactPage: React.FC = () => {
   const handleCreateEvent = (): void => {
     if (!firstEmail) return
     openCalendarEvent(firstEmail, { workplaceFqdn })
+  }
+
+  if (loading) {
+    return <ContactDetailsSkeleton />
   }
 
   return (
