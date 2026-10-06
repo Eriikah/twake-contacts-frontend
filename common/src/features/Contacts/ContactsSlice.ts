@@ -6,6 +6,7 @@ import {
   deleteContactThunk,
   fetchContactsThunk,
   fetchMoreContactsThunk,
+  moveContactThunk,
   updateContactThunk
 } from './services'
 
@@ -40,6 +41,7 @@ const ContactsSlice = createAppSlice({
     fetchMoreContacts: fetchMoreContactsThunk(create),
     createContact: createContactThunk(create),
     updateContact: updateContactThunk(create),
+    moveContact: moveContactThunk(create),
     deleteContact: deleteContactThunk(create)
   })
 })
@@ -51,6 +53,7 @@ export const {
   deleteContact,
   fetchContacts,
   fetchMoreContacts,
+  moveContact,
   updateContact
 } = ContactsSlice.actions
 export default ContactsSlice.reducer

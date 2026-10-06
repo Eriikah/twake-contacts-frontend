@@ -1,14 +1,26 @@
 import { setupStore } from '@common/app/store'
 import { DEFAULT_ADDRESS_BOOK_ID } from '@common/features/Contacts/constants'
+import {
+  moveContact as moveContactDao,
+  saveContact
+} from '@common/features/Contacts/ContactsDao'
 import { UserState } from '@common/features/User/UserSlice'
 import en from '@common/locales/en.json'
 import { TwakeMuiThemeProvider } from '@linagora/twake-mui'
-import { fireEvent, render, screen, within } from '@testing-library/react'
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within
+} from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import I18n from 'twake-i18n'
 import { CreateContactPage } from './CreateContactPage'
 import { EditContactPage } from './EditContactPage'
+
+jest.mock('@common/features/Contacts/ContactsDao')
 
 function renderPage(initialEntries: string[]): ReturnType<typeof render> {
   const store = setupStore({
@@ -239,5 +251,85 @@ describe('EditContactPage', () => {
       'href',
       '/contacts'
     )
+  })
+
+  it('allows changing the address book during edit', () => {
+    renderPage(['/contacts/book1/c1/edit'])
+
+    const addressBookSelect = screen.getByLabelText('Address book')
+    expect(addressBookSelect).not.toBeDisabled()
+  })
+
+  it('updates the contact and moves it to a different address book', async () => {
+    jest.mocked(saveContact).mockResolvedValue()
+    jest.mocked(moveContactDao).mockResolvedValue()
+    renderPage(['/contacts/book1/c1/edit'])
+
+    fireEvent.change(screen.getByLabelText('First name'), {
+      target: { value: 'Alice Updated' }
+    })
+
+    const addressBookSelect = screen.getByLabelText('Address book')
+    fireEvent.mouseDown(addressBookSelect)
+    fireEvent.click(screen.getByRole('option', { name: 'Book 2' }))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Contact')).toBeInTheDocument()
+    })
+
+    expect(saveContact).toHaveBeenCalledWith(
+      'u1',
+      'book1',
+      expect.objectContaining({
+        id: 'c1',
+        displayName: 'Alice Updated Roche'
+      })
+    )
+    expect(moveContactDao).toHaveBeenCalledWith(
+      'u1',
+      'book1',
+      'book2',
+      expect.objectContaining({
+        id: 'c1',
+        displayName: 'Alice Updated Roche'
+      })
+    )
+  })
+
+  it('navigates to the contact in the new address book after moving', async () => {
+    jest.mocked(saveContact).mockResolvedValue()
+    jest.mocked(moveContactDao).mockResolvedValue()
+    renderPage(['/contacts/book1/c1/edit'])
+
+    const addressBookSelect = screen.getByLabelText('Address book')
+    fireEvent.mouseDown(addressBookSelect)
+    fireEvent.click(screen.getByRole('option', { name: 'Book 2' }))
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Contact')).toBeInTheDocument()
+    })
+  })
+
+  it('only updates the contact when the address book is unchanged', async () => {
+    jest.mocked(saveContact).mockResolvedValue()
+    jest.mocked(moveContactDao).mockResolvedValue()
+    renderPage(['/contacts/book1/c1/edit'])
+
+    fireEvent.change(screen.getByLabelText('First name'), {
+      target: { value: 'Alice Updated' }
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByText('Contact')).toBeInTheDocument()
+    })
+
+    expect(saveContact).toHaveBeenCalledTimes(1)
+    expect(moveContactDao).not.toHaveBeenCalled()
   })
 })
