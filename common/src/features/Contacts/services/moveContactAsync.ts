@@ -17,29 +17,38 @@ export interface MoveContactArgs {
 function removeContactFromBook(
   book: AddressBookWithContacts,
   contactId: string
-): void {
+): AddressBookWithContacts {
   const previousLength = book.contacts.length
-  book.contacts = book.contacts.filter(contact => contact.id !== contactId)
-  if (book.contacts.length < previousLength) {
-    book.offset = Math.max(0, book.offset - 1)
-    if (typeof book.contactsCount === 'number') {
-      book.contactsCount -= 1
-    }
+  const contacts = book.contacts.filter(contact => contact.id !== contactId)
+  const wasRemoved = contacts.length < previousLength
+  return {
+    ...book,
+    contacts,
+    offset: wasRemoved ? Math.max(0, book.offset - 1) : book.offset,
+    contactsCount:
+      typeof book.contactsCount === 'number'
+        ? book.contactsCount - 1
+        : book.contactsCount
   }
 }
 
 function addOrReplaceContactInBook(
   book: AddressBookWithContacts,
   contact: Contact
-): void {
+): AddressBookWithContacts {
   const index = book.contacts.findIndex(c => c.id === contact.id)
   if (index !== -1) {
-    book.contacts[index] = contact
-  } else {
-    book.contacts.push(contact)
-    if (typeof book.contactsCount === 'number') {
-      book.contactsCount += 1
-    }
+    const contacts = [...book.contacts]
+    contacts[index] = contact
+    return { ...book, contacts }
+  }
+  return {
+    ...book,
+    contacts: [...book.contacts, contact],
+    contactsCount:
+      typeof book.contactsCount === 'number'
+        ? book.contactsCount + 1
+        : book.contactsCount
   }
 }
 
@@ -65,12 +74,15 @@ export const moveContactThunk = (create: ReducerCreators<ContactsState>) =>
     {
       fulfilled: (state, action) => {
         const fromBook = state.addressBooks[action.payload.fromAddressBookId]
-        const toBook = state.addressBooks[action.payload.toAddressBookId]
         if (fromBook) {
-          removeContactFromBook(fromBook, action.payload.contact.id)
+          state.addressBooks[action.payload.fromAddressBookId] =
+            removeContactFromBook(fromBook, action.payload.contact.id)
         }
+
+        const toBook = state.addressBooks[action.payload.toAddressBookId]
         if (toBook) {
-          addOrReplaceContactInBook(toBook, action.payload.contact)
+          state.addressBooks[action.payload.toAddressBookId] =
+            addOrReplaceContactInBook(toBook, action.payload.contact)
         }
       },
       rejected: (state, action) => {
