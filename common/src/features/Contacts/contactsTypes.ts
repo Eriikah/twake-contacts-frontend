@@ -8,6 +8,7 @@ export interface AddressBook {
   contactsCount: number | null
   acl: string[]
   canWrite: boolean
+  ownerDisplayName?: string
 }
 
 export interface ContactName {
