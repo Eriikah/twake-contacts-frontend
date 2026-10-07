@@ -4,9 +4,9 @@ import { Loading } from '@common/components/Loading/Loading'
 import { EmbeddingProvider } from '@common/contexts/EmbeddingContext'
 import { AVAILABLE_LANGUAGES } from '@common/features/Settings/constants'
 import { useInitializeApp } from '@common/features/User/useInitializeApp'
-import { TwakeMuiThemeProvider } from '@linagora/twake-mui'
+import { TwakeMuiThemeProvider, useColorScheme } from '@linagora/twake-mui'
 import * as Sentry from '@sentry/react'
-import { Suspense } from 'react'
+import { Suspense, useEffect } from 'react'
 import { ErrorBoundary } from 'react-error-boundary'
 import { BrowserRouter as Router } from 'react-router'
 
@@ -50,6 +50,19 @@ const isValidLanguage = (
   return !!lang && SUPPORTED_LANGUAGES.includes(lang as SupportedLanguage)
 }
 
+function ThemeSync(): null {
+  const { mode, setMode } = useColorScheme()
+  const themeMode = useAppSelector(state => state.settings.themeMode)
+
+  useEffect(() => {
+    if (mode !== themeMode) {
+      setMode(themeMode)
+    }
+  }, [mode, themeMode, setMode])
+
+  return null
+}
+
 export default function App(): JSX.Element {
   const appLoading = useAppSelector(state => state.loading.isLoading)
   const userLanguage = useAppSelector(state => state.user.coreConfig.language)
@@ -67,6 +80,7 @@ export default function App(): JSX.Element {
   return (
     <EmbeddingProvider>
       <TwakeMuiThemeProvider>
+        <ThemeSync />
         <I18n
           dictRequire={(lang: keyof typeof locale) => locale[lang]}
           lang={lang}

@@ -1,4 +1,11 @@
-import { Content, Layout, Main, Snackbar, Alert } from '@linagora/twake-mui'
+import {
+  Content,
+  Layout,
+  Main,
+  Snackbar,
+  Alert,
+  Stack
+} from '@linagora/twake-mui'
 import { useAppDispatch, useAppSelector } from '@common/app/hooks'
 import {
   fetchContacts,
@@ -10,6 +17,7 @@ import { useI18n } from 'twake-i18n'
 import { ContactsSidebar } from './ContactsSidebar'
 import { ContactSearchBar } from './ContactSearchBar'
 import { CreateAddressBookDialog } from './CreateAddressBookDialog'
+import { ThemeToggle } from '@common/components/ThemeToggle/ThemeToggle'
 
 export const ContactsPage: React.FC = () => {
   const [isCreateBookOpen, setIsCreateBookOpen] = useState(false)
@@ -31,7 +39,13 @@ export const ContactsPage: React.FC = () => {
       <ContactsSidebar onOpenCreateBook={() => setIsCreateBookOpen(true)} />
       <Main>
         <Content className="u-p-1">
-          <ContactSearchBar />
+          <Stack
+            direction="row"
+            className="u-flex-items-center u-flex-justify-between u-mb-1"
+          >
+            <ContactSearchBar />
+            {window.DEBUG && <ThemeToggle />}
+          </Stack>
           {error && <Alert severity="error">{t(error)}</Alert>}
           <Outlet />
         </Content>

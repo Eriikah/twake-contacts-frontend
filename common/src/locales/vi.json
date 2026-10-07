@@ -98,6 +98,10 @@
   "common": {
     "ok": "OK"
   },
+  "theme": {
+    "darkMode": "Chế độ tối",
+    "lightMode": "Chế độ sáng"
+  },
   "mobile": {
     "comingSoon": {
       "title": "Phiên bản di động sắp ra mắt",
