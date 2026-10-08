@@ -1,11 +1,15 @@
 import { MutableRefObject } from 'react'
 import { parsePush } from './parsePush'
+import { useAppDispatch } from '@common/app/hooks'
+import { fetchUpdatedContacts } from '@common/features/Contacts/ContactsSlice'
+import { AppDispatch } from '@common/app/store'
 
 export const ADDRESSBOOK_PATH = /^\/addressbooks\/([^/]+)\/([^/]+)$/
 
 export function parseMessage(
   message: unknown,
-  syncTokensRef: MutableRefObject<Map<string, string>>
+  syncTokensRef: MutableRefObject<Map<string, string>>,
+  dispatch: AppDispatch
 ): void {
   const payload = parsePush(message)
   if (!payload) {
@@ -26,6 +30,13 @@ export function parseMessage(
       if (syncTokensRef.current.get(path) !== push.syncToken) {
         syncTokensRef.current.set(path, push.syncToken)
         console.log({ userId, bookId })
+        dispatch(
+          fetchUpdatedContacts({
+            userId,
+            bookId,
+            newSyncToken: Number(push.syncToken)
+          })
+        )
       }
     }
 

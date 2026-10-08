@@ -72,19 +72,6 @@ export const moveContactThunk = (create: ReducerCreators<ContactsState>) =>
       }
     },
     {
-      fulfilled: (state, action) => {
-        const fromBook = state.addressBooks[action.payload.fromAddressBookId]
-        if (fromBook) {
-          state.addressBooks[action.payload.fromAddressBookId] =
-            removeContactFromBook(fromBook, action.payload.contact.id)
-        }
-
-        const toBook = state.addressBooks[action.payload.toAddressBookId]
-        if (toBook) {
-          state.addressBooks[action.payload.toAddressBookId] =
-            addOrReplaceContactInBook(toBook, action.payload.contact)
-        }
-      },
       rejected: (state, action) => {
         state.error = action.payload?.message ?? 'Failed to move contact'
       }
