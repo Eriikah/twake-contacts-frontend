@@ -1,6 +1,5 @@
 import { MutableRefObject } from 'react'
-import { parsePush } from './parsePush'
-import { useAppDispatch } from '@common/app/hooks'
+import { AddressBookPush, parsePush } from './parsePush'
 import { fetchUpdatedContacts } from '@common/features/Contacts/ContactsSlice'
 import { AppDispatch } from '@common/app/store'
 
@@ -26,32 +25,56 @@ export function parseMessage(
     const [, userId, bookId] = match
 
     // Contact created/updated/deleted: refetch when the token moved
-    if (push.syncToken !== undefined) {
-      if (syncTokensRef.current.get(path) !== push.syncToken) {
-        syncTokensRef.current.set(path, push.syncToken)
-        console.log({ userId, bookId })
-        dispatch(
-          fetchUpdatedContacts({
-            userId,
-            bookId,
-            newSyncToken: Number(push.syncToken)
-          })
-        )
-      }
-    }
+    handleBookUpdate({ push, syncTokensRef, path, dispatch, userId, bookId })
 
     // vCard import result
-    if (push.imports) {
-      for (const [importId, result] of Object.entries(push.imports)) {
-        console.log({
-          userId,
-          bookId,
-          importId,
-          status: result.status,
-          succeedCount: result.succeedCount ?? 0,
-          failedCount: result.failedCount ?? 0
-        })
-      }
+    handleImportNotification(push, userId, bookId)
+  }
+}
+
+function handleImportNotification(
+  push: AddressBookPush,
+  userId: string,
+  bookId: string
+) {
+  if (push.imports) {
+    for (const [importId, result] of Object.entries(push.imports)) {
+      console.info({
+        userId,
+        bookId,
+        importId,
+        status: result.status,
+        succeedCount: result.succeedCount ?? 0,
+        failedCount: result.failedCount ?? 0
+      })
     }
+  }
+}
+
+function handleBookUpdate({
+  push,
+  syncTokensRef,
+  path,
+  dispatch,
+  userId,
+  bookId
+}: {
+  push: AddressBookPush
+  syncTokensRef: MutableRefObject<Map<string, string>>
+  path: string
+  dispatch: AppDispatch
+  userId: string
+  bookId: string
+}) {
+  if (push.syncToken === undefined) return
+  if (syncTokensRef.current.get(path) !== push.syncToken) {
+    syncTokensRef.current.set(path, push.syncToken)
+    void dispatch(
+      fetchUpdatedContacts({
+        userId,
+        bookId,
+        newSyncToken: Number(push.syncToken)
+      })
+    )
   }
 }
