@@ -1,40 +1,52 @@
-import { useAppSelector } from '@common/app/hooks'
+import { useAppDispatch, useAppSelector } from '@common/app/hooks'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   closeWebSocketConnection,
   establishWebSocketConnection,
   setupWebSocketPing,
-  type PingCleanup,
   type WebSocketWithCleanup,
   useWebSocketReconnect,
   registerWebSocketState,
   setWebSocketConnecting
 } from '@linagora/twake-websocket'
 import { api } from '@common/utils/apiUtils'
+import { useSyncRegistrations } from './operations/useSyncRegistrations'
+import { parseMessage } from './messaging/parseMessage'
+
+const CONNECT_TIMEOUT_MS = 10_000
 
 export function WebSocketGate(): JSX.Element | null {
+  const dispatch = useAppDispatch()
+
   const socketRef = useRef<WebSocketWithCleanup | null>(null)
   const reconnectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const reconnectAttemptsRef = useRef(0)
   const isConnectingRef = useRef(false)
-  const pingCleanupRef = useRef<PingCleanup | null>(null)
 
   const connectTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const didConnectTimeoutRef = useRef(false)
-  const CONNECT_TIMEOUT_MS = 10_000
 
   const hadSocketBeforeRef = useRef(false)
   const justReconnectedRef = useRef(false)
+
+  // Last sync token seen per address book path
+  const syncTokensRef = useRef<Map<string, string>>(new Map())
 
   const isAuthenticated = useAppSelector(state =>
     Boolean(state.user.userData && state.user.tokens)
   )
   const isAuthenticatedRef = useRef(isAuthenticated)
 
+  // shallowEqual: don't re-render when contacts load/paginate but the set of
+  // books is unchanged
+
   const [isSocketOpen, setIsSocketOpen] = useState(false)
   const [shouldConnect, setShouldConnect] = useState(false)
 
-  const onMessage = useCallback((message: unknown) => console.info(message), [])
+  const onMessage = useCallback(
+    (message: unknown) => parseMessage(message, syncTokensRef),
+    [dispatch]
+  )
 
   const { scheduleReconnect, clearReconnectTimeout } = useWebSocketReconnect(
     reconnectTimeoutRef,
@@ -70,13 +82,28 @@ export function WebSocketGate(): JSX.Element | null {
   }, [])
 
   const callBacks = useMemo(
-    () => ({
-      onMessage,
-      onClose,
-      onError
-    }),
+    () => ({ onMessage, onClose, onError }),
     [onMessage, onClose, onError]
   )
+
+  const clearConnectTimeout = useCallback((): void => {
+    if (connectTimeoutRef.current) {
+      clearTimeout(connectTimeoutRef.current)
+      connectTimeoutRef.current = null
+    }
+  }, [])
+
+  const teardown = useCallback((): void => {
+    clearConnectTimeout()
+    closeWebSocketConnection(socketRef, setIsSocketOpen)
+    clearReconnectTimeout()
+  }, [clearConnectTimeout, clearReconnectTimeout])
+
+  const triggerReconnect = useCallback((): void => {
+    reconnectAttemptsRef.current = 0
+    clearReconnectTimeout()
+    setShouldConnect(prev => !prev)
+  }, [clearReconnectTimeout])
 
   useEffect(() => {
     isAuthenticatedRef.current = isAuthenticated
@@ -84,43 +111,30 @@ export function WebSocketGate(): JSX.Element | null {
 
   // Reset reconnection state on successful connection and mark for calendar re-sync
   useEffect(() => {
-    if (isSocketOpen) {
-      if (connectTimeoutRef.current) {
-        clearTimeout(connectTimeoutRef.current)
-        connectTimeoutRef.current = null
-      }
+    if (!isSocketOpen) return
 
-      // Reset timeout marker on successful connection
-      didConnectTimeoutRef.current = false
+    clearConnectTimeout()
 
-      if (hadSocketBeforeRef.current) {
-        justReconnectedRef.current = true
-      }
+    // Reset timeout marker on successful connection
+    didConnectTimeoutRef.current = false
 
-      hadSocketBeforeRef.current = true
-      reconnectAttemptsRef.current = 0
-
-      clearReconnectTimeout()
+    if (hadSocketBeforeRef.current) {
+      justReconnectedRef.current = true
     }
-  }, [isSocketOpen, clearReconnectTimeout])
+
+    hadSocketBeforeRef.current = true
+    reconnectAttemptsRef.current = 0
+
+    clearReconnectTimeout()
+  }, [isSocketOpen, clearConnectTimeout, clearReconnectTimeout])
 
   // Manage WebSocket connection
   useEffect(() => {
     const abortController = new AbortController()
 
-    const cleanup = (): void => {
-      if (connectTimeoutRef.current) {
-        clearTimeout(connectTimeoutRef.current)
-        connectTimeoutRef.current = null
-      }
-      closeWebSocketConnection(socketRef, setIsSocketOpen)
-      clearReconnectTimeout()
-    }
-
     if (!isAuthenticated) {
-      cleanup()
+      teardown()
       reconnectAttemptsRef.current = 0
-
       hadSocketBeforeRef.current = false
       return
     }
@@ -130,6 +144,7 @@ export function WebSocketGate(): JSX.Element | null {
       isConnectingRef.current = true
       setWebSocketConnecting(true)
       didConnectTimeoutRef.current = false
+
       connectTimeoutRef.current = setTimeout(() => {
         console.warn('WebSocket connection attempt timed out')
 
@@ -138,7 +153,7 @@ export function WebSocketGate(): JSX.Element | null {
         connectTimeoutRef.current = null
         isConnectingRef.current = false
         setWebSocketConnecting(false)
-        cleanup()
+        teardown()
 
         scheduleReconnect()
       }, CONNECT_TIMEOUT_MS)
@@ -155,10 +170,7 @@ export function WebSocketGate(): JSX.Element | null {
       } catch (err) {
         console.warn('WebSocket establishment failed:', err)
 
-        if (connectTimeoutRef.current) {
-          clearTimeout(connectTimeoutRef.current)
-          connectTimeoutRef.current = null
-        }
+        clearConnectTimeout()
 
         // Only schedule reconnect if the timeout handler hasn't already done so
         if (!didConnectTimeoutRef.current) {
@@ -174,13 +186,16 @@ export function WebSocketGate(): JSX.Element | null {
 
     return (): void => {
       abortController.abort()
-      cleanup()
+      teardown()
     }
+    // isSocketOpen is intentionally omitted: adding it would tear down the
+    // socket as soon as it opens.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     isAuthenticated,
     callBacks,
-    clearReconnectTimeout,
+    teardown,
+    clearConnectTimeout,
     shouldConnect,
     scheduleReconnect
   ])
@@ -188,25 +203,9 @@ export function WebSocketGate(): JSX.Element | null {
   // Handle browser online/offline events
   useEffect(() => {
     const handleOnline = (): void => {
-      if (!isSocketOpen && isAuthenticatedRef.current) {
-        reconnectAttemptsRef.current = 0
-        clearReconnectTimeout()
-        setShouldConnect(prev => !prev)
-      }
+      if (!isSocketOpen && isAuthenticatedRef.current) triggerReconnect()
     }
-
-    const handleOffline = (): void => {
-      cleanupConnection()
-    }
-
-    const cleanupConnection = (): void => {
-      closeWebSocketConnection(socketRef, setIsSocketOpen)
-      clearReconnectTimeout()
-      if (connectTimeoutRef.current) {
-        clearTimeout(connectTimeoutRef.current)
-        connectTimeoutRef.current = null
-      }
-    }
+    const handleOffline = teardown
 
     window.addEventListener('online', handleOnline)
     window.addEventListener('offline', handleOffline)
@@ -215,49 +214,27 @@ export function WebSocketGate(): JSX.Element | null {
       window.removeEventListener('online', handleOnline)
       window.removeEventListener('offline', handleOffline)
     }
-  }, [isSocketOpen, isAuthenticated, clearReconnectTimeout])
+  }, [isSocketOpen, triggerReconnect, teardown])
 
+  // Ping monitoring while the socket is open
   useEffect(() => {
-    // Only set up ping if socket is open
-    if (!isSocketOpen || !socketRef.current) {
-      // Clean up existing ping if socket closed
-      if (pingCleanupRef.current) {
-        pingCleanupRef.current.stop()
-        pingCleanupRef.current = null
-      }
-      return
-    }
+    const socket = socketRef.current
+    if (!isSocketOpen || !socket) return
 
-    // Set up ping monitoring
-    const pingCleanup = setupWebSocketPing(socketRef.current, {
+    const ping = setupWebSocketPing(socket, {
       onConnectionDead: () => {
         console.warn('WebSocket connection appears dead (no pong received)')
-
-        // Trigger reconnection
-        if (socketRef.current) {
-          socketRef.current.close()
-        }
+        // Closing triggers onClose, which schedules the reconnection
+        socket.close()
       },
-      onPingFail: () => {
-        console.warn('Failed to send ping')
-      }
+      onPingFail: () => console.warn('Failed to send ping')
     })
 
-    pingCleanupRef.current = pingCleanup
-
-    return (): void => {
-      if (pingCleanupRef.current) {
-        pingCleanupRef.current.stop()
-        pingCleanupRef.current = null
-      }
-    }
+    return (): void => ping.stop()
   }, [isSocketOpen])
 
-  const triggerReconnect = useCallback(() => {
-    reconnectAttemptsRef.current = 0
-    clearReconnectTimeout()
-    setShouldConnect(prev => !prev)
-  }, [clearReconnectTimeout])
+  // Keep server-side address book subscriptions in sync with the store
+  useSyncRegistrations({ socketRef, isSocketOpen, syncTokensRef })
 
   useEffect(() => {
     registerWebSocketState(socketRef, triggerReconnect)
