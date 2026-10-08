@@ -44,7 +44,7 @@ export function WebSocketGate(): JSX.Element | null {
   const [shouldConnect, setShouldConnect] = useState(false)
 
   const onMessage = useCallback(
-    (message: unknown) => parseMessage(message, syncTokensRef),
+    (message: unknown) => parseMessage(message, syncTokensRef, dispatch),
     [dispatch]
   )
 

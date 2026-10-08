@@ -12,6 +12,7 @@ export interface AddressBook {
   canWrite: boolean
   ownerDisplayName?: string
   invitedMembers?: userData[]
+  syncToken?: number
 }
 
 export interface ContactName {
