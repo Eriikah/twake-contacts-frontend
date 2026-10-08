@@ -29,22 +29,16 @@ export function WebSocketGate(): JSX.Element | null {
   const hadSocketBeforeRef = useRef(false)
   const justReconnectedRef = useRef(false)
 
-  // Last sync token seen per address book path
-  const syncTokensRef = useRef<Map<string, string>>(new Map())
-
   const isAuthenticated = useAppSelector(state =>
     Boolean(state.user.userData && state.user.tokens)
   )
   const isAuthenticatedRef = useRef(isAuthenticated)
 
-  // shallowEqual: don't re-render when contacts load/paginate but the set of
-  // books is unchanged
-
   const [isSocketOpen, setIsSocketOpen] = useState(false)
   const [shouldConnect, setShouldConnect] = useState(false)
 
   const onMessage = useCallback(
-    (message: unknown) => parseMessage(message, syncTokensRef, dispatch),
+    (message: unknown) => parseMessage(message, dispatch),
     [dispatch]
   )
 
@@ -61,9 +55,8 @@ export function WebSocketGate(): JSX.Element | null {
       socketRef.current = null
       setIsSocketOpen(false)
 
-      // Only attempt reconnection if it wasn't a normal closure
-      // Code 1000 = normal closure, 1001 = going away (e.g., page unload)
-      if (event.code !== 1000 && event.code !== 1001) {
+      // Only attempt reconnection if it wasn't a normal closure (1000).
+      if (event.code !== 1000) {
         console.warn(
           `WebSocket closed unexpectedly (code: ${event.code}, reason: ${event.reason || 'none'}). ` +
             `Attempting to reconnect...`
@@ -131,8 +124,9 @@ export function WebSocketGate(): JSX.Element | null {
   // Manage WebSocket connection
   useEffect(() => {
     const abortController = new AbortController()
+    const websocketUrl = window.WEBSOCKET_URL
 
-    if (!isAuthenticated) {
+    if (!isAuthenticated || !websocketUrl) {
       teardown()
       reconnectAttemptsRef.current = 0
       hadSocketBeforeRef.current = false
@@ -160,7 +154,7 @@ export function WebSocketGate(): JSX.Element | null {
 
       try {
         await establishWebSocketConnection(
-          window.WEBSOCKET_URL || '',
+          websocketUrl,
           api,
           callBacks,
           socketRef,
@@ -234,7 +228,7 @@ export function WebSocketGate(): JSX.Element | null {
   }, [isSocketOpen])
 
   // Keep server-side address book subscriptions in sync with the store
-  useSyncRegistrations({ socketRef, isSocketOpen, syncTokensRef })
+  useSyncRegistrations({ socketRef, isSocketOpen })
 
   useEffect(() => {
     registerWebSocketState(socketRef, triggerReconnect)

@@ -6,17 +6,22 @@ export interface AddressBookPush {
   >
 }
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null && !Array.isArray(value)
+
 export function parsePush(
   message: unknown
 ): Record<string, AddressBookPush> | null {
+  let raw: unknown = message
   if (typeof message === 'string') {
     try {
-      return JSON.parse(message)
+      raw = JSON.parse(message)
     } catch {
       return null
     }
   }
-  return message && typeof message === 'object'
-    ? (message as Record<string, AddressBookPush>)
-    : null
+  if (!isRecord(raw)) return null
+
+  const entries = Object.entries(raw).filter(([, push]) => isRecord(push))
+  return Object.fromEntries(entries) as Record<string, AddressBookPush>
 }

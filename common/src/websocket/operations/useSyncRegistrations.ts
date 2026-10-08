@@ -5,12 +5,10 @@ import { shallowEqual } from 'react-redux'
 
 export function useSyncRegistrations({
   socketRef,
-  isSocketOpen,
-  syncTokensRef
+  isSocketOpen
 }: {
   socketRef: React.MutableRefObject<WebSocketWithCleanup | null>
   isSocketOpen: boolean
-  syncTokensRef: React.MutableRefObject<Map<string, string>>
 }): void {
   // Paths currently registered on the live socket
   const registeredAddressBooksRef = useRef<Set<string>>(new Set())
@@ -27,9 +25,7 @@ export function useSyncRegistrations({
 
     if (!isSocketOpen || socket?.readyState !== WebSocket.OPEN) {
       // Subscriptions die with the socket: re-register everything on reconnect
-      // and let the first push per book trigger a refetch
       registered.clear()
-      syncTokensRef.current.clear()
       return
     }
 
@@ -39,15 +35,12 @@ export function useSyncRegistrations({
 
     if (toUnregister.length > 0) {
       socket.send(JSON.stringify({ unregister: toUnregister }))
-      toUnregister.forEach(path => {
-        registered.delete(path)
-        syncTokensRef.current.delete(path)
-      })
+      toUnregister.forEach(path => registered.delete(path))
     }
 
     if (toRegister.length > 0) {
       socket.send(JSON.stringify({ register: toRegister }))
       toRegister.forEach(path => registered.add(path))
     }
-  }, [isSocketOpen, addressBookPaths, socketRef, syncTokensRef])
+  }, [isSocketOpen, addressBookPaths, socketRef])
 }
