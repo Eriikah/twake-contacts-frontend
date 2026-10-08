@@ -80,6 +80,14 @@
       "update": "Không thể cập nhật liên hệ",
       "delete": "Không thể xóa liên hệ",
       "forbidden": "Bạn không có quyền chỉnh sửa sổ địa chỉ này"
+    },
+    "addressBook": {
+      "createTitle": "Sổ địa chỉ mới",
+      "nameLabel": "Nhập tên sổ địa chỉ mới",
+      "namePlaceholder": "Tên sổ địa chỉ",
+      "cancel": "Hủy",
+      "save": "Tạo",
+      "createSuccess": "Đã tạo sổ địa chỉ thành công"
     }
   },
   "error": {

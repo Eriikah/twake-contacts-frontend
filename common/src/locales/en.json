@@ -47,6 +47,14 @@
       "newContact": "New contact",
       "invalidEmail": "Invalid email address"
     },
+    "addressBook": {
+      "createTitle": "New address book",
+      "nameLabel": "Enter a new address book name",
+      "namePlaceholder": "Address book name",
+      "cancel": "Cancel",
+      "save": "Create",
+      "createSuccess": "Address book created successfully"
+    },
     "types": {
       "cell": "Mobile",
       "work": "Work",

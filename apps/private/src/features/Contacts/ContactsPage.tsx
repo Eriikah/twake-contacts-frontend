@@ -1,13 +1,20 @@
-import { Alert, Content, Layout, Main } from '@linagora/twake-mui'
+import { Content, Layout, Main, Snackbar, Alert } from '@linagora/twake-mui'
 import { useAppDispatch, useAppSelector } from '@common/app/hooks'
-import { fetchContacts } from '@common/features/Contacts/ContactsSlice'
-import { useEffect } from 'react'
+import {
+  fetchContacts,
+  createAddressBook
+} from '@common/features/Contacts/ContactsSlice'
+import { useEffect, useState } from 'react'
 import { Outlet } from 'react-router'
 import { useI18n } from 'twake-i18n'
 import { ContactsSidebar } from './ContactsSidebar'
 import { ContactSearchBar } from './ContactSearchBar'
+import { CreateAddressBookDialog } from './CreateAddressBookDialog'
 
 export const ContactsPage: React.FC = () => {
+  const [isCreateBookOpen, setIsCreateBookOpen] = useState(false)
+  const [createSuccess, setCreateSuccess] = useState(false)
+  const [isCreating, setIsCreating] = useState(false)
   const { t } = useI18n()
   const dispatch = useAppDispatch()
   const openpaasId = useAppSelector(state => state.user.userData.openpaasId)
@@ -21,7 +28,7 @@ export const ContactsPage: React.FC = () => {
 
   return (
     <Layout withTopBar={false}>
-      <ContactsSidebar />
+      <ContactsSidebar onOpenCreateBook={() => setIsCreateBookOpen(true)} />
       <Main>
         <Content className="u-p-1">
           <ContactSearchBar />
@@ -29,6 +36,45 @@ export const ContactsPage: React.FC = () => {
           <Outlet />
         </Content>
       </Main>
+      {isCreateBookOpen && (
+        <CreateAddressBookDialog
+          isCreating={isCreating}
+          onClose={() => setIsCreateBookOpen(false)}
+          onConfirm={name => {
+            if (isCreating) return
+            setIsCreating(true)
+            const create = async (): Promise<void> => {
+              if (openpaasId) {
+                try {
+                  await dispatch(
+                    createAddressBook({ userId: openpaasId, name })
+                  ).unwrap()
+                  setCreateSuccess(true)
+                } catch {
+                  // error is surfaced by the contacts slice
+                } finally {
+                  setIsCreating(false)
+                  setIsCreateBookOpen(false)
+                }
+              } else {
+                setIsCreating(false)
+                setIsCreateBookOpen(false)
+              }
+            }
+            void create()
+          }}
+        />
+      )}
+      <Snackbar
+        open={createSuccess}
+        autoHideDuration={6000}
+        onClose={() => setCreateSuccess(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success" onClose={() => setCreateSuccess(false)}>
+          {t('contacts.addressBook.createSuccess')}
+        </Alert>
+      </Snackbar>
     </Layout>
   )
 }

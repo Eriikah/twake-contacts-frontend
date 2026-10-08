@@ -69,7 +69,7 @@ export const fetchContactsThunk = (create: ReducerCreators<ContactsState>) =>
       },
       fulfilled: (state, action) => {
         state.loading = false
-        state.addressBooks = action.payload
+        state.addressBooks = { ...state.addressBooks, ...action.payload }
       },
       rejected: (state, action) => {
         state.loading = false

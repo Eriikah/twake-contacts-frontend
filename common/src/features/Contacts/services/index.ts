@@ -1,4 +1,5 @@
 export * from './createContactAsync'
+export * from './createAddressBookAsync'
 export * from './deleteContactAsync'
 export * from './moveContactAsync'
 export * from './updateContactAsync'

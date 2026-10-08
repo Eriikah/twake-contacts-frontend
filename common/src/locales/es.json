@@ -80,6 +80,14 @@
       "update": "No se ha podido actualizar el contacto",
       "delete": "No se ha podido eliminar el contacto",
       "forbidden": "No tiene permiso para modificar esta libreta de direcciones"
+    },
+    "addressBook": {
+      "createTitle": "Nueva libreta de direcciones",
+      "nameLabel": "Introduzca un nuevo nombre para la libreta de direcciones",
+      "namePlaceholder": "Nombre de la libreta de direcciones",
+      "cancel": "Cancelar",
+      "save": "Crear",
+      "createSuccess": "Libreta de direcciones creada exitosamente"
     }
   },
   "error": {

@@ -126,7 +126,10 @@ describe('ContactsSidebar', () => {
 
     const items = [
       screen.getByRole('link', { name: en.contacts.create }).textContent,
-      ...screen.getAllByRole('button').map(btn => btn.textContent)
+      ...screen
+        .getAllByRole('button')
+        .map(btn => btn.textContent)
+        .filter(Boolean)
     ]
 
     expect(items).toEqual([

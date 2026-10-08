@@ -262,3 +262,30 @@ export async function searchContacts(
       : []
   })
 }
+
+export async function createAddressBook(
+  userId: string,
+  name: string
+): Promise<AddressBook> {
+  const id = crypto.randomUUID()
+  await api.post(`dav/addressbooks/${userId}.json`, {
+    headers: {
+      Accept: 'application/vcard+json'
+    },
+    json: {
+      id,
+      'dav:name': name,
+      'dav:acl': ['dav:read', 'dav:write'],
+      type: 'user'
+    }
+  })
+
+  return {
+    id,
+    userId,
+    name,
+    contactsCount: 0,
+    acl: ['dav:read', 'dav:write'],
+    canWrite: true
+  }
+}
