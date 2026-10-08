@@ -80,6 +80,14 @@
       "update": "Échec de la modification du contact",
       "delete": "Échec de la suppression du contact",
       "forbidden": "Vous n'avez pas le droit de modifier ce carnet d'adresses"
+    },
+    "addressBook": {
+      "createTitle": "Nouveau carnet d'adresses",
+      "nameLabel": "Entrez un nouveau nom de carnet d'adresses",
+      "namePlaceholder": "Nom du carnet d'adresses",
+      "cancel": "Annuler",
+      "save": "Créer",
+      "createSuccess": "Carnet d'adresses créé avec succès"
     }
   },
   "error": {

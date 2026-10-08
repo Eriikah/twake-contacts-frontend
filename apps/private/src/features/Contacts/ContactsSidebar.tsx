@@ -16,7 +16,8 @@ import {
   Sidebar,
   Button,
   Tooltip,
-  NavDropdown
+  NavDropdown,
+  IconButton
 } from '@linagora/twake-mui'
 import { Link, useNavigate, useParams } from 'react-router'
 import { useI18n } from 'twake-i18n'
@@ -27,7 +28,33 @@ import {
   AddressBookWithContacts
 } from '@common/features/Contacts/contactsTypes'
 
-export const ContactsSidebar: React.FC = () => {
+interface ContactsSidebarProps {
+  onOpenCreateBook: () => void
+}
+
+const CreateAddressBookButton: React.FC<{ onClick: () => void }> = ({
+  onClick
+}) => {
+  const { t } = useI18n()
+  return (
+    <Tooltip title={t('contacts.addressBook.createTitle')}>
+      <IconButton
+        size="xsmall"
+        aria-label={t('contacts.addressBook.createTitle')}
+        onClick={e => {
+          e.stopPropagation()
+          onClick()
+        }}
+      >
+        <Icon icon={Plus} size={14} />
+      </IconButton>
+    </Tooltip>
+  )
+}
+
+export const ContactsSidebar: React.FC<ContactsSidebarProps> = ({
+  onOpenCreateBook
+}) => {
   const [isMyContactsExpanded, setIsMyContactsExpanded] = useState(true)
   const { t } = useI18n()
   const { addressBookId } = useParams()
@@ -69,7 +96,11 @@ export const ContactsSidebar: React.FC = () => {
       </Box>
       <Box className="u-flex-auto u-ov-auto u-mt-1-half">
         <Nav className="u-mv-0">
-          <NavItem>
+          <NavItem
+            secondaryAction={
+              <CreateAddressBookButton onClick={onOpenCreateBook} />
+            }
+          >
             {otherBooks.length === 0 ? (
               <NavLink
                 selected={addressBookId === undefined}

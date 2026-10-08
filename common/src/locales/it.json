@@ -80,6 +80,14 @@
       "update": "Impossibile aggiornare il contatto",
       "delete": "Impossibile eliminare il contatto",
       "forbidden": "Non hai i permessi per modificare questa rubrica"
+    },
+    "addressBook": {
+      "createTitle": "Nuova rubrica",
+      "nameLabel": "Inserisci un nuovo nome per la rubrica",
+      "namePlaceholder": "Nome della rubrica",
+      "cancel": "Annulla",
+      "save": "Crea",
+      "createSuccess": "Rubrica creata con successo"
     }
   },
   "error": {

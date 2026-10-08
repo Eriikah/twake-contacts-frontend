@@ -80,6 +80,14 @@
       "update": "Kontakt konnte nicht aktualisiert werden",
       "delete": "Kontakt konnte nicht gelöscht werden",
       "forbidden": "Sie haben keine Berechtigung, dieses Adressbuch zu ändern"
+    },
+    "addressBook": {
+      "createTitle": "Neues Adressbuch",
+      "nameLabel": "Geben Sie einen neuen Adressbuchnamen ein",
+      "namePlaceholder": "Adressbuchname",
+      "cancel": "Abbrechen",
+      "save": "Erstellen",
+      "createSuccess": "Adressbuch erfolgreich erstellt"
     }
   },
   "error": {
