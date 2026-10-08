@@ -98,6 +98,10 @@
   "common": {
     "ok": "OK"
   },
+  "theme": {
+    "darkMode": "Dunkelmodus",
+    "lightMode": "Hellmodus"
+  },
   "mobile": {
     "comingSoon": {
       "title": "Mobile Version in Kürze verfügbar",

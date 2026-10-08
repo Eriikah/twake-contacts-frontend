@@ -98,6 +98,10 @@
   "common": {
     "ok": "Ok"
   },
+  "theme": {
+    "darkMode": "Dark mode",
+    "lightMode": "Light mode"
+  },
   "mobile": {
     "comingSoon": {
       "title": "Mobile version coming soon",

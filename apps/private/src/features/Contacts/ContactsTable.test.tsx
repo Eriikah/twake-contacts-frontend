@@ -1,7 +1,7 @@
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { MemoryRouter, Route, Routes } from 'react-router'
-import { VirtuosoMockContext } from '@linagora/twake-mui'
+import { TwakeMuiThemeProvider, VirtuosoMockContext } from '@linagora/twake-mui'
 import I18n from 'twake-i18n'
 import { setupStore } from '@common/app/store'
 import { ContactEntry } from '@common/features/Contacts/contactsTypes'
@@ -25,26 +25,29 @@ const renderTable = (): ReturnType<typeof render> =>
         user: { userData: { openpaasId: 'u1' } } as UserState
       })}
     >
-      <I18n dictRequire={() => en} lang="en">
-        <VirtuosoMockContext.Provider
-          value={{ viewportHeight: 1000, itemHeight: 50 }}
-        >
-          <MemoryRouter initialEntries={['/contacts/book1']}>
-            <Routes>
-              <Route
-                path="/contacts/:addressBookId"
-                element={
-                  <ContactsTable entries={[jane]} onEndReached={jest.fn()} />
-                }
-              />
-              <Route
-                path="/contacts/:addressBookId/:contactId"
-                element={<div>contact page</div>}
-              />
-            </Routes>
-          </MemoryRouter>
-        </VirtuosoMockContext.Provider>
-      </I18n>
+      {' '}
+      <TwakeMuiThemeProvider>
+        <I18n dictRequire={() => en} lang="en">
+          <VirtuosoMockContext.Provider
+            value={{ viewportHeight: 1000, itemHeight: 50 }}
+          >
+            <MemoryRouter initialEntries={['/contacts/book1']}>
+              <Routes>
+                <Route
+                  path="/contacts/:addressBookId"
+                  element={
+                    <ContactsTable entries={[jane]} onEndReached={jest.fn()} />
+                  }
+                />
+                <Route
+                  path="/contacts/:addressBookId/:contactId"
+                  element={<div>contact page</div>}
+                />
+              </Routes>
+            </MemoryRouter>
+          </VirtuosoMockContext.Provider>
+        </I18n>
+      </TwakeMuiThemeProvider>
     </Provider>
   )
 
