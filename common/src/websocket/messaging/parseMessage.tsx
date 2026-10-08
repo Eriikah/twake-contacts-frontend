@@ -1,15 +1,10 @@
-import { MutableRefObject } from 'react'
 import { AddressBookPush, parsePush } from './parsePush'
 import { fetchUpdatedContacts } from '@common/features/Contacts/ContactsSlice'
 import { AppDispatch } from '@common/app/store'
 
 export const ADDRESSBOOK_PATH = /^\/addressbooks\/([^/]+)\/([^/]+)$/
 
-export function parseMessage(
-  message: unknown,
-  syncTokensRef: MutableRefObject<Map<string, string>>,
-  dispatch: AppDispatch
-): void {
+export function parseMessage(message: unknown, dispatch: AppDispatch): void {
   const payload = parsePush(message)
   if (!payload) {
     console.info(message)
@@ -24,8 +19,8 @@ export function parseMessage(
     }
     const [, userId, bookId] = match
 
-    // Contact created/updated/deleted: refetch when the token moved
-    handleBookUpdate({ push, syncTokensRef, path, dispatch, userId, bookId })
+    // Contact created/updated/deleted: refresh the already-loaded contacts
+    handleBookUpdate({ push, dispatch, userId, bookId })
 
     // vCard import result
     handleImportNotification(push, userId, bookId)
@@ -36,45 +31,36 @@ function handleImportNotification(
   push: AddressBookPush,
   userId: string,
   bookId: string
-) {
-  if (push.imports) {
-    for (const [importId, result] of Object.entries(push.imports)) {
-      console.info({
-        userId,
-        bookId,
-        importId,
-        status: result.status,
-        succeedCount: result.succeedCount ?? 0,
-        failedCount: result.failedCount ?? 0
-      })
-    }
+): void {
+  if (typeof push.imports !== 'object' || push.imports === null) return
+
+  for (const [importId, result] of Object.entries(push.imports)) {
+    if (typeof result !== 'object' || result === null) continue
+    console.info({
+      userId,
+      bookId,
+      importId,
+      status: result.status,
+      succeedCount: result.succeedCount ?? 0,
+      failedCount: result.failedCount ?? 0
+    })
   }
 }
 
 function handleBookUpdate({
   push,
-  syncTokensRef,
-  path,
   dispatch,
   userId,
   bookId
 }: {
   push: AddressBookPush
-  syncTokensRef: MutableRefObject<Map<string, string>>
-  path: string
   dispatch: AppDispatch
   userId: string
   bookId: string
-}) {
-  if (push.syncToken === undefined) return
-  if (syncTokensRef.current.get(path) !== push.syncToken) {
-    syncTokensRef.current.set(path, push.syncToken)
-    void dispatch(
-      fetchUpdatedContacts({
-        userId,
-        bookId,
-        newSyncToken: Number(push.syncToken)
-      })
-    )
-  }
+}): void {
+  // A missing or non-numeric token would trigger an invalid refetch
+  const newSyncToken = Number.parseInt(String(push.syncToken), 10)
+  if (!Number.isFinite(newSyncToken)) return
+
+  void dispatch(fetchUpdatedContacts({ userId, bookId, newSyncToken }))
 }
