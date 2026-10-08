@@ -11,7 +11,7 @@ export function useSyncRegistrations({
   socketRef: React.MutableRefObject<WebSocketWithCleanup | null>
   isSocketOpen: boolean
   syncTokensRef: React.MutableRefObject<Map<string, string>>
-}) {
+}): void {
   // Paths currently registered on the live socket
   const registeredAddressBooksRef = useRef<Set<string>>(new Set())
   const addressBookPaths = useAppSelector(
@@ -49,5 +49,5 @@ export function useSyncRegistrations({
       socket.send(JSON.stringify({ register: toRegister }))
       toRegister.forEach(path => registered.add(path))
     }
-  }, [isSocketOpen, addressBookPaths])
+  }, [isSocketOpen, addressBookPaths, socketRef, syncTokensRef])
 }

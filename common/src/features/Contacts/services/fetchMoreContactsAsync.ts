@@ -35,7 +35,7 @@ export const fetchMoreContactsThunk = (
             contacts: [],
             offset: bookWithContacts?.offset || 0,
             hasMore: false,
-            syncToken: 1
+            syncToken: bookWithContacts?.syncToken ?? 1
           }
         }
 
