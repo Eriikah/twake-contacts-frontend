@@ -12,17 +12,31 @@ export const selectBook = createSelector(
   (books, addressBookId) => (addressBookId ? books[addressBookId] : undefined)
 )
 
-export type BookScope = 'mine' | 'shared'
+export type BookScope = 'mine' | 'shared' | 'onlyMine'
 
-const matchesScope = (
+export const matchesScope = (
   book: AddressBook,
   scope?: BookScope,
   userId?: string
-): boolean =>
-  !scope ||
-  (scope === 'shared'
-    ? book.ownerId !== undefined && book.ownerId !== userId && book.id !== 'dab'
-    : true)
+): boolean => {
+  switch (scope) {
+    case 'shared':
+      return (
+        book.ownerId !== undefined &&
+        book.ownerId !== userId &&
+        book.id !== 'dab'
+      )
+    case 'onlyMine':
+      return (
+        (book.ownerId === undefined || book.ownerId === userId) &&
+        book.id !== 'dab'
+      )
+
+    default:
+      return true
+  }
+}
+
 export const selectContactEntries = createSelector(
   [
     selectAddressBooks,
