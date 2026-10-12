@@ -99,6 +99,9 @@
   "common": {
     "ok": "OK"
   },
+  "ContactPopover": {
+    "emailButton": "E-Mail senden"
+  },
   "theme": {
     "darkMode": "Dunkelmodus",
     "lightMode": "Hellmodus"

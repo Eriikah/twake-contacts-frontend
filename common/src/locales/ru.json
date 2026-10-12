@@ -99,6 +99,9 @@
   "common": {
     "ok": "Ок"
   },
+  "ContactPopover": {
+    "emailButton": "Отправить письмо"
+  },
   "theme": {
     "darkMode": "Тёмный режим",
     "lightMode": "Светлый режим"

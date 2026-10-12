@@ -99,6 +99,9 @@
   "common": {
     "ok": "Aceptar"
   },
+  "ContactPopover": {
+    "emailButton": "Enviar correo"
+  },
   "theme": {
     "darkMode": "Modo oscuro",
     "lightMode": "Modo claro"

@@ -62,7 +62,7 @@
       "edit": "Modifier",
       "delete": "Supprimer",
       "chat": "Discuter",
-      "mail": "Envoyer un email",
+      "mail": "Envoyer un e-mail",
       "schedule": "Planifier"
     },
     "delete": {
@@ -98,6 +98,9 @@
   },
   "common": {
     "ok": "OK"
+  },
+  "ContactPopover": {
+    "emailButton": "Envoyer un e-mail"
   },
   "theme": {
     "darkMode": "Mode sombre",
