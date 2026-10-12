@@ -42,6 +42,7 @@ import { useI18n } from 'twake-i18n'
 import { ContactActionsMenu } from './ContactActionsMenu'
 import { AvatarHeader } from './ContactForm/fields/AvatarHeader'
 import { ContactDetailsSkeleton } from './ContactSkeletons'
+import { useContact } from './useContact'
 
 interface ContactFieldProps {
   icon: React.ComponentType
@@ -148,13 +149,10 @@ export const ContactPage: React.FC = () => {
   const { t } = useI18n()
   const navigate = useNavigate()
   const { addressBookId = '', contactId } = useParams()
-  const contact = useAppSelector(
-    state => state.contacts.addressBooks[addressBookId]?.contacts
-  )?.find(c => c.id === contactId)
+  const { contact, loading } = useContact(addressBookId, contactId)
   const workplaceFqdn = useAppSelector(
     state => state.user.userData?.workplaceFqdn
   )
-  const loading = useAppSelector(state => state.contacts.loading)
   const handleDeleted = (): void =>
     void navigate(
       isHiddenAddressBook(addressBookId)

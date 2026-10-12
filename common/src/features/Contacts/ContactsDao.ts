@@ -6,7 +6,8 @@ import { AddressBook, Contact, ContactEntry } from './contactsTypes'
 import {
   DavAddressBookItem,
   DavAddressBooksResponse,
-  DavContactsResponse
+  DavContactsResponse,
+  JCalCard
 } from './davTypes'
 import {
   denormalizeContact,
@@ -156,6 +157,27 @@ export async function fetchContactsForBook(
   const hasMore = data._links?.next?.href !== undefined
 
   return { contacts, hasMore }
+}
+
+export async function fetchContact(
+  book: AddressBook,
+  contactId: string
+): Promise<Contact> {
+  const bookPath =
+    book.id === 'dab'
+      ? `dav/addressbooks/${book.userId}/domain-members`
+      : `dav/addressbooks/${book.userId}/${book.id}`
+  const href = `${bookPath}/${encodeDavSegment(contactId)}.vcf`
+
+  const data: JCalCard = await api
+    .get(href, { headers: { Accept: 'application/vcard+json' } })
+    .json()
+
+  // the route id is the one to look the contact up with, not its encoded form
+  return {
+    ...normalizeContact({ _links: { self: { href } }, data }),
+    id: contactId
+  }
 }
 
 export async function saveContact(

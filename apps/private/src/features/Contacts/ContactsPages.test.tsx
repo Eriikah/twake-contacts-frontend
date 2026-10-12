@@ -1,4 +1,5 @@
 import { setupStore } from '@common/app/store'
+import { fetchContact } from '@common/features/Contacts/ContactsDao'
 import { DEFAULT_ADDRESS_BOOK_ID } from '@common/features/Contacts/constants'
 import { UserState } from '@common/features/User/UserSlice'
 import en from '@common/locales/en.json'
@@ -9,6 +10,11 @@ import { VirtuosoMockContext } from '@linagora/twake-mui'
 import I18n from 'twake-i18n'
 import { AddressBookPage } from './AddressBookPage'
 import { ContactPage } from './ContactPage'
+
+jest.mock('@common/features/Contacts/ContactsDao', () => ({
+  ...jest.requireActual('@common/features/Contacts/ContactsDao'),
+  fetchContact: jest.fn()
+}))
 
 const renderContacts = (path: string): ReturnType<typeof render> =>
   render(
@@ -228,10 +234,37 @@ describe('ContactPage', () => {
     )
   })
 
-  it('shows a not found message for an unknown contact', () => {
+  it('shows a not found message for an unknown contact', async () => {
+    jest.mocked(fetchContact).mockRejectedValue(new Error('Not found'))
+
     renderContacts('/contacts/book1/unknown')
 
-    expect(screen.getByText('Contact not found')).toBeInTheDocument()
+    expect(await screen.findByText('Contact not found')).toBeInTheDocument()
+  })
+
+  it('fetches a contact that is not in the loaded pages of its book', async () => {
+    jest.mocked(fetchContact).mockResolvedValue({
+      id: 'c60',
+      displayName: 'Search Own',
+      emails: [{ type: 'work', value: 'own@twake.app' }]
+    })
+
+    renderContacts('/contacts/book1/c60')
+
+    expect(await screen.findByText('own@twake.app')).toBeInTheDocument()
+    expect(screen.queryByText('Contact not found')).not.toBeInTheDocument()
+    expect(fetchContact).toHaveBeenCalledWith(
+      expect.objectContaining({ id: 'book1' }),
+      'c60'
+    )
+  })
+
+  it('does not fetch a contact already loaded', () => {
+    jest.mocked(fetchContact).mockClear()
+
+    renderContacts('/contacts/book1/c1')
+
+    expect(fetchContact).not.toHaveBeenCalled()
   })
 
   it('does not render a categories row for a contact without categories', () => {

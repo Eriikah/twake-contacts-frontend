@@ -17,6 +17,7 @@ import {
   makeFormValuesFromContact
 } from './ContactForm'
 import { ContactFormSkeleton } from './ContactSkeletons'
+import { useContact } from './useContact'
 
 export const EditContactPage: React.FC = () => {
   const { t } = useI18n()
@@ -33,12 +34,7 @@ export const EditContactPage: React.FC = () => {
       ? [...allWritableBooks, currentBook]
       : allWritableBooks
   const writableBooks = formBooks.filter(book => book.id !== 'dab')
-  const contact = useAppSelector(state =>
-    state.contacts.addressBooks[addressBookId]?.contacts.find(
-      c => c.id === contactId
-    )
-  )
-  const loading = useAppSelector(state => state.contacts.loading)
+  const { contact, loading } = useContact(addressBookId, contactId)
 
   if (addressBookId === 'dab') {
     return <Navigate to={`/contacts/${addressBookId}/${contactId}`} replace />

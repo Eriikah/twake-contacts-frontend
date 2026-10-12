@@ -6,8 +6,12 @@ import {
   getCardProperty,
   normalizeContact
 } from './transformer/ContactsTransformer'
+import { api } from '@common/utils/apiUtils'
+import { fetchContact } from './ContactsDao'
 import { formatAddress } from './contactsUtils'
 import { DavContactItem, DavContactsResponse, JCalCard } from './davTypes'
+
+jest.mock('@common/utils/apiUtils', () => ({ api: { get: jest.fn() } }))
 
 /**
  * Synthetic data mirroring the shape of a real
@@ -393,5 +397,55 @@ describe('formatAddress', () => {
         country: 'France'
       })
     ).toBe('Building B, 10 Avenue des Champs, 75008 Paris, France')
+  })
+})
+
+describe('fetchContact', () => {
+  const card: JCalCard = [
+    'vcard',
+    [
+      ['version', {}, 'text', '4.0'],
+      ['fn', {}, 'text', 'Search Own'],
+      ['email', { type: 'work' }, 'text', 'own@twake.app']
+    ]
+  ]
+  const book = {
+    userId: 'bob',
+    name: 'My contacts',
+    contactsCount: 60,
+    acl: [],
+    canWrite: true
+  }
+
+  beforeEach(() => {
+    jest.mocked(api.get).mockReset()
+    jest.mocked(api.get).mockReturnValue({
+      json: () => Promise.resolve(card)
+    } as unknown as ReturnType<typeof api.get>)
+  })
+
+  it('reads the single vCard of the contact as jCard', async () => {
+    const contact = await fetchContact({ ...book, id: 'contacts' }, 'c60')
+
+    expect(api.get).toHaveBeenCalledWith(
+      'dav/addressbooks/bob/contacts/c60.vcf',
+      { headers: { Accept: 'application/vcard+json' } }
+    )
+    expect(contact).toEqual(
+      expect.objectContaining({
+        id: 'c60',
+        displayName: 'Search Own',
+        emails: [{ type: 'work', value: 'own@twake.app' }]
+      })
+    )
+  })
+
+  it('reads a domain member from the domain members book', async () => {
+    await fetchContact({ ...book, id: 'dab', userId: 'domain-1' }, 'm1')
+
+    expect(api.get).toHaveBeenCalledWith(
+      'dav/addressbooks/domain-1/domain-members/m1.vcf',
+      expect.anything()
+    )
   })
 })

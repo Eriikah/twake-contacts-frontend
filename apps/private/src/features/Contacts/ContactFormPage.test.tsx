@@ -1,6 +1,7 @@
 import { setupStore } from '@common/app/store'
 import { DEFAULT_ADDRESS_BOOK_ID } from '@common/features/Contacts/constants'
 import {
+  fetchContact,
   moveContact as moveContactDao,
   saveContact
 } from '@common/features/Contacts/ContactsDao'
@@ -238,16 +239,34 @@ describe('EditContactPage', () => {
     ).toBeInTheDocument()
   })
 
-  it('shows not found for missing contact', () => {
+  it('shows not found for missing contact', async () => {
+    jest.mocked(fetchContact).mockRejectedValue(new Error('Not found'))
+
     renderPage(['/contacts/book1/missing/edit'])
 
-    expect(screen.getByText('Contact not found')).toBeInTheDocument()
+    expect(await screen.findByText('Contact not found')).toBeInTheDocument()
   })
 
-  it('links back to main page for hidden address books when contact not found', () => {
+  it('fetches a contact that is not in the loaded pages of its book', async () => {
+    jest.mocked(fetchContact).mockResolvedValue({
+      id: 'c60',
+      displayName: 'Search Own',
+      name: { givenName: 'Search', familyName: 'Own' },
+      emails: []
+    })
+
+    renderPage(['/contacts/book1/c60/edit'])
+
+    expect(await screen.findByLabelText('First name')).toHaveValue('Search')
+    expect(screen.getByLabelText('Last name')).toHaveValue('Own')
+  })
+
+  it('links back to main page for hidden address books when contact not found', async () => {
+    jest.mocked(fetchContact).mockRejectedValue(new Error('Not found'))
+
     renderPage(['/contacts/contacts/missing/edit'])
 
-    expect(screen.getByRole('link', { name: /back/i })).toHaveAttribute(
+    expect(await screen.findByRole('link', { name: /back/i })).toHaveAttribute(
       'href',
       '/contacts'
     )

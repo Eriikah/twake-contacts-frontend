@@ -4,6 +4,7 @@ import { Contact, ContactsState } from './contactsTypes'
 import {
   createContactThunk,
   deleteContactThunk,
+  fetchContactThunk,
   fetchContactsThunk,
   fetchMoreContactsThunk,
   moveContactThunk,
@@ -38,6 +39,7 @@ const ContactsSlice = createAppSlice({
         }
       }
     ),
+    fetchContact: fetchContactThunk(create),
     fetchContacts: fetchContactsThunk(create),
     fetchMoreContacts: fetchMoreContactsThunk(create),
     createContact: createContactThunk(create),
@@ -53,6 +55,7 @@ export const {
   clearContactsError,
   createContact,
   deleteContact,
+  fetchContact,
   fetchContacts,
   fetchMoreContacts,
   moveContact,
