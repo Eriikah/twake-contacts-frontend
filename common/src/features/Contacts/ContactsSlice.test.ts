@@ -22,6 +22,17 @@ import {
 jest.mock('./ContactsDao')
 
 describe('fetchContacts', () => {
+  it('is loading until the address books are fetched', async () => {
+    jest.mocked(fetchAddressBooks).mockResolvedValue([])
+    const store = setupStore()
+
+    expect(store.getState().contacts.loading).toBe(true)
+
+    await store.dispatch(fetchContacts({ userId: 'bob' }))
+
+    expect(store.getState().contacts.loading).toBe(false)
+  })
+
   it('loads the contacts of a shared book whose count is unknown', async () => {
     jest.mocked(fetchAddressBooks).mockResolvedValue([
       {

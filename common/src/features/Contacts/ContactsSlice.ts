@@ -14,7 +14,8 @@ import {
 
 const initialState: ContactsState = {
   addressBooks: {},
-  loading: false,
+  // address books are not loaded yet: pages show skeletons, not empty states
+  loading: true,
   error: null
 }
 

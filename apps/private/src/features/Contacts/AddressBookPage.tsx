@@ -61,7 +61,7 @@ export const AddressBookPage: React.FC = () => {
     if (entries.length === 0) loadMore()
   }, [entries.length, loadMore])
 
-  if (addressBookId && !book) {
+  if (addressBookId && !book && !loading) {
     return (
       <Stack spacing={3}>
         <Button
