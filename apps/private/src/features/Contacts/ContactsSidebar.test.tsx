@@ -142,4 +142,23 @@ describe('ContactsSidebar', () => {
       'zeta'
     ])
   })
+
+  it('truncates long address book names with a trailing ellipsis', () => {
+    const longName =
+      'Customers and suppliers of the northern regional office 2026'
+    renderSidebar(
+      '/contacts',
+      Object.fromEntries(
+        [
+          makeBook(DEFAULT_ADDRESS_BOOK_ID, 'My contacts'),
+          makeBook('long', longName)
+        ].map(book => [book.id, book])
+      )
+    )
+
+    const label = screen.getByText(longName)
+
+    expect(label).toHaveClass('u-ellipsis', 'u-db')
+    expect(label.closest('.u-midellipsis')).toBeNull()
+  })
 })

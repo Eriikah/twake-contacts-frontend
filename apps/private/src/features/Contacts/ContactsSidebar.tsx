@@ -137,11 +137,10 @@ export const ContactsSidebar: React.FC<ContactsSidebarProps> = ({
                 >
                   <NavIcon icon={Peoples} />
                   <Tooltip title={getAddressBookDisplayName(book, t)}>
-                    <NavText
-                      className="u-midellipsis"
-                      secondaryText={book.ownerDisplayName}
-                    >
-                      {getAddressBookDisplayName(book, t)}
+                    <NavText secondaryText={book.ownerDisplayName}>
+                      <span className="u-ellipsis u-db">
+                        {getAddressBookDisplayName(book, t)}
+                      </span>
                     </NavText>
                   </Tooltip>
                 </NavLink>
@@ -158,7 +157,7 @@ export const ContactsSidebar: React.FC<ContactsSidebarProps> = ({
               >
                 <NavIcon icon={Company} />
                 <NavText>
-                  <span className="u-ellipsis">
+                  <span className="u-ellipsis u-db">
                     {getAddressBookDisplayName(book, t)}
                   </span>
                 </NavText>
