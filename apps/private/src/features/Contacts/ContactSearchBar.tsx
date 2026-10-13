@@ -5,17 +5,11 @@ import {
   searchContacts
 } from '@common/features/Contacts/ContactsDao'
 import { Contact, ContactEntry } from '@common/features/Contacts/contactsTypes'
-import {
-  Autocomplete,
-  Avatar,
-  ListItem,
-  SearchBar,
-  Stack
-} from '@linagora/twake-mui'
+import { Autocomplete, ListItem, SearchBar, Stack } from '@linagora/twake-mui'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useI18n } from 'twake-i18n'
-import { getInitials } from './getInitials'
+import { ContactAvatar } from './ContactAvatar'
 
 interface SearchOption {
   contact: Contact
@@ -134,7 +128,7 @@ export const ContactSearchBar: React.FC = () => {
       renderOption={(props, option) => (
         <ListItem {...props} key={option.contact.id}>
           <Stack direction="row" spacing={1}>
-            <Avatar size="s">{getInitials(option.contact.displayName)}</Avatar>
+            <ContactAvatar size="s" displayName={option.contact.displayName} />
             <span>{option.label}</span>
           </Stack>
         </ListItem>

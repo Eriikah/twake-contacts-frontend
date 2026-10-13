@@ -1,5 +1,4 @@
 import {
-  Avatar,
   Button,
   Dialog,
   DialogActions,
@@ -16,7 +15,7 @@ import {
 import { Cross, Icon } from '@linagora/twake-icons'
 import { Contact } from '@common/features/Contacts/contactsTypes'
 import { useI18n } from 'twake-i18n'
-import { getInitials } from './getInitials'
+import { ContactAvatar } from './ContactAvatar'
 
 interface DeleteContactDialogProps {
   contact: Contact
@@ -57,9 +56,11 @@ export const DeleteContactDialog: React.FC<DeleteContactDialogProps> = ({
           <Paper variant="outlined">
             <ListItem>
               <ListItemAvatar>
-                <Avatar size="s" src={contact.photo}>
-                  {getInitials(contact.displayName)}
-                </Avatar>
+                <ContactAvatar
+                  size="s"
+                  src={contact.photo}
+                  displayName={contact.displayName}
+                />
               </ListItemAvatar>
               <ListItemText
                 primary={contact.displayName}

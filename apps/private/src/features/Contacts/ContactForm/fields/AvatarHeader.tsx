@@ -1,5 +1,5 @@
-import { Stack, Typography, Avatar, Tooltip } from '@linagora/twake-mui'
-import { getInitials } from '../../getInitials'
+import { Stack, Typography, Tooltip } from '@linagora/twake-mui'
+import { ContactAvatar } from '../../ContactAvatar'
 
 interface AvatarHeaderProps {
   displayName: string
@@ -12,9 +12,7 @@ export const AvatarHeader: React.FC<AvatarHeaderProps> = ({
 }) => {
   return (
     <Stack direction="row" spacing={2} className="u-flex u-flex-items-center">
-      <Avatar size={94} color={displayName ? undefined : 'sunrise'}>
-        {getInitials(displayName)}
-      </Avatar>
+      <ContactAvatar size={94} displayName={displayName} />
       <Tooltip title={displayName || title || ''}>
         <Typography variant="h4" noWrap>
           {displayName || title || ''}

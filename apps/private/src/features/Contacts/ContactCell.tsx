@@ -1,6 +1,5 @@
 import { ContactEntry } from '@common/features/Contacts/contactsTypes'
 import {
-  Avatar,
   Box,
   Chip,
   ContactPopover,
@@ -19,7 +18,7 @@ import React from 'react'
 import { useI18n } from 'twake-i18n'
 import { useAppSelector } from '@common/app/hooks'
 import { ContactRowActions } from './ContactRowActions'
-import { getInitials } from './getInitials'
+import { ContactAvatar } from './ContactAvatar'
 
 interface ContactCellProps {
   row?: VirtualizedTableRow
@@ -84,7 +83,7 @@ export const ContactCell: React.FC<ContactCellProps> = ({
 
       const nameElement = (
         <Stack direction="row" spacing={2}>
-          <Avatar size="s">{getInitials(contact.displayName)}</Avatar>
+          <ContactAvatar size="s" displayName={contact.displayName} />
           <Typography className="u-maw-6" noWrap>
             {contact.displayName}
           </Typography>
