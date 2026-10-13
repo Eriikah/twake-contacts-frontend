@@ -163,6 +163,14 @@ describe('CreateContactPage', () => {
     expect(screen.getAllByLabelText('Phone')).toHaveLength(2)
   })
 
+  it('gives the type selector room for long translated placeholders', () => {
+    renderPage(['/contacts/new'])
+
+    const typeSelector = screen.getAllByRole('combobox', { name: 'Type' })[0]
+
+    expect(typeSelector.closest('.MuiGrid-grid-xs-3')).not.toBeNull()
+  })
+
   it('adds email entries', () => {
     renderPage(['/contacts/new'])
 

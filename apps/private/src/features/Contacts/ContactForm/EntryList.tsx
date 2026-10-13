@@ -52,7 +52,7 @@ export const EntryList: React.FC<EntryListProps> = ({
     <Stack spacing={3}>
       {entries.map((entry, index) => (
         <FormRow key={index}>
-          <Grid size={showTypeSelector ? 6 : 8}>
+          <Grid size={showTypeSelector ? 5 : 8}>
             <TextField
               fullWidth
               variant="outlined"
@@ -75,7 +75,7 @@ export const EntryList: React.FC<EntryListProps> = ({
             />
           </Grid>
           {showTypeSelector && (
-            <Grid size={2}>
+            <Grid size={3}>
               <Select
                 fullWidth
                 variant="outlined"
