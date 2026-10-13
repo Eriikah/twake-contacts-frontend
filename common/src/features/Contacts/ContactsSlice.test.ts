@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { setupStore } from '@common/app/store'
+import { AppStore, RootState, setupStore } from '@common/app/store'
 import {
   deleteContact as deleteContactDao,
   fetchAddressBooks,
@@ -11,6 +11,7 @@ import {
   saveContact
 } from './ContactsDao'
 import {
+  createContact,
   deleteContact,
   fetchContact,
   fetchContacts,
@@ -312,6 +313,85 @@ describe('updateContact', () => {
 
     const contact = store.getState().contacts.addressBooks.book1.contacts[0]
     expect(contact.displayName).toBe('Alice Updated')
+  })
+})
+
+const bookWith = (
+  contacts: { id: string; displayName: string }[]
+): Partial<RootState> => ({
+  contacts: {
+    addressBooks: {
+      book1: {
+        id: 'book1',
+        userId: 'u1',
+        name: 'Book 1',
+        contactsCount: contacts.length,
+        acl: [],
+        canWrite: true,
+        contacts: contacts.map(contact => ({ ...contact, emails: [] })),
+        offset: contacts.length,
+        hasMore: false
+      }
+    },
+    loading: false,
+    error: null
+  }
+})
+
+describe('contact order after a save', () => {
+  const displayNames = (store: AppStore): string[] =>
+    store
+      .getState()
+      .contacts.addressBooks.book1.contacts.map(contact => contact.displayName)
+
+  it('inserts a created contact at its sorted position', async () => {
+    jest.mocked(saveContact).mockResolvedValue()
+    const store = setupStore(
+      bookWith([
+        { id: 'aaron', displayName: 'Aaron Analyse' },
+        { id: 'rita', displayName: 'Read Only Rita' }
+      ])
+    )
+
+    await store.dispatch(
+      createContact({
+        userId: 'u1',
+        addressBookId: 'book1',
+        contact: { id: 'abel', displayName: 'Abel Second', emails: [] }
+      })
+    )
+
+    expect(displayNames(store)).toEqual([
+      'Aaron Analyse',
+      'Abel Second',
+      'Read Only Rita'
+    ])
+    expect(store.getState().contacts.addressBooks.book1.contactsCount).toBe(3)
+  })
+
+  it('moves a renamed contact to its sorted position', async () => {
+    jest.mocked(saveContact).mockResolvedValue()
+    const store = setupStore(
+      bookWith([
+        { id: 'aaron', displayName: 'Aaron Analyse' },
+        { id: 'abel', displayName: 'Abel Second' },
+        { id: 'rita', displayName: 'Read Only Rita' }
+      ])
+    )
+
+    await store.dispatch(
+      updateContact({
+        userId: 'u1',
+        addressBookId: 'book1',
+        contact: { id: 'abel', displayName: 'Zoe Second', emails: [] }
+      })
+    )
+
+    expect(displayNames(store)).toEqual([
+      'Aaron Analyse',
+      'Read Only Rita',
+      'Zoe Second'
+    ])
   })
 })
 

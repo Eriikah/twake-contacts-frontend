@@ -6,6 +6,7 @@ import {
   Contact,
   ContactsState
 } from '../contactsTypes'
+import { placeContact } from '../contactsUtils'
 
 export interface MoveContactArgs {
   userId: string
@@ -36,15 +37,13 @@ function addOrReplaceContactInBook(
   book: AddressBookWithContacts,
   contact: Contact
 ): AddressBookWithContacts {
-  const index = book.contacts.findIndex(c => c.id === contact.id)
-  if (index !== -1) {
-    const contacts = [...book.contacts]
-    contacts[index] = contact
+  const contacts = placeContact(book.contacts, contact)
+  if (book.contacts.some(c => c.id === contact.id)) {
     return { ...book, contacts }
   }
   return {
     ...book,
-    contacts: [...book.contacts, contact],
+    contacts,
     contactsCount:
       typeof book.contactsCount === 'number'
         ? book.contactsCount + 1
