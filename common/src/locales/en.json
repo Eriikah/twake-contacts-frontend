@@ -4,6 +4,7 @@
     "title": "Contacts",
     "tabs": { "mine": "My contacts", "shared": "Shared contacts" },
     "myContacts": "My contacts",
+    "shared": "Shared",
     "domainAddressBook": "Domain Address Book",
     "create": "Create",
     "name": "Name",

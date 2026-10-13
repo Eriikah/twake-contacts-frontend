@@ -4,6 +4,7 @@
     "title": "Kontakte",
     "tabs": { "mine": "Meine Kontakte", "shared": "Geteilte Kontakte" },
     "myContacts": "Meine Kontakte",
+    "shared": "Geteilt",
     "domainAddressBook": "Domain-Adressbuch",
     "create": "Erstellen",
     "name": "Name",
