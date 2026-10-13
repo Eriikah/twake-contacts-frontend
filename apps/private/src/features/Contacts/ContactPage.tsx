@@ -37,7 +37,7 @@ import {
 import cx from 'classnames'
 import { useState } from 'react'
 
-import { Link, useNavigate, useParams } from 'react-router'
+import { Link, useLocation, useNavigate, useParams } from 'react-router'
 import { useI18n } from 'twake-i18n'
 import { ContactActionsMenu } from './ContactActionsMenu'
 import { AvatarHeader } from './ContactForm/fields/AvatarHeader'
@@ -142,23 +142,29 @@ const ContactField: React.FC<ContactFieldProps> = ({
   )
 }
 
+interface ContactPageLocationState {
+  from?: string
+}
+
 const getButtonVariant = (value?: string): 'contained' | 'ghost' =>
   !value ? 'contained' : 'ghost'
 
 export const ContactPage: React.FC = () => {
   const { t } = useI18n()
   const navigate = useNavigate()
+  const location = useLocation()
   const { addressBookId = '', contactId } = useParams()
   const { contact, loading } = useContact(addressBookId, contactId)
   const workplaceFqdn = useAppSelector(
     state => state.user.userData?.workplaceFqdn
   )
-  const handleDeleted = (): void =>
-    void navigate(
-      isHiddenAddressBook(addressBookId)
-        ? '/contacts'
-        : `/contacts/${addressBookId}`
-    )
+  // The list the contact was opened from, falling back to its own book
+  const backTo =
+    (location.state as ContactPageLocationState | null)?.from ??
+    (isHiddenAddressBook(addressBookId)
+      ? '/contacts'
+      : `/contacts/${addressBookId}`)
+  const handleDeleted = (): void => void navigate(backTo)
 
   const firstEmail = contact?.emails[0]?.value
   const matrixProfile = contact?.socialProfiles?.find(
@@ -190,11 +196,7 @@ export const ContactPage: React.FC = () => {
       <Stack direction="row" className="u-flex u-flex-justify-between">
         <Button
           component={Link}
-          to={
-            isHiddenAddressBook(addressBookId)
-              ? '/contacts'
-              : `/contacts/${addressBookId}`
-          }
+          to={backTo}
           variant="text"
           startIcon={<Icon icon={Left} />}
         >

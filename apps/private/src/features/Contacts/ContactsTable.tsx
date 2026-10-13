@@ -7,7 +7,7 @@ import {
   VirtualizedTableRow
 } from '@linagora/twake-mui'
 import React from 'react'
-import { useNavigate } from 'react-router'
+import { useLocation, useNavigate } from 'react-router'
 import { useI18n } from 'twake-i18n'
 import { ContactCell } from './ContactCell'
 
@@ -24,6 +24,7 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
 }) => {
   const { t } = useI18n()
   const navigate = useNavigate()
+  const location = useLocation()
 
   // We don't sort using the virtualized tables as we load entries
   // using lazy loading
@@ -93,7 +94,9 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
 
   const handleClick = (row: VirtualizedTableRow): void => {
     const { addressBookId, contact } = row as unknown as ContactEntry
-    void navigate(`/contacts/${addressBookId}/${contact.id}`)
+    void navigate(`/contacts/${addressBookId}/${contact.id}`, {
+      state: { from: location.pathname }
+    })
   }
 
   return (

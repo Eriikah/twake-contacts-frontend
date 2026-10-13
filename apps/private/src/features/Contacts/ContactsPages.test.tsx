@@ -3,7 +3,7 @@ import { fetchContact } from '@common/features/Contacts/ContactsDao'
 import { DEFAULT_ADDRESS_BOOK_ID } from '@common/features/Contacts/constants'
 import { UserState } from '@common/features/User/UserSlice'
 import en from '@common/locales/en.json'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
 import { MemoryRouter, Route, Routes } from 'react-router'
 import { VirtuosoMockContext } from '@linagora/twake-mui'
@@ -293,6 +293,28 @@ describe('ContactPage', () => {
     expect(screen.getByRole('link', { name: /back/i })).toHaveAttribute(
       'href',
       '/contacts'
+    )
+  })
+
+  it('links back to My contacts for a contact opened from My contacts', () => {
+    renderContacts('/contacts')
+
+    fireEvent.click(screen.getByText('martinez@twake.app'))
+
+    expect(screen.getByRole('link', { name: /back/i })).toHaveAttribute(
+      'href',
+      '/contacts'
+    )
+  })
+
+  it('links back to the address book for a contact opened from it', () => {
+    renderContacts('/contacts/book1')
+
+    fireEvent.click(screen.getByText('martinez@twake.app'))
+
+    expect(screen.getByRole('link', { name: /back/i })).toHaveAttribute(
+      'href',
+      '/contacts/book1'
     )
   })
 })
