@@ -2,7 +2,7 @@ import { ReducerCreators } from '@reduxjs/toolkit'
 import { RejectedError, toRejectedError } from '@common/utils/errorUtils'
 import { saveContact } from '../ContactsDao'
 import { ContactsState } from '../contactsTypes'
-import { placeContact, toContactsErrorKey } from '../contactsUtils'
+import { toContactsErrorKey } from '../contactsUtils'
 import { CreateContactArgs } from './createContactAsync'
 
 export const updateContactThunk = (create: ReducerCreators<ContactsState>) =>

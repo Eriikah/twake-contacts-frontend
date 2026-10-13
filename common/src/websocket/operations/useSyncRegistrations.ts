@@ -1,15 +1,12 @@
 import { useAppSelector } from '@common/app/hooks'
-import { WebSocketWithCleanup } from '@linagora/twake-websocket'
+import { WebSocketConnection } from '@linagora/twake-websocket'
 import { useRef, useEffect } from 'react'
 import { shallowEqual } from 'react-redux'
 
-export function useSyncRegistrations({
-  socketRef,
-  isSocketOpen
-}: {
-  socketRef: React.MutableRefObject<WebSocketWithCleanup | null>
-  isSocketOpen: boolean
-}): void {
+export function useSyncRegistrations(
+  connection: Pick<WebSocketConnection, 'socketRef' | 'isOpen' | 'epoch'>
+): void {
+  const { socketRef, isOpen } = connection
   // Paths currently registered on the live socket
   const registeredAddressBooksRef = useRef<Set<string>>(new Set())
   const addressBookPaths = useAppSelector(
@@ -23,7 +20,7 @@ export function useSyncRegistrations({
     const registered = registeredAddressBooksRef.current
     const socket = socketRef.current
 
-    if (!isSocketOpen || socket?.readyState !== WebSocket.OPEN) {
+    if (!isOpen || socket?.readyState !== WebSocket.OPEN) {
       // Subscriptions die with the socket: re-register everything on reconnect
       registered.clear()
       return
@@ -42,5 +39,5 @@ export function useSyncRegistrations({
       socket.send(JSON.stringify({ register: toRegister }))
       toRegister.forEach(path => registered.add(path))
     }
-  }, [isSocketOpen, addressBookPaths, socketRef])
+  }, [isOpen, addressBookPaths, socketRef])
 }

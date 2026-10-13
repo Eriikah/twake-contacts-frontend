@@ -2,7 +2,7 @@ import { ReducerCreators } from '@reduxjs/toolkit'
 import { RejectedError, toRejectedError } from '@common/utils/errorUtils'
 import { saveContact } from '../ContactsDao'
 import { Contact, ContactsState } from '../contactsTypes'
-import { placeContact, toContactsErrorKey } from '../contactsUtils'
+import { toContactsErrorKey } from '../contactsUtils'
 
 export interface CreateContactArgs {
   userId: string

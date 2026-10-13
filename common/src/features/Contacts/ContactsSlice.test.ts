@@ -1,14 +1,19 @@
 /**
  * @jest-environment jsdom
  */
-import { AppStore, RootState, setupStore } from '@common/app/store'
+import { setupStore } from '@common/app/store'
 import {
   fetchAddressBooks,
   fetchContact as fetchContactDao,
   fetchContactsForBook,
   moveContact as moveContactDao
 } from './ContactsDao'
-import { fetchContacts, fetchMoreContacts, moveContact } from './ContactsSlice'
+import {
+  fetchContact,
+  fetchContacts,
+  fetchMoreContacts,
+  moveContact
+} from './ContactsSlice'
 
 jest.mock('./ContactsDao')
 
