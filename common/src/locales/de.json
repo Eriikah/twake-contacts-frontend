@@ -83,7 +83,8 @@
       "update": "Kontakt konnte nicht aktualisiert werden",
       "delete": "Kontakt konnte nicht gelöscht werden",
       "forbidden": "Sie haben keine Berechtigung, dieses Adressbuch zu ändern",
-      "share": "Adressbuch konnte nicht freigegeben werden"
+      "share": "Adressbuch konnte nicht freigegeben werden",
+      "subscribe": "Adressbuch konnte nicht hinzugefügt werden"
     },
     "addressBook": {
       "createTitle": "Neues Adressbuch",
@@ -91,7 +92,17 @@
       "namePlaceholder": "Adressbuchname",
       "cancel": "Abbrechen",
       "save": "Erstellen",
-      "createSuccess": "Adressbuch erfolgreich erstellt"
+      "createSuccess": "Adressbuch erfolgreich erstellt",
+      "subscribeTitle": "Geteiltes Adressbuch hinzufügen",
+      "userLabel": "Suchen Sie einen Benutzer, um seine Adressbücher anzuzeigen",
+      "userPlaceholder": "Benutzer suchen",
+      "noUserFound": "Kein Benutzer gefunden",
+      "noneAvailable": "Dieser Benutzer hat kein verfügbares Adressbuch",
+      "allSubscribed": "Keine weiteren Adressbücher zum Hinzufügen",
+      "subscribe": "Hinzufügen",
+      "subscribeSuccess": "Adressbuch erfolgreich hinzugefügt",
+      "loadError": "Die Adressbücher dieses Benutzers konnten nicht geladen werden",
+      "contactsCount": "%{smart_count} Kontakt |||| %{smart_count} Kontakte"
     },
     "share": {
       "title": "%{name} teilen",

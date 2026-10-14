@@ -55,7 +55,17 @@
       "namePlaceholder": "Address book name",
       "cancel": "Cancel",
       "save": "Create",
-      "createSuccess": "Address book created successfully"
+      "createSuccess": "Address book created successfully",
+      "subscribeTitle": "Add a shared address book",
+      "userLabel": "Search for a user to see their address books",
+      "userPlaceholder": "Search for a user",
+      "noUserFound": "No user found",
+      "noneAvailable": "This user has no address book available",
+      "allSubscribed": "No more address books to add",
+      "subscribe": "Add",
+      "subscribeSuccess": "Address book added successfully",
+      "loadError": "Could not load this user's address books",
+      "contactsCount": "%{smart_count} contact |||| %{smart_count} contacts"
     },
     "types": {
       "cell": "Mobile",
@@ -91,7 +101,8 @@
       "update": "Failed to update contact",
       "delete": "Failed to delete contact",
       "forbidden": "You don't have permission to modify this address book",
-      "share": "Failed to share address book"
+      "share": "Failed to share address book",
+      "subscribe": "Failed to add address book"
     },
     "share": {
       "title": "Share %{name}",

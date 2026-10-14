@@ -1,21 +1,20 @@
 import React from 'react'
 import { Icon, Plus } from '@linagora/twake-icons'
 import { IconButton, Tooltip } from '@linagora/twake-mui'
-import { useI18n } from 'twake-i18n'
 
 export interface CreateAddressBookButtonProps {
   onClick: () => void
+  label: string
 }
 
 export const CreateAddressBookButton: React.FC<
   CreateAddressBookButtonProps
-> = ({ onClick }) => {
-  const { t } = useI18n()
+> = ({ onClick, label }) => {
   return (
-    <Tooltip title={t('contacts.addressBook.createTitle')}>
+    <Tooltip title={label}>
       <IconButton
         size="xsmall"
-        aria-label={t('contacts.addressBook.createTitle')}
+        aria-label={label}
         onClick={e => {
           e.stopPropagation()
           onClick()

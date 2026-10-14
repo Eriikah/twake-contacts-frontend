@@ -30,7 +30,12 @@ export const MyContactsNavItem: React.FC<MyContactsNavItemProps> = ({
 
   return (
     <NavItem
-      secondaryAction={<CreateAddressBookButton onClick={onOpenCreateBook} />}
+      secondaryAction={
+        <CreateAddressBookButton
+          onClick={onOpenCreateBook}
+          label={t('contacts.addressBook.createTitle')}
+        />
+      }
     >
       {hasBooks ? (
         <NavDropdown

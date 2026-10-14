@@ -10,7 +10,8 @@ import { useAppDispatch, useAppSelector } from '@common/app/hooks'
 import {
   clearContactsError,
   fetchContacts,
-  createAddressBook
+  createAddressBook,
+  subscribeAddressBook
 } from '@common/features/Contacts/ContactsSlice'
 import { useEffect, useState } from 'react'
 import { Outlet, useLocation } from 'react-router'
@@ -18,12 +19,16 @@ import { useI18n } from 'twake-i18n'
 import { ContactsSidebar } from './ContactsSidebar'
 import { ContactSearchBar } from './ContactSearchBar'
 import { CreateAddressBookDialog } from './CreateAddressBookDialog'
+import { SubscribeAddressBookDialog } from './SubscribeAddressBookDialog'
 import { ThemeToggle } from '@common/components/ThemeToggle/ThemeToggle'
 
 export const ContactsPage: React.FC = () => {
   const [isCreateBookOpen, setIsCreateBookOpen] = useState(false)
   const [createSuccess, setCreateSuccess] = useState(false)
   const [isCreating, setIsCreating] = useState(false)
+  const [isSubscribeOpen, setIsSubscribeOpen] = useState(false)
+  const [subscribeSuccess, setSubscribeSuccess] = useState(false)
+  const [isSubscribing, setIsSubscribing] = useState(false)
   const { t } = useI18n()
   const dispatch = useAppDispatch()
   const openpaasId = useAppSelector(state => state.user.userData.openpaasId)
@@ -42,7 +47,10 @@ export const ContactsPage: React.FC = () => {
 
   return (
     <Layout withTopBar={false}>
-      <ContactsSidebar onOpenCreateBook={() => setIsCreateBookOpen(true)} />
+      <ContactsSidebar
+        onOpenCreateBook={() => setIsCreateBookOpen(true)}
+        onOpenSubscribe={() => setIsSubscribeOpen(true)}
+      />
       <Main>
         <Content className="u-p-1">
           <Stack
@@ -92,6 +100,40 @@ export const ContactsPage: React.FC = () => {
           }}
         />
       )}
+      {isSubscribeOpen && (
+        <SubscribeAddressBookDialog
+          isSubscribing={isSubscribing}
+          onClose={() => setIsSubscribeOpen(false)}
+          onConfirm={(user, books) => {
+            if (isSubscribing || !openpaasId) return
+            setIsSubscribing(true)
+            const subscribe = async (): Promise<void> => {
+              try {
+                const results = await Promise.allSettled(
+                  books.map(source =>
+                    dispatch(
+                      subscribeAddressBook({
+                        userId: openpaasId,
+                        source,
+                        ownerDisplayName: user.displayName
+                      })
+                    ).unwrap()
+                  )
+                )
+                const succeeded = results.filter(r => r.status === 'fulfilled')
+                if (succeeded.length > 0) setSubscribeSuccess(true)
+                // keep the dialog open on failure: only the books still to add remain listed
+                if (succeeded.length === results.length) {
+                  setIsSubscribeOpen(false)
+                }
+              } finally {
+                setIsSubscribing(false)
+              }
+            }
+            void subscribe()
+          }}
+        />
+      )}
       <Snackbar
         open={createSuccess}
         autoHideDuration={6000}
@@ -104,6 +146,16 @@ export const ContactsPage: React.FC = () => {
           onClose={() => setCreateSuccess(false)}
         >
           {t('contacts.addressBook.createSuccess')}
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={subscribeSuccess}
+        autoHideDuration={6000}
+        onClose={() => setSubscribeSuccess(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success" onClose={() => setSubscribeSuccess(false)}>
+          {t('contacts.addressBook.subscribeSuccess')}
         </Alert>
       </Snackbar>
     </Layout>

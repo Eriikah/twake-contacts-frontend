@@ -83,7 +83,8 @@
       "update": "Impossibile aggiornare il contatto",
       "delete": "Impossibile eliminare il contatto",
       "forbidden": "Non hai i permessi per modificare questa rubrica",
-      "share": "Impossibile condividere la rubrica"
+      "share": "Impossibile condividere la rubrica",
+      "forbidden": "Non hai i permessi per modificare questa rubrica"
     },
     "addressBook": {
       "createTitle": "Nuova rubrica",
@@ -91,7 +92,17 @@
       "namePlaceholder": "Nome della rubrica",
       "cancel": "Annulla",
       "save": "Crea",
-      "createSuccess": "Rubrica creata con successo"
+      "createSuccess": "Rubrica creata con successo",
+      "subscribeTitle": "Aggiungi una rubrica condivisa",
+      "userLabel": "Cerca un utente per vedere le sue rubriche",
+      "userPlaceholder": "Cerca un utente",
+      "noUserFound": "Nessun utente trovato",
+      "noneAvailable": "Questo utente non ha nessuna rubrica disponibile",
+      "allSubscribed": "Nessun'altra rubrica da aggiungere",
+      "subscribe": "Aggiungi",
+      "subscribeSuccess": "Rubrica aggiunta con successo",
+      "loadError": "Impossibile caricare le rubriche di questo utente",
+      "contactsCount": "%{smart_count} contatto |||| %{smart_count} contatti"
     },
     "share": {
       "title": "Condividi %{name}",

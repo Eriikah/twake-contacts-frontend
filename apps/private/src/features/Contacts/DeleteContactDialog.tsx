@@ -1,3 +1,5 @@
+import { Contact } from '@common/features/Contacts/contactsTypes'
+import { Cross, Icon } from '@linagora/twake-icons'
 import {
   Button,
   Dialog,
@@ -7,15 +9,10 @@ import {
   DialogTitle,
   IconButton,
   ListItem,
-  ListItemAvatar,
-  ListItemText,
-  Paper,
   Stack
 } from '@linagora/twake-mui'
-import { Cross, Icon } from '@linagora/twake-icons'
-import { Contact } from '@common/features/Contacts/contactsTypes'
 import { useI18n } from 'twake-i18n'
-import { ContactAvatar } from './ContactAvatar'
+import { ContactPaper } from './ContactPaper'
 
 interface DeleteContactDialogProps {
   contact: Contact
@@ -53,21 +50,7 @@ export const DeleteContactDialog: React.FC<DeleteContactDialogProps> = ({
           <DialogContentText>
             {t('contacts.delete.description')}
           </DialogContentText>
-          <Paper variant="outlined">
-            <ListItem>
-              <ListItemAvatar>
-                <ContactAvatar
-                  size="s"
-                  src={contact.photo}
-                  displayName={contact.displayName}
-                />
-              </ListItemAvatar>
-              <ListItemText
-                primary={contact.displayName}
-                secondary={contact.emails[0]?.value}
-              />
-            </ListItem>
-          </Paper>
+          <ContactPaper contact={contact} />
         </Stack>
       </DialogContent>
       <DialogActions>
