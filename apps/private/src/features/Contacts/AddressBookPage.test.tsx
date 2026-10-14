@@ -1,6 +1,6 @@
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import { MemoryRouter, Route, Routes } from 'react-router'
+import { Link, MemoryRouter, Route, Routes } from 'react-router'
 import { VirtuosoMockContext } from '@linagora/twake-mui'
 import I18n from 'twake-i18n'
 import { setupStore } from '@common/app/store'
@@ -50,6 +50,8 @@ const renderPage = (
           value={{ viewportHeight: 1000, itemHeight: 50 }}
         >
           <MemoryRouter initialEntries={[path]}>
+            <Link to="/contacts">Go to My contacts</Link>
+            <Link to="/contacts/book1">Go to book1</Link>
             <Routes>
               <Route path="/contacts" element={<AddressBookPage />} />
               <Route
@@ -105,5 +107,31 @@ describe('AddressBookPage lazy loading', () => {
       50,
       0
     )
+  })
+})
+
+describe('AddressBookPage tabs', () => {
+  it('starts again on My contacts after visiting an address book', () => {
+    const shared = {
+      ...makeBook('shared', [bob], false),
+      ownerId: 'u2'
+    }
+    renderPage('/contacts', {
+      book1: { ...makeBook('book1', [alice], false), ownerId: 'u1' },
+      shared
+    })
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Shared contacts' }))
+    expect(screen.queryByText('Alice Roche')).toBe(null)
+
+    fireEvent.click(screen.getByText('Go to book1'))
+    fireEvent.click(screen.getByText('Go to My contacts'))
+
+    expect(screen.getByRole('tab', { name: 'My contacts' })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    )
+    expect(screen.getByText('Alice Roche')).toBeInTheDocument()
+    expect(screen.getByText('Bob Martin')).toBeInTheDocument()
   })
 })
