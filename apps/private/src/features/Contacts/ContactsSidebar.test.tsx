@@ -4,9 +4,9 @@ import { AddressBookWithContacts } from '@common/features/Contacts/contactsTypes
 import { UserState } from '@common/features/User/UserSlice'
 import en from '@common/locales/en.json'
 import { TwakeMuiThemeProvider } from '@linagora/twake-mui'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import { MemoryRouter, Route, Routes } from 'react-router'
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router'
 import I18n from 'twake-i18n'
 import { ContactsSidebar } from './ContactsSidebar'
 
@@ -21,6 +21,11 @@ const makeBook = (id: string, name: string): AddressBookWithContacts => ({
   offset: 0,
   hasMore: false
 })
+
+function LocationDisplay(): React.ReactElement {
+  const location = useLocation()
+  return <div data-testid="location">{location.pathname}</div>
+}
 
 function renderSidebar(
   path: string,
@@ -73,6 +78,7 @@ function renderSidebar(
                 <Route path=":addressBookId" element={<div />} />
               </Route>
             </Routes>
+            <LocationDisplay />
           </MemoryRouter>
         </I18n>
       </TwakeMuiThemeProvider>
@@ -160,5 +166,35 @@ describe('ContactsSidebar', () => {
 
     expect(label).toHaveClass('u-ellipsis', 'u-db')
     expect(label.closest('.u-midellipsis')).toBeNull()
+  })
+
+  describe('My contacts dropdown', () => {
+    const getMyContacts = (): HTMLElement =>
+      screen.getByRole('button', { name: en.contacts.myContacts })
+
+    it('navigates to /contacts and keeps books shown when on another book', () => {
+      renderSidebar('/contacts/book1')
+
+      fireEvent.click(getMyContacts())
+
+      expect(screen.getByTestId('location')).toHaveTextContent(/^\/contacts$/)
+      expect(getMyContacts()).toHaveAttribute('aria-expanded', 'true')
+      expect(screen.getByText('Book 1')).toBeInTheDocument()
+    })
+
+    it('toggles nested books without navigating when already on /contacts', () => {
+      renderSidebar('/contacts')
+
+      fireEvent.click(getMyContacts())
+
+      expect(screen.getByTestId('location')).toHaveTextContent(/^\/contacts$/)
+      expect(getMyContacts()).toHaveAttribute('aria-expanded', 'false')
+      expect(screen.queryByText('Book 1')).not.toBeInTheDocument()
+
+      fireEvent.click(getMyContacts())
+
+      expect(getMyContacts()).toHaveAttribute('aria-expanded', 'true')
+      expect(screen.getByText('Book 1')).toBeInTheDocument()
+    })
   })
 })

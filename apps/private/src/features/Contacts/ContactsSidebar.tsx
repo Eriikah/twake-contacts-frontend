@@ -20,7 +20,13 @@ import {
   IconButton,
   NavDesktopDropdown
 } from '@linagora/twake-mui'
-import { Link, NavigateFunction, useNavigate, useParams } from 'react-router'
+import {
+  Link,
+  NavigateFunction,
+  useMatch,
+  useNavigate,
+  useParams
+} from 'react-router'
 import { useI18n } from 'twake-i18n'
 import { Peoples } from '@linagora/twake-icons'
 
@@ -61,6 +67,7 @@ export const ContactsSidebar: React.FC<ContactsSidebarProps> = ({
   const { t } = useI18n()
   const { addressBookId } = useParams()
   const navigate = useNavigate()
+  const isOnMyContacts = useMatch('/contacts') !== null
   const openpaasId = useAppSelector(state => state.user.userData.openpaasId)
   const addressBooks = useAppSelector(state => state.contacts.addressBooks)
   const currentBook = addressBookId ? addressBooks[addressBookId] : undefined
@@ -124,10 +131,16 @@ export const ContactsSidebar: React.FC<ContactsSidebarProps> = ({
             ) : (
               <NavDropdown
                 open={isMyContactsExpanded}
-                onToggle={() => setIsMyContactsExpanded(!isMyContactsExpanded)}
                 selected={addressBookId === undefined}
                 onClick={() => {
-                  void navigate('/contacts')
+                  // NavDropdown has a single click target: toggle when already
+                  // on /contacts, otherwise navigate there with books shown
+                  if (isOnMyContacts) {
+                    setIsMyContactsExpanded(!isMyContactsExpanded)
+                  } else {
+                    setIsMyContactsExpanded(true)
+                    void navigate('/contacts')
+                  }
                 }}
               >
                 <NavIcon icon={ContactList} />
