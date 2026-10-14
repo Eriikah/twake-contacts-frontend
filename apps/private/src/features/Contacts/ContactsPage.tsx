@@ -98,7 +98,11 @@ export const ContactsPage: React.FC = () => {
         onClose={() => setCreateSuccess(false)}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
       >
-        <Alert severity="success" onClose={() => setCreateSuccess(false)}>
+        <Alert
+          variant="filled"
+          severity="success"
+          onClose={() => setCreateSuccess(false)}
+        >
           {t('contacts.addressBook.createSuccess')}
         </Alert>
       </Snackbar>
