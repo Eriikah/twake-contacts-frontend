@@ -1,4 +1,5 @@
 import { JCalProperty } from './davTypes'
+import { userData } from '../User/userDataTypes'
 
 export interface AddressBook {
   id: string
@@ -10,6 +11,7 @@ export interface AddressBook {
   acl: string[]
   canWrite: boolean
   ownerDisplayName?: string
+  invitedMembers?: userData[]
 }
 
 export interface ContactName {
@@ -73,11 +75,13 @@ export interface AddressBookWithContacts extends AddressBook {
   offset: number
   hasMore: boolean
   isLoadingMore?: boolean
+  invitedMembers?: userData[]
 }
 
 export interface ContactsState {
   addressBooks: Record<string, AddressBookWithContacts>
   loading: boolean
+  detailsLoading?: boolean
   error: string | null
 }
 
