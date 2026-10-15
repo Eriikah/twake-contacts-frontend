@@ -121,7 +121,7 @@ describe('AddressBookPage tabs', () => {
       shared
     })
 
-    fireEvent.click(screen.getByRole('tab', { name: 'Shared contacts' }))
+    fireEvent.click(screen.getByRole('tab', { name: 'Shared with me' }))
     expect(screen.queryByText('Alice Roche')).toBe(null)
 
     fireEvent.click(screen.getByText('Go to book1'))
