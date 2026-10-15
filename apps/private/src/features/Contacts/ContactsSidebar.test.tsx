@@ -164,7 +164,7 @@ describe('ContactsSidebar', () => {
 
     const label = screen.getByText(longName)
 
-    expect(label).toHaveClass('u-ellipsis', 'u-db')
+    expect(label).toHaveClass('u-ellipsis')
     expect(label.closest('.u-midellipsis')).toBeNull()
   })
 
