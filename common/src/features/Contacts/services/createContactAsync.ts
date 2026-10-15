@@ -2,7 +2,7 @@ import { ReducerCreators } from '@reduxjs/toolkit'
 import { RejectedError, toRejectedError } from '@common/utils/errorUtils'
 import { saveContact } from '../ContactsDao'
 import { Contact, ContactsState } from '../contactsTypes'
-import { placeContact, toContactsErrorKey } from '../contactsUtils'
+import { toContactsErrorKey } from '../contactsUtils'
 
 export interface CreateContactArgs {
   userId: string
@@ -25,12 +25,6 @@ export const createContactThunk = (create: ReducerCreators<ContactsState>) =>
       }
     },
     {
-      fulfilled: (state, action) => {
-        const book = state.addressBooks[action.payload.addressBookId]
-        if (!book) return
-        book.contacts = placeContact(book.contacts, action.payload.contact)
-        if (book.contactsCount !== null) book.contactsCount += 1
-      },
       rejected: (state, action) => {
         state.error = toContactsErrorKey(
           action.payload,
