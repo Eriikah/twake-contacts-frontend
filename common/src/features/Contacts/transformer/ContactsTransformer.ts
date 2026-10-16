@@ -155,6 +155,14 @@ function isDefaultAddressBook(raw: DavAddressBookItem, id: string): boolean {
   return bookId === DEFAULT_ADDRESS_BOOK_ID
 }
 
+// dav:name comes as-is from the JSON payload, other clients may store a number
+// an empty name is labelled by getAddressBookDisplayName
+function normalizeAddressBookName(name: unknown): string {
+  return typeof name === 'string' || typeof name === 'number'
+    ? String(name)
+    : ''
+}
+
 export function normalizeAddressBook(raw: DavAddressBookItem): AddressBook {
   const href = raw._links?.self?.href
   const id = extractId(href, '.json')
@@ -168,7 +176,7 @@ export function normalizeAddressBook(raw: DavAddressBookItem): AddressBook {
   return {
     id,
     userId,
-    name: raw['dav:name'] ?? '',
+    name: normalizeAddressBookName(raw['dav:name']),
     isDefault: isDefaultAddressBook(raw, id),
     contactsCount: raw.numberOfContacts ?? null,
     acl,

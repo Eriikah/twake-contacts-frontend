@@ -30,6 +30,16 @@ describe('normalizeAddressBook', () => {
     expect(normalizeAddressBook(book).canWrite).toBe(false)
   })
 
+  it('converts a numeric name to a string', () => {
+    const book = { ...sharedBook(), 'dav:name': 12345 }
+    expect(normalizeAddressBook(book).name).toBe('12345')
+  })
+
+  it('keeps an empty name when the name is not a string nor a number', () => {
+    const book = { ...sharedBook(), 'dav:name': { foo: 'bar' } }
+    expect(normalizeAddressBook(book).name).toBe('')
+  })
+
   it('keeps an empty name when dav:name is missing', () => {
     const book = { ...sharedBook(), 'dav:name': undefined }
     expect(normalizeAddressBook(book).name).toBe('')

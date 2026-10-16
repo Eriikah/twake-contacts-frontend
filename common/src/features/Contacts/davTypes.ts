@@ -87,7 +87,8 @@ export interface DavInvite {
 export interface DavAddressBookItem {
   /** `/addressbooks/<userId>/<bookId>.json`, `userId` being the owner of the book. */
   _links?: DavLinks
-  'dav:name'?: string
+  /** Usually a string, but any JSON value set by another client may come back. */
+  'dav:name'?: unknown
   'dav:syncToken': number
   numberOfContacts?: number | null
   'dav:acl'?: string[]
