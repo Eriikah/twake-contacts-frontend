@@ -83,7 +83,8 @@
       "update": "No se ha podido actualizar el contacto",
       "delete": "No se ha podido eliminar el contacto",
       "forbidden": "No tiene permiso para modificar esta libreta de direcciones",
-      "share": "No se ha podido compartir la libreta de direcciones"
+      "share": "No se ha podido compartir la libreta de direcciones",
+      "subscribe": "No se ha podido añadir la libreta de direcciones"
     },
     "addressBook": {
       "createTitle": "Nueva libreta de direcciones",
@@ -91,7 +92,17 @@
       "namePlaceholder": "Nombre de la libreta de direcciones",
       "cancel": "Cancelar",
       "save": "Crear",
-      "createSuccess": "Libreta de direcciones creada exitosamente"
+      "createSuccess": "Libreta de direcciones creada exitosamente",
+      "subscribeTitle": "Añadir una libreta de direcciones compartida",
+      "userLabel": "Busque un usuario para ver sus libretas de direcciones",
+      "userPlaceholder": "Buscar un usuario",
+      "noUserFound": "No se ha encontrado ningún usuario",
+      "noneAvailable": "Este usuario no tiene ninguna libreta de direcciones disponible",
+      "allSubscribed": "No hay más libretas de direcciones que añadir",
+      "subscribe": "Añadir",
+      "subscribeSuccess": "Libreta de direcciones añadida correctamente",
+      "loadError": "No se han podido cargar las libretas de direcciones de este usuario",
+      "contactsCount": "%{smart_count} contacto |||| %{smart_count} contactos"
     },
     "share": {
       "title": "Compartir %{name}",

@@ -5,6 +5,7 @@ export interface AddressBook {
   id: string
   userId: string
   ownerId?: string
+  sourceBookId?: string
   name: string
   // null when the server does not report it, as for shared books
   contactsCount: number | null
@@ -89,4 +90,10 @@ export interface ContactsState {
 export interface ContactEntry {
   addressBookId: string
   contact: Contact
+}
+
+export interface UserResult {
+  id: string
+  displayName: string
+  emails: { value: string }[]
 }

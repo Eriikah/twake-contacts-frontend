@@ -2,7 +2,7 @@ import { api } from '@common/utils/apiUtils'
 import { encodeDavSegment } from '@linagora/twake-utils'
 import { fetchUserById } from '@common/features/User/UserDao'
 import { DomainInfo } from '@common/features/User/userDataTypes'
-import { AddressBook, Contact, ContactEntry } from './contactsTypes'
+import { AddressBook, Contact, ContactEntry, UserResult } from './contactsTypes'
 import {
   AddressBookAccessLevel,
   DavAddressBookItem,
@@ -68,6 +68,7 @@ async function enrichAddressBookOwner(
   const ownerId = parts[2]
   if (!ownerId || ownerId === userId) return book
   book.ownerId = ownerId
+  book.sourceBookId = parts[3]?.replace('.json', '')
 
   try {
     const user = await fetchUserById(ownerId)
@@ -391,4 +392,85 @@ export async function updateAddressBookShares(
       }
     }
   })
+}
+
+interface PeopleSearchResult {
+  id: string
+  names?: { displayName: string }[]
+  emailAddresses?: { value: string }[]
+}
+
+export async function searchUsers(
+  q: string,
+  excludeId: string,
+  signal?: AbortSignal
+): Promise<UserResult[]> {
+  const data: PeopleSearchResult[] = await api
+    .post('api/people/search', {
+      json: {
+        q,
+        objectTypes: ['user'],
+        limit: 5,
+        excludes: [{ id: excludeId, objectType: 'user' }]
+      },
+      signal
+    })
+    .json()
+
+  return data.map(p => ({
+    id: p.id,
+    displayName:
+      p.names?.[0]?.displayName ?? p.emailAddresses?.[0]?.value ?? '',
+    emails: p.emailAddresses ?? []
+  }))
+}
+
+export async function fetchPublicAddressBooks(
+  ownerId: string
+): Promise<AddressBook[]> {
+  const data: DavAddressBooksResponse = await api
+    .get(`dav/addressbooks/${ownerId}.json`, {
+      searchParams: { public: 'true', contactsCount: 'true' },
+      headers: { Accept: 'application/vcard+json' }
+    })
+    .json()
+
+  return (data._embedded?.['dav:addressbook'] ?? []).map(normalizeAddressBook)
+}
+
+export async function subscribeToAddressBook(
+  userId: string,
+  source: AddressBook,
+  ownerDisplayName?: string
+): Promise<AddressBook> {
+  const id = crypto.randomUUID()
+  await api.post(`dav/addressbooks/${userId}.json`, {
+    headers: { Accept: 'application/vcard+json' },
+    json: {
+      id,
+      'dav:name': source.name,
+      'carddav:description': '',
+      'dav:acl': ['dav:read', 'dav:write']?.filter(
+        right => right === 'dav:write' && source.canWrite
+      ),
+      type: 'subscription',
+      'openpaas:source': {
+        _links: {
+          self: { href: `/addressbooks/${source.userId}/${source.id}.json` }
+        }
+      }
+    }
+  })
+
+  return {
+    id,
+    userId,
+    sourceBookId: source.id,
+    name: source.name,
+    contactsCount: source.contactsCount,
+    acl: ['dav:read'],
+    canWrite: false,
+    ownerId: source.userId,
+    ownerDisplayName
+  }
 }

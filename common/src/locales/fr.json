@@ -83,7 +83,8 @@
       "update": "Échec de la modification du contact",
       "delete": "Échec de la suppression du contact",
       "forbidden": "Vous n'avez pas le droit de modifier ce carnet d'adresses",
-      "share": "Échec du partage du carnet d'adresses"
+      "share": "Échec du partage du carnet d'adresses",
+      "subscribe": "Impossible d'ajouter le carnet d'adresses"
     },
     "addressBook": {
       "createTitle": "Nouveau carnet d'adresses",
@@ -91,7 +92,17 @@
       "namePlaceholder": "Nom du carnet d'adresses",
       "cancel": "Annuler",
       "save": "Créer",
-      "createSuccess": "Carnet d'adresses créé avec succès"
+      "createSuccess": "Carnet d'adresses créé avec succès",
+      "subscribeTitle": "Ajouter un carnet d'adresses partagé",
+      "userLabel": "Recherchez un utilisateur pour voir ses carnets d'adresses",
+      "userPlaceholder": "Rechercher un utilisateur",
+      "noUserFound": "Aucun utilisateur trouvé",
+      "noneAvailable": "Cet utilisateur n'a aucun carnet d'adresses disponible",
+      "allSubscribed": "Aucun autre carnet d'adresses à ajouter",
+      "subscribe": "Ajouter",
+      "subscribeSuccess": "Carnet d'adresses ajouté avec succès",
+      "loadError": "Impossible de charger les carnets d'adresses de cet utilisateur",
+      "contactsCount": "%{smart_count} contact |||| %{smart_count} contacts"
     },
     "share": {
       "title": "Partager %{name}",

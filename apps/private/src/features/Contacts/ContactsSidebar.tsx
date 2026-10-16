@@ -4,14 +4,15 @@ import { getAddressBookDisplayName } from '@common/features/Contacts/contactsUti
 import { Company, Icon, Plus } from '@linagora/twake-icons'
 import {
   Box,
-  Button,
   Nav,
-  NavDesktopDropdown,
   NavIcon,
   NavItem,
   NavLink,
   NavText,
-  Sidebar
+  Sidebar,
+  Button,
+  NavDesktopDropdown,
+  Stack
 } from '@linagora/twake-mui'
 import { Link, useMatch, useNavigate, useParams } from 'react-router'
 import { useI18n } from 'twake-i18n'
@@ -21,13 +22,16 @@ import {
   categorizeAddressBooks,
   getCreateContactLink
 } from './ContactsSidebar/sidebarHelpers'
+import { CreateAddressBookButton } from './ContactsSidebar/CreateAddressBookButton'
 
 export interface ContactsSidebarProps {
   onOpenCreateBook: () => void
+  onOpenSubscribe: () => void
 }
 
 export const ContactsSidebar: React.FC<ContactsSidebarProps> = ({
-  onOpenCreateBook
+  onOpenCreateBook,
+  onOpenSubscribe
 }) => {
   const [isMyContactsExpanded, setIsMyContactsExpanded] = useState(true)
   const { t } = useI18n()
@@ -105,8 +109,22 @@ export const ContactsSidebar: React.FC<ContactsSidebarProps> = ({
               </NavLink>
             </NavItem>
           ))}
-          <NavDesktopDropdown label={t('contacts.shared')} limit={0}>
-            {sharedBooks.map(book => (
+          <NavDesktopDropdown
+            label={
+              <Stack
+                direction="row"
+                className="u-flex-justify-between u-flex-items-center"
+              >
+                <span>{t('contacts.shared')}</span>
+                <CreateAddressBookButton
+                  onClick={onOpenSubscribe}
+                  label={t('contacts.addressBook.subscribeTitle')}
+                />
+              </Stack>
+            }
+            limit={0}
+          >
+            {sharedBooks?.map(book => (
               <AddressBookNavItem
                 key={book.id}
                 book={book}

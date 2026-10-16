@@ -83,7 +83,8 @@
       "update": "Không thể cập nhật liên hệ",
       "delete": "Không thể xóa liên hệ",
       "forbidden": "Bạn không có quyền chỉnh sửa sổ địa chỉ này",
-      "share": "Không thể chia sẻ sổ địa chỉ"
+      "share": "Không thể chia sẻ sổ địa chỉ",
+      "subscribe": "Không thể thêm sổ địa chỉ"
     },
     "addressBook": {
       "createTitle": "Sổ địa chỉ mới",
@@ -91,7 +92,17 @@
       "namePlaceholder": "Tên sổ địa chỉ",
       "cancel": "Hủy",
       "save": "Tạo",
-      "createSuccess": "Đã tạo sổ địa chỉ thành công"
+      "createSuccess": "Đã tạo sổ địa chỉ thành công",
+      "subscribeTitle": "Thêm sổ địa chỉ được chia sẻ",
+      "userLabel": "Tìm người dùng để xem sổ địa chỉ của họ",
+      "userPlaceholder": "Tìm người dùng",
+      "noUserFound": "Không tìm thấy người dùng",
+      "noneAvailable": "Người dùng này không có sổ địa chỉ nào khả dụng",
+      "allSubscribed": "Không còn sổ địa chỉ nào để thêm",
+      "subscribe": "Thêm",
+      "subscribeSuccess": "Đã thêm sổ địa chỉ thành công",
+      "loadError": "Không thể tải sổ địa chỉ của người dùng này",
+      "contactsCount": "%{smart_count} liên hệ"
     },
     "share": {
       "title": "Chia sẻ %{name}",
