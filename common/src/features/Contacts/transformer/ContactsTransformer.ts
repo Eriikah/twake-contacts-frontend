@@ -1,4 +1,4 @@
-import { READ_ONLY_SHARE_ACCESSES } from '../constants'
+import { DEFAULT_ADDRESS_BOOK_ID, READ_ONLY_SHARE_ACCESSES } from '../constants'
 import { userData as UserDataType } from '@common/features/User/userDataTypes'
 import { AddressBookAccessLevel } from '../davTypes'
 import {
@@ -147,6 +147,14 @@ function extractId(href: string | undefined, extension: string): string {
   return href?.split('/').pop()?.replace(extension, '') ?? ''
 }
 
+// a sharee's copy of a book points to the original through its source
+function isDefaultAddressBook(raw: DavAddressBookItem, id: string): boolean {
+  const source =
+    raw['{http://open-paas.org/contacts}source'] || raw['openpaas:source']
+  const bookId = source ? extractId(source, '.json') : id
+  return bookId === DEFAULT_ADDRESS_BOOK_ID
+}
+
 export function normalizeAddressBook(raw: DavAddressBookItem): AddressBook {
   const href = raw._links?.self?.href
   const id = extractId(href, '.json')
@@ -160,7 +168,8 @@ export function normalizeAddressBook(raw: DavAddressBookItem): AddressBook {
   return {
     id,
     userId,
-    name: raw['dav:name'] ?? id,
+    name: raw['dav:name'] ?? '',
+    isDefault: isDefaultAddressBook(raw, id),
     contactsCount: raw.numberOfContacts ?? null,
     acl,
     canWrite:

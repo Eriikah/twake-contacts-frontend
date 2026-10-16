@@ -45,7 +45,7 @@ export const AddressBookField: React.FC<AddressBookFieldProps> = ({
         >
           {sortAddressBooks(addressBooks, t).map(book => (
             <MenuItem key={book.id} value={book.id}>
-              {getAddressBookDisplayName(book, t) || t('contacts.myContacts')}
+              {getAddressBookDisplayName(book, t)}
             </MenuItem>
           ))}
         </TextField>

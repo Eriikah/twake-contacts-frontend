@@ -1,6 +1,10 @@
 import { DEFAULT_ADDRESS_BOOK_ID } from './constants'
 import { AddressBook, Contact } from './contactsTypes'
-import { placeContact, sortAddressBooks } from './contactsUtils'
+import {
+  getAddressBookDisplayName,
+  placeContact,
+  sortAddressBooks
+} from './contactsUtils'
 
 const makeBook = (id: string, name: string): AddressBook => ({
   id,
@@ -42,6 +46,38 @@ describe('sortAddressBooks', () => {
     sortAddressBooks(books, t)
 
     expect(books.map(book => book.id)).toEqual(['b', 'a'])
+  })
+})
+
+describe('getAddressBookDisplayName', () => {
+  it('returns the name of the book', () => {
+    expect(getAddressBookDisplayName(makeBook('qa', 'QA Book'), t)).toBe(
+      'QA Book'
+    )
+  })
+
+  it('names the domain address book', () => {
+    expect(getAddressBookDisplayName(makeBook('dab', ''), t)).toBe(
+      'contacts.domainAddressBook'
+    )
+  })
+
+  it('names an unnamed own default book "My contacts"', () => {
+    expect(
+      getAddressBookDisplayName(makeBook(DEFAULT_ADDRESS_BOOK_ID, ''), t)
+    ).toBe('contacts.myContacts')
+  })
+
+  it('names an unnamed shared default book "My contacts"', () => {
+    const book = { ...makeBook('generated-id', ''), isDefault: true }
+
+    expect(getAddressBookDisplayName(book, t)).toBe('contacts.myContacts')
+  })
+
+  it('falls back to the id of an unnamed book', () => {
+    expect(getAddressBookDisplayName(makeBook('api-empty', ''), t)).toBe(
+      'api-empty'
+    )
   })
 })
 

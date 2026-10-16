@@ -2,6 +2,7 @@ import React from 'react'
 import { Stack, Typography, Avatar } from '@linagora/twake-mui'
 import { Icon, Peoples } from '@linagora/twake-icons'
 import { AddressBook } from '@common/features/Contacts/contactsTypes'
+import { getAddressBookDisplayName } from '@common/features/Contacts/contactsUtils'
 import { useI18n } from 'twake-i18n'
 
 interface AddressBookInfoCardProps {
@@ -26,7 +27,7 @@ export const AddressBookInfoCard: React.FC<AddressBookInfoCardProps> = ({
       </Avatar>
       <Stack className="u-ml-1">
         <Typography variant="body1" className="u-fw-500">
-          {book?.name}
+          {getAddressBookDisplayName(book, t)}
         </Typography>
         {typeof book?.contactsCount === 'number' && (
           <Typography variant="caption" color="textSecondary">
