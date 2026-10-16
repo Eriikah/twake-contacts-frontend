@@ -50,4 +50,21 @@ describe('makeContactFromForm', () => {
 
     expect(saved.addresses?.map(address => address.type)).toEqual(['', 'work'])
   })
+
+  it('trims the emails', () => {
+    const values = {
+      ...makeFormValuesFromContact(contact, 'book'),
+      emails: [
+        { type: '', value: ' a@example.com' },
+        { type: '', value: 'b@example.com ' }
+      ]
+    }
+
+    const saved = makeContactFromForm(values, contact)
+
+    expect(saved.emails.map(email => email.value)).toEqual([
+      'a@example.com',
+      'b@example.com'
+    ])
+  })
 })

@@ -109,7 +109,9 @@ export function makeContactFromForm(
     displayName: [givenName, familyName].filter(Boolean).join(' '),
     name: { givenName, familyName },
     categories: values.categories,
-    emails: values.emails.filter(hasValue),
+    emails: values.emails
+      .filter(hasValue)
+      .map(entry => ({ ...entry, value: entry.value.trim() })),
     phones: values.phones.filter(hasValue),
     addresses,
     socialProfiles: matrixId
