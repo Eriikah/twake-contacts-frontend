@@ -1,7 +1,13 @@
 import React, { useState } from 'react'
 import { AddressBook } from '@common/features/Contacts/contactsTypes'
 import { getAddressBookDisplayName } from '@common/features/Contacts/contactsUtils'
-import { Dots, Icon, Peoples, ShareExternal } from '@linagora/twake-icons'
+import {
+  Trash,
+  Dots,
+  Icon,
+  Peoples,
+  ShareExternal
+} from '@linagora/twake-icons'
 import {
   ActionsMenu,
   ActionsMenuItem,
@@ -20,6 +26,9 @@ import { useNavigate } from 'react-router'
 import { useI18n } from 'twake-i18n'
 import { ShareAddressBookDialog } from '../ShareAddressBook/ShareAddressBookDialog'
 import { getAriaCurrent } from './sidebarHelpers'
+import { useAppDispatch } from '@common/app/hooks'
+import { deleteAddressBook } from '@common/features/Contacts/ContactsSlice'
+import { DeleteAddressBookDialog } from '../DeleteAddressBookDialog'
 
 export interface AddressBookNavItemProps {
   book: AddressBook
@@ -38,6 +47,27 @@ export const AddressBookNavItem: React.FC<AddressBookNavItemProps> = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+
+  const dispatch = useAppDispatch()
+  const isCopy = Boolean(book.ownerId)
+
+  const removeBook = (): void => {
+    void dispatch(
+      deleteAddressBook({ userId: book.userId, addressBookId: book.id })
+    )
+      .unwrap()
+      .then(() => {
+        if (selected) void navigate('/contacts')
+        return
+      })
+      .catch(() => {})
+  }
+
+  const handleDelete = (): void => {
+    handleMenuClose()
+    setIsConfirmOpen(true)
+  }
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>): void => {
     event.stopPropagation()
@@ -60,15 +90,20 @@ export const AddressBookNavItem: React.FC<AddressBookNavItemProps> = ({
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onFocus={() => setIsHovered(true)}
     >
       <NavItem
         key={book.id}
         variant={variant}
         secondaryAction={
-          (isHovered || isMenuOpen || isMobile) && book.canWrite ? (
+          isHovered || isMenuOpen || isMobile ? (
             <>
               <Tooltip disableInteractive title={t('contacts.menu.more')}>
-                <IconButton size="xsmall" onClick={handleMenuOpen}>
+                <IconButton
+                  size="xsmall"
+                  onClick={handleMenuOpen}
+                  onBlur={() => setIsHovered(false)}
+                >
                   <Icon icon={Dots} size={10} rotate={90} />
                 </IconButton>
               </Tooltip>
@@ -78,11 +113,23 @@ export const AddressBookNavItem: React.FC<AddressBookNavItemProps> = ({
                 onClose={handleMenuClose}
                 onClick={e => e.stopPropagation()}
               >
-                <ActionsMenuItem onClick={handleShare}>
+                {book.canWrite && (
+                  <ActionsMenuItem onClick={handleShare}>
+                    <ListItemIcon>
+                      <Icon icon={ShareExternal} />
+                    </ListItemIcon>
+                    <ListItemText>{t('contacts.menu.share')}</ListItemText>
+                  </ActionsMenuItem>
+                )}
+                <ActionsMenuItem onClick={handleDelete}>
                   <ListItemIcon>
-                    <Icon icon={ShareExternal} />
+                    <Icon icon={Trash} />
                   </ListItemIcon>
-                  <ListItemText>{t('contacts.menu.share')}</ListItemText>
+                  <ListItemText>
+                    {t(
+                      isCopy ? 'contacts.menu.remove' : 'contacts.menu.delete'
+                    )}
+                  </ListItemText>
                 </ActionsMenuItem>
               </ActionsMenu>
             </>
@@ -113,6 +160,16 @@ export const AddressBookNavItem: React.FC<AddressBookNavItemProps> = ({
         <ShareAddressBookDialog
           addressBookId={book.id}
           onClose={() => setIsShareDialogOpen(false)}
+        />
+      )}
+      {isConfirmOpen && (
+        <DeleteAddressBookDialog
+          book={book}
+          onClose={() => setIsConfirmOpen(false)}
+          onConfirm={() => {
+            setIsConfirmOpen(false)
+            removeBook()
+          }}
         />
       )}
     </div>

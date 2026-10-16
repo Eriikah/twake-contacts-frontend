@@ -2,7 +2,7 @@
   "locale": "de-de",
   "contacts": {
     "title": "Kontakte",
-    "tabs": { "mine": "Meine Kontakte", "shared": "Mit mir geteilt" },
+    "tabs": { "mine": "Meine Kontakte", "shared": "Mir mitgeteilt" },
     "myContacts": "Meine Kontakte",
     "shared": "Geteilt",
     "domainAddressBook": "Domain-Adressbuch",
@@ -66,7 +66,8 @@
       "chat": "Chat",
       "mail": "E-Mail senden",
       "schedule": "Termin planen",
-      "share": "Teilen"
+      "share": "Teilen",
+      "remove": "Aus meiner Liste entfernen"
     },
     "delete": {
       "title": "Diesen Kontakt löschen?",
@@ -90,7 +91,8 @@
       "delete": "Kontakt konnte nicht gelöscht werden",
       "forbidden": "Sie haben keine Berechtigung, dieses Adressbuch zu ändern",
       "share": "Adressbuch konnte nicht freigegeben werden",
-      "subscribe": "Adressbuch konnte nicht hinzugefügt werden"
+      "subscribe": "Adressbuch konnte nicht hinzugefügt werden",
+      "deleteAddressBook": "Adressbuch konnte nicht entfernt werden"
     },
     "addressBook": {
       "createTitle": "Neues Adressbuch",
@@ -108,7 +110,13 @@
       "subscribe": "Hinzufügen",
       "subscribeSuccess": "Adressbuch erfolgreich hinzugefügt",
       "loadError": "Die Adressbücher dieses Benutzers konnten nicht geladen werden",
-      "contactsCount": "%{smart_count} Kontakt |||| %{smart_count} Kontakte"
+      "contactsCount": "%{smart_count} Kontakt |||| %{smart_count} Kontakte",
+      "deleteTitle": "Dieses Adressbuch löschen?",
+      "deleteDescription": "„%{name}“ und alle zugehörigen Kontakte werden dauerhaft gelöscht.",
+      "deleteConfirm": "Löschen",
+      "removeDescription": "„%{name}“ wird aus Ihrer Liste entfernt. Sie können es wieder hinzufügen, indem Sie nach dem Eigentümer suchen.",
+      "removeTitle": "Dieses Adressbuch entfernen?",
+      "removeConfirm": "Entfernen"
     },
     "share": {
       "title": "%{name} teilen",
