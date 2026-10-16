@@ -1,142 +1,36 @@
-import { useAppDispatch, useAppSelector } from '@common/app/hooks'
-import { addContactFromSearch } from '@common/features/Contacts/ContactsSlice'
-import {
-  AddressBookRef,
-  searchContacts
-} from '@common/features/Contacts/ContactsDao'
-import { Contact, ContactEntry } from '@common/features/Contacts/contactsTypes'
-import { Autocomplete, ListItem, SearchBar, Stack } from '@linagora/twake-mui'
-import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router'
+import { SearchBar } from '@linagora/twake-mui'
+import { useState } from 'react'
+import { createSearchParams, useNavigate, useSearchParams } from 'react-router'
 import { useI18n } from 'twake-i18n'
-import { ContactAvatar } from './ContactAvatar'
-
-interface SearchOption {
-  contact: Contact
-  addressBookId: string
-  label: string
-}
-
-function buildSearchOptions(entries: ContactEntry[]): SearchOption[] {
-  return entries.map(entry => ({
-    contact: entry.contact,
-    addressBookId: entry.addressBookId,
-    label: entry.contact.displayName
-  }))
-}
 
 export const ContactSearchBar: React.FC = () => {
   const { t } = useI18n()
   const navigate = useNavigate()
-  const dispatch = useAppDispatch()
-  const addressBooksRecord = useAppSelector(
-    state => state.contacts.addressBooks
-  )
-  const addressBooks = useMemo(
-    () => Object.values(addressBooksRecord),
-    [addressBooksRecord]
-  )
+  const [searchParams] = useSearchParams()
+  const [inputValue, setInputValue] = useState(searchParams.get('q') ?? '')
 
-  const addressBookRefs = useMemo<AddressBookRef[]>(
-    () =>
-      addressBooks.map(book => ({
-        userId: book.userId,
-        addressBookId: book.id === 'dab' ? 'domain-members' : book.id
-      })),
-    [addressBooks]
-  )
-
-  const [inputValue, setInputValue] = useState('')
-  const [options, setOptions] = useState<SearchOption[]>([])
-  const [loading, setLoading] = useState(false)
-  const [open, setOpen] = useState(false)
-
-  const fetchSearchResults = useCallback(
-    async (search: string) => {
-      if (addressBookRefs.length === 0 || !search.trim()) {
-        setOptions([])
-        setLoading(false)
-        return
-      }
-
-      setLoading(true)
-      try {
-        const entries = await searchContacts(addressBookRefs, search)
-        setOptions(buildSearchOptions(entries))
-      } catch {
-        setOptions([])
-      } finally {
-        setLoading(false)
-      }
-    },
-    [addressBookRefs]
-  )
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      void fetchSearchResults(inputValue)
-    }, 300)
-
-    return (): void => clearTimeout(timeoutId)
-  }, [inputValue, fetchSearchResults])
-
-  const handleChange = (_event: unknown, value: SearchOption | null): void => {
-    if (value) {
-      const storeAddressBookId =
-        value.addressBookId === 'domain-members' ? 'dab' : value.addressBookId
-      dispatch(
-        addContactFromSearch({
-          addressBookId: storeAddressBookId,
-          contact: value.contact
-        })
-      )
-      void navigate(`/contacts/${storeAddressBookId}/${value.contact.id}`)
-      setInputValue('')
-      setOptions([])
+  const handleKeyDown = (event: React.KeyboardEvent): void => {
+    if (event.key !== 'Enter' || !(event.target instanceof HTMLInputElement)) {
+      return
     }
+    event.preventDefault()
+    const query = event.target.value.trim()
+    if (!query) return
+    void navigate({
+      pathname: '/contacts/search',
+      search: createSearchParams({ q: query }).toString()
+    })
+    setInputValue('')
   }
 
   return (
-    <Autocomplete
-      value={null}
-      open={open && inputValue.trim().length > 0}
-      onOpen={() => setOpen(true)}
-      onClose={() => setOpen(false)}
-      options={options}
-      getOptionLabel={option => option.label}
-      inputValue={inputValue}
-      onInputChange={(_event, newInputValue) => {
-        setInputValue(newInputValue)
-        setLoading(true)
-      }}
-      onChange={handleChange}
-      loading={loading}
-      noOptionsText={t('contacts.search.noResults')}
-      loadingText={t('contacts.search.loading')}
-      renderInput={params => (
-        <SearchBar
-          ref={params.slotProps.input.ref}
-          onMouseDown={params.slotProps.input.onMouseDown}
-          value={inputValue}
-          placeholder={t('contacts.search.placeholder')}
-          onClear={() => setInputValue('')}
-          componentsProps={{
-            inputBase: { inputProps: params.slotProps.htmlInput }
-          }}
-        />
-      )}
-      renderOption={(props, option) => (
-        <ListItem {...props} key={option.contact.id}>
-          <Stack direction="row" spacing={1}>
-            <ContactAvatar size="s" displayName={option.contact.displayName} />
-            <span>{option.label}</span>
-          </Stack>
-        </ListItem>
-      )}
-      isOptionEqualToValue={(option, value): boolean =>
-        option.contact.id === value.contact.id
-      }
-      className="u-miw-7 "
-    />
+    <div className="u-miw-7" onKeyDown={handleKeyDown}>
+      <SearchBar
+        value={inputValue}
+        onChange={event => setInputValue(event.target.value)}
+        placeholder={t('contacts.search.placeholder')}
+        onClear={() => setInputValue('')}
+      />
+    </div>
   )
 }

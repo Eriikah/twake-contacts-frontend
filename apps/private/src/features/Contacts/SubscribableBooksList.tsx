@@ -1,13 +1,11 @@
 import { Stack, Typography } from '@linagora/twake-mui'
 import { useI18n } from 'twake-i18n'
-import {
-  AddressBook,
-  UserResult
-} from '@common/features/Contacts/contactsTypes'
+import { AddressBook } from '@common/features/Contacts/contactsTypes'
 import { AddressBookPaper } from './AddressBookPaper'
+import { OpenPaasUserData } from '@common/features/User/type/OpenPaasUserData'
 
 interface Props {
-  user: UserResult
+  user: OpenPaasUserData
   books: AddressBook[]
   emptyMessageKey: string | null
   onRemove: (book: AddressBook) => void

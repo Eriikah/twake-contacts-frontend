@@ -14,6 +14,7 @@ import { ContactCell } from './ContactCell'
 interface ContactsTableProps {
   entries: ContactEntry[]
   onEndReached: () => void
+  onSelect?: (entry: ContactEntry) => void
   loading?: boolean
   loadingMore?: boolean
 }
@@ -26,6 +27,7 @@ const LOADING_MORE_ROWS: VirtualizedTableRow[] = [0, 1].map(i => ({
 export const ContactsTable: React.FC<ContactsTableProps> = ({
   entries,
   onEndReached,
+  onSelect,
   loading = false,
   loadingMore = false
 }) => {
@@ -106,8 +108,12 @@ export const ContactsTable: React.FC<ContactsTableProps> = ({
 
   const handleClick = (row: VirtualizedTableRow): void => {
     if (row.loadingMore) return
-    const { addressBookId, contact } = row as unknown as ContactEntry
-    void navigate(`/contacts/${addressBookId}/${contact.id}`, {
+    const entry = row as unknown as ContactEntry
+    if (onSelect) {
+      onSelect(entry)
+      return
+    }
+    void navigate(`/contacts/${entry.addressBookId}/${entry.contact.id}`, {
       state: { from: location.pathname }
     })
   }

@@ -12,6 +12,7 @@ import { CreateContactPage } from './features/Contacts/CreateContactPage'
 import { EditContactPage } from './features/Contacts/EditContactPage'
 import HandleLogin from './features/User/HandleLogin'
 import { CallbackResume } from './features/User/LoginCallback'
+import { ContactSearchResults } from './features/Contacts/ContactSearchResults'
 
 export function AppRoutes(): JSX.Element {
   const error = useAppSelector(state => state.user.error)
@@ -35,6 +36,7 @@ export function AppRoutes(): JSX.Element {
           <Route path="/contacts" element={<ContactsPage />}>
             <Route index element={<AddressBookPage />} />
             <Route path="new" element={<CreateContactPage />} />
+            <Route path="/contacts/search" element={<ContactSearchResults />} />
             <Route path=":addressBookId/new" element={<CreateContactPage />} />
             <Route path=":addressBookId" element={<AddressBookPage />} />
             <Route path=":addressBookId/:contactId" element={<ContactPage />} />

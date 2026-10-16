@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import { useAppSelector } from '@common/app/hooks'
-import {
-  AddressBook,
-  UserResult
-} from '@common/features/Contacts/contactsTypes'
+import { AddressBook } from '@common/features/Contacts/contactsTypes'
 import { usePublicBooksLookup } from './usePublicBooksLookup'
+import { OpenPaasUserData } from '@common/features/User/type/OpenPaasUserData'
 
 type EmptyMessageKey =
   | 'contacts.addressBook.noneAvailable'
@@ -31,15 +29,15 @@ function getEmptyMessageKey(
 }
 
 export function usePublicAddressBooks(): {
-  user: UserResult | null
-  selectUser: (user: UserResult) => void
+  user: OpenPaasUserData | null
+  selectUser: (user: OpenPaasUserData) => void
   clearUser: () => void
   books: AddressBook[]
   emptyMessageKey: EmptyMessageKey | null
   removeBook: (book: AddressBook) => void
 } {
   const addressBooks = useAppSelector(state => state.contacts.addressBooks)
-  const [user, setUser] = useState<UserResult | null>(null)
+  const [user, setUser] = useState<OpenPaasUserData | null>(null)
   const [removedKeys, setRemovedKeys] = useState<string[]>([])
   const { fetched, failed } = usePublicBooksLookup(user)
 

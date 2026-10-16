@@ -1,36 +1,33 @@
 import { useEffect, useState } from 'react'
 import { useAppSelector } from '@common/app/hooks'
-import { UserResult } from '@common/features/Contacts/contactsTypes'
-import { searchUsers } from '@common/features/Contacts/ContactsDao'
+import { OpenPaasUserData } from '@common/features/User/type/OpenPaasUserData'
+import { searchUsers } from '@common/features/User/UserDao'
 
-const DEBOUNCE_MS = 300
-
-export function useUserSearch(query: string): UserResult[] {
+export function useUserSearch(query: string): {
+  users: OpenPaasUserData[]
+  loading: boolean
+} {
   const openpaasId = useAppSelector(state => state.user.userData.openpaasId)
-  const [users, setUsers] = useState<UserResult[]>([])
+  const [users, setUsers] = useState<OpenPaasUserData[]>([])
+  const [loading, setLoading] = useState(false)
   const trimmed = query.trim()
 
   useEffect(() => {
     if (!trimmed || !openpaasId) return
-    const ctrl = new AbortController()
+    let cancelled = false
+    setLoading(true)
+    setUsers([])
 
-    const timer = setTimeout((): void => {
-      const run = async (): Promise<void> => {
-        try {
-          setUsers(await searchUsers(trimmed, openpaasId, ctrl.signal))
-        } catch {
-          // aborted or failed: keep the previous options
-        }
-      }
-      void run()
-    }, DEBOUNCE_MS)
+    searchUsers(trimmed, [openpaasId]).then(result => {
+      if (cancelled) return
+      setUsers(result)
+      setLoading(false)
+    })
 
     return (): void => {
-      clearTimeout(timer)
-      ctrl.abort()
+      cancelled = true
     }
   }, [trimmed, openpaasId])
 
-  // stale results are hidden rather than cleared inside the effect
-  return trimmed ? users : []
+  return { users: trimmed ? users : [], loading: trimmed ? loading : false }
 }

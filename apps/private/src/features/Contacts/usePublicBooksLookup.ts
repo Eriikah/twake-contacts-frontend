@@ -1,9 +1,7 @@
 import { useEffect, useState } from 'react'
-import {
-  AddressBook,
-  UserResult
-} from '@common/features/Contacts/contactsTypes'
+import { AddressBook } from '@common/features/Contacts/contactsTypes'
 import { fetchPublicAddressBooks } from '@common/features/Contacts/ContactsDao'
+import { OpenPaasUserData } from '@common/features/User/type/OpenPaasUserData'
 
 interface Lookup {
   userId: string
@@ -11,7 +9,7 @@ interface Lookup {
   failed: boolean
 }
 
-export function usePublicBooksLookup(user: UserResult | null): {
+export function usePublicBooksLookup(user: OpenPaasUserData | null): {
   fetched: AddressBook[] | null
   failed: boolean
 } {

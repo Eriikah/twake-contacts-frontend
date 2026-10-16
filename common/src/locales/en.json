@@ -63,6 +63,7 @@
       "noneAvailable": "This user has no address book available",
       "allSubscribed": "No more address books to add",
       "subscribe": "Add",
+      "subscribeAll": "Add All",
       "subscribeSuccess": "Address book added successfully",
       "loadError": "Could not load this user's address books",
       "contactsCount": "%{smart_count} contact |||| %{smart_count} contacts"
@@ -93,7 +94,8 @@
     "search": {
       "placeholder": "Search contacts...",
       "loading": "Loading...",
-      "noResults": "No contacts found"
+      "noResults": "No contacts found",
+      "discoverContacts":"Discover Address Books"
     },
     "errors": {
       "load": "Failed to load contacts",
