@@ -11,7 +11,7 @@ export const CreateAddressBookButton: React.FC<
   CreateAddressBookButtonProps
 > = ({ onClick, label }) => {
   return (
-    <Tooltip title={label}>
+    <Tooltip disableInteractive title={label}>
       <IconButton
         size="xsmall"
         aria-label={label}

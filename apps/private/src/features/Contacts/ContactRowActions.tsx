@@ -79,7 +79,7 @@ export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
             row, so the old isHovered state is no longer reachable from here.
             The menu is portaled, so the row loses :hover while it is open. */}
         {!isReadOnly && (
-          <Tooltip title={t('contacts.menu.edit')}>
+          <Tooltip disableInteractive title={t('contacts.menu.edit')}>
             <IconButton
               size="medium"
               aria-label={t('contacts.menu.edit')}
@@ -93,7 +93,7 @@ export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
             </IconButton>
           </Tooltip>
         )}
-        <Tooltip title={t('contacts.menu.more')}>
+        <Tooltip disableInteractive title={t('contacts.menu.more')}>
           <IconButton
             size="medium"
             aria-label={t('contacts.menu.more')}

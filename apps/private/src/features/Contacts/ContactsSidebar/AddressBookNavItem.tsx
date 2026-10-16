@@ -66,7 +66,7 @@ export const AddressBookNavItem: React.FC<AddressBookNavItemProps> = ({
         secondaryAction={
           (isHovered || isMenuOpen) && book.canWrite ? (
             <>
-              <Tooltip title={t('contacts.menu.more')}>
+              <Tooltip disableInteractive title={t('contacts.menu.more')}>
                 <IconButton size="xsmall" onClick={handleMenuOpen}>
                   <Icon icon={Dots} size={10} rotate={90} />
                 </IconButton>
@@ -95,7 +95,10 @@ export const AddressBookNavItem: React.FC<AddressBookNavItemProps> = ({
           selected={selected}
         >
           <NavIcon icon={Peoples} />
-          <Tooltip title={getAddressBookDisplayName(book, t)}>
+          <Tooltip
+            disableInteractive
+            title={getAddressBookDisplayName(book, t)}
+          >
             <NavText className="u-mr-1" secondaryText={book.ownerDisplayName}>
               <Box className="u-ellipsis">
                 {getAddressBookDisplayName(book, t)}

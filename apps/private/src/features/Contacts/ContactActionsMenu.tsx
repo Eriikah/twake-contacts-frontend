@@ -29,7 +29,7 @@ export const ContactActionsBar: React.FC<ContactActionsBarProps> = ({
     <Stack direction="row" spacing={1}>
       {primaryAction}
       {onDelete && (
-        <Tooltip title={t('contacts.menu.delete')}>
+        <Tooltip disableInteractive title={t('contacts.menu.delete')}>
           <IconButton aria-label={t('contacts.menu.delete')} onClick={onDelete}>
             <Icon icon={Trash} />
           </IconButton>

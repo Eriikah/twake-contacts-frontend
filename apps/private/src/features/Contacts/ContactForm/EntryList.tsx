@@ -95,7 +95,7 @@ export const EntryList: React.FC<EntryListProps> = ({
           )}
           <Grid size={1}>
             {index > 0 && (
-              <Tooltip title={t('contacts.form.remove')}>
+              <Tooltip disableInteractive title={t('contacts.form.remove')}>
                 <Button
                   variant="text"
                   onClick={() => onRemove(index)}

@@ -168,6 +168,16 @@ describe('ContactsSidebar', () => {
     expect(label.closest('.u-midellipsis')).toBeNull()
   })
 
+  it('does not let the address book name tooltip capture clicks meant for the next entry', async () => {
+    renderSidebar('/contacts')
+
+    fireEvent.mouseOver(screen.getByText('Book 1'))
+
+    const tooltip = await screen.findByRole('tooltip')
+    expect(tooltip).toHaveTextContent('Book 1')
+    expect(tooltip).not.toHaveClass('MuiTooltip-popperInteractive')
+  })
+
   describe('My contacts dropdown', () => {
     const getMyContacts = (): HTMLElement =>
       screen.getByRole('button', { name: en.contacts.myContacts })

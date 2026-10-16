@@ -13,7 +13,7 @@ export const AvatarHeader: React.FC<AvatarHeaderProps> = ({
   return (
     <Stack direction="row" spacing={2} className="u-flex u-flex-items-center">
       <ContactAvatar size={94} initialsVariant="h2" displayName={displayName} />
-      <Tooltip title={displayName || title || ''}>
+      <Tooltip disableInteractive title={displayName || title || ''}>
         <Typography variant="h4" noWrap>
           {displayName || title || ''}
         </Typography>
