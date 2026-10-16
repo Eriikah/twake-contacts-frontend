@@ -18,12 +18,18 @@ export const UserAutocomplete: React.FC<{
 }> = ({ onSelect, onType }) => {
   const { t } = useI18n()
   const [query, setQuery] = useState('')
-  const users = useUserSearch(query)
+  const { users, loading } = useUserSearch(query)
+  const [open, setOpen] = useState(false)
 
   return (
     <Autocomplete
       fullWidth
       options={users}
+      open={open && query.trim().length > 0}
+      onOpen={() => setOpen(true)}
+      onClose={() => setOpen(false)}
+      loading={loading}
+      loadingText={t('contacts.search.loading')}
       value={null}
       inputValue={query}
       onInputChange={(_, value, reason) => {

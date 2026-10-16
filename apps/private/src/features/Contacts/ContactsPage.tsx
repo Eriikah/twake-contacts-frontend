@@ -103,9 +103,14 @@ export const ContactsPage: React.FC = () => {
       {isSubscribeOpen && (
         <SubscribeAddressBookDialog
           isSubscribing={isSubscribing}
-          onClose={() => setIsSubscribeOpen(false)}
+          error={error}
+          onClose={() => {
+            dispatch(clearContactsError())
+            setIsSubscribeOpen(false)
+          }}
           onConfirm={(user, books) => {
             if (isSubscribing || !openpaasId) return
+            dispatch(clearContactsError())
             setIsSubscribing(true)
             const subscribe = async (): Promise<void> => {
               try {

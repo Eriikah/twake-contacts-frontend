@@ -17,15 +17,18 @@ import {
 import { UserAutocomplete } from './UserAutocomplete'
 import { SubscribableBooksList } from './SubscribableBooksList'
 import { usePublicAddressBooks } from './usePublicAddressBooks'
+import { ErrorSnackbar } from '@common/components/Error/ErrorSnackbar'
 
 interface Props {
   isSubscribing?: boolean
+  error?: string | null
   onClose: () => void
   onConfirm: (user: UserResult, books: AddressBook[]) => void
 }
 
 export const SubscribeAddressBookDialog: React.FC<Props> = ({
   isSubscribing,
+  error,
   onClose,
   onConfirm
 }) => {
@@ -64,6 +67,7 @@ export const SubscribeAddressBookDialog: React.FC<Props> = ({
             onRemove={removeBook}
           />
         )}
+        {error && <ErrorSnackbar error={error} />}
       </DialogContent>
       <DialogActions>
         <Button variant="text" onClick={onClose}>

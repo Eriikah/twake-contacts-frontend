@@ -5,9 +5,15 @@ import { searchUsers } from '@common/features/Contacts/ContactsDao'
 
 const DEBOUNCE_MS = 300
 
-export function useUserSearch(query: string): UserResult[] {
+export function useUserSearch(query: string): {
+  users: UserResult[]
+  loading: boolean
+} {
   const openpaasId = useAppSelector(state => state.user.userData.openpaasId)
-  const [users, setUsers] = useState<UserResult[]>([])
+  const [result, setResult] = useState<{
+    query: string
+    users: UserResult[]
+  } | null>(null)
   const trimmed = query.trim()
 
   useEffect(() => {
@@ -16,11 +22,13 @@ export function useUserSearch(query: string): UserResult[] {
 
     const timer = setTimeout((): void => {
       const run = async (): Promise<void> => {
+        let users: UserResult[] = []
         try {
-          setUsers(await searchUsers(trimmed, openpaasId, ctrl.signal))
+          users = await searchUsers(trimmed, openpaasId, ctrl.signal)
         } catch {
-          // aborted or failed: keep the previous options
+          // failed search: show no option for this query
         }
+        if (!ctrl.signal.aborted) setResult({ query: trimmed, users })
       }
       void run()
     }, DEBOUNCE_MS)
@@ -31,6 +39,9 @@ export function useUserSearch(query: string): UserResult[] {
     }
   }, [trimmed, openpaasId])
 
-  // stale results are hidden rather than cleared inside the effect
-  return trimmed ? users : []
+  const current = result?.query === trimmed
+  return {
+    users: current ? result.users : [],
+    loading: Boolean(trimmed) && !current
+  }
 }
