@@ -114,7 +114,7 @@
       "emptySubtitle": "Las personas invitadas a unirse aparecerán aquí",
       "editor": "Editor",
       "viewer": "Lector",
-      "contactsCount": "%{count} contactos",
+      "contactsCount": "%{smart_count} contacto |||| %{smart_count} contactos",
       "you": "Tú",
       "defaultAddressBookName": "Libreta de direcciones"
     }

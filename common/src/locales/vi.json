@@ -114,7 +114,7 @@
       "emptySubtitle": "Những người được mời tham gia sẽ được liệt kê ở đây",
       "editor": "Người chỉnh sửa",
       "viewer": "Người xem",
-      "contactsCount": "%{count} liên hệ",
+      "contactsCount": "%{smart_count} liên hệ",
       "you": "Bạn",
       "defaultAddressBookName": "Sổ địa chỉ"
     }

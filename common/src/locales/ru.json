@@ -114,7 +114,7 @@
       "emptySubtitle": "Здесь будут перечислены приглашенные люди",
       "editor": "Редактор",
       "viewer": "Читатель",
-      "contactsCount": "%{count} контактов",
+      "contactsCount": "%{smart_count} контакт |||| %{smart_count} контакта |||| %{smart_count} контактов",
       "you": "Вы",
       "defaultAddressBookName": "Адресная книга"
     }

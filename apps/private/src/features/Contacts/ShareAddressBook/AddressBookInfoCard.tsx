@@ -31,7 +31,7 @@ export const AddressBookInfoCard: React.FC<AddressBookInfoCardProps> = ({
         {typeof book?.contactsCount === 'number' && (
           <Typography variant="caption" color="textSecondary">
             {t('contacts.share.contactsCount', {
-              count: book.contactsCount
+              smart_count: book.contactsCount
             })}
           </Typography>
         )}

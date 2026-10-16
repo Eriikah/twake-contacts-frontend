@@ -114,7 +114,7 @@
       "emptySubtitle": "People invited to join will be listed here",
       "editor": "Editor",
       "viewer": "Viewer",
-      "contactsCount": "%{count} contacts",
+      "contactsCount": "%{smart_count} contact |||| %{smart_count} contacts",
       "you": "You",
       "defaultAddressBookName": "Address book"
     }

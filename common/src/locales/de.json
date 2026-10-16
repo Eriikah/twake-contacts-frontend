@@ -114,7 +114,7 @@
       "emptySubtitle": "Personen, die eingeladen wurden, werden hier aufgelistet",
       "editor": "Bearbeiter",
       "viewer": "Betrachter",
-      "contactsCount": "%{count} Kontakte",
+      "contactsCount": "%{smart_count} Kontakt |||| %{smart_count} Kontakte",
       "you": "Du",
       "defaultAddressBookName": "Adressbuch"
     }
