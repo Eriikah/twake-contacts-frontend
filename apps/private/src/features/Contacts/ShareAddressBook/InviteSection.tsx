@@ -17,14 +17,17 @@ import { ToUserData } from '@common/features/User/type/OpenPaasUserData'
 import { userData } from '@common/features/User/userDataTypes'
 import { UserSearch } from '@common/components/Common/UserSearch'
 import { getInitials } from '../getInitials'
+import { getNonInvitableUserIds } from './sharingHelpers'
 
 interface InviteSectionProps {
+  currentUserId?: string
   invitedMembers?: userData[]
   onShare: (users: userData[], role: AddressBookAccessLevel) => void
   loading?: boolean
 }
 
 export const InviteSection: React.FC<InviteSectionProps> = ({
+  currentUserId,
   invitedMembers = [],
   onShare,
   loading = false
@@ -37,13 +40,15 @@ export const InviteSection: React.FC<InviteSectionProps> = ({
     AddressBookAccessLevel.Viewer
   )
 
-  const excludes = useMemo(() => {
-    return invitedMembers.map(m => m.openpaasId).filter(Boolean) as string[]
-  }, [invitedMembers])
+  const nonInvitableIds = useMemo(
+    () => getNonInvitableUserIds(invitedMembers, currentUserId),
+    [invitedMembers, currentUserId]
+  )
 
   const fetchOptions = useCallback(
     async (search: string): Promise<userData[]> => {
-      const users = await searchUsers(search, excludes)
+      // the backend may ignore excludes: filter client-side as well
+      const users = await searchUsers(search, [...nonInvitableIds])
       const selectedIds = new Set(
         selectedUsers
           .map(u => u.openpaasId)
@@ -55,10 +60,11 @@ export const InviteSection: React.FC<InviteSectionProps> = ({
           (user): user is userData =>
             user != null &&
             Boolean(user.openpaasId) &&
+            !nonInvitableIds.has(user.openpaasId as string) &&
             !selectedIds.has(user.openpaasId as string)
         )
     },
-    [excludes, selectedUsers]
+    [nonInvitableIds, selectedUsers]
   )
 
   return (

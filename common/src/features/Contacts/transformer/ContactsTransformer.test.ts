@@ -1,5 +1,9 @@
-import { DavAddressBookItem } from '../davTypes'
-import { normalizeAddressBook } from './ContactsTransformer'
+import { AddressBookAccessLevel, DavAddressBookItem } from '../davTypes'
+import { userData } from '../../User/userDataTypes'
+import {
+  buildFullShareesList,
+  normalizeAddressBook
+} from './ContactsTransformer'
 
 const sharedBook = (shareAccess?: number | null): DavAddressBookItem => ({
   _links: { self: { href: '/addressbooks/owner/book.json' } },
@@ -24,5 +28,83 @@ describe('normalizeAddressBook', () => {
   it('is read-only when the acl grants no write right', () => {
     const book = { ...sharedBook(), 'dav:acl': ['dav:read'] }
     expect(normalizeAddressBook(book).canWrite).toBe(false)
+  })
+})
+
+describe('buildFullShareesList', () => {
+  const member = (
+    openpaasId: string,
+    role: AddressBookAccessLevel
+  ): userData => ({
+    openpaasId,
+    role,
+    email: `${openpaasId}@example.com`,
+    name: openpaasId,
+    family_name: '',
+    given_name: '',
+    sid: '',
+    sub: ''
+  })
+
+  const ownerEntry = {
+    userId: 'alice',
+    access: AddressBookAccessLevel.Owner,
+    href: 'principals/users/alice'
+  }
+
+  it('keeps the owner entry when the owner is invited', () => {
+    const sharees = buildFullShareesList(
+      'alice',
+      [member('bob', AddressBookAccessLevel.Viewer)],
+      [
+        {
+          userId: 'alice',
+          role: AddressBookAccessLevel.Viewer,
+          href: 'mailto:alice@example.com'
+        }
+      ]
+    )
+
+    expect(sharees).toEqual([
+      ownerEntry,
+      {
+        userId: 'bob',
+        access: AddressBookAccessLevel.Viewer,
+        href: 'mailto:bob@example.com'
+      }
+    ])
+  })
+
+  it('keeps the owner entry when the owner is listed among the members', () => {
+    const sharees = buildFullShareesList(
+      'alice',
+      [member('alice', AddressBookAccessLevel.Owner)],
+      []
+    )
+
+    expect(sharees).toEqual([ownerEntry])
+  })
+
+  it('applies the updates of the other users', () => {
+    const sharees = buildFullShareesList(
+      'alice',
+      [member('bob', AddressBookAccessLevel.Viewer)],
+      [
+        {
+          userId: 'bob',
+          role: AddressBookAccessLevel.Editor,
+          href: 'mailto:bob@example.com'
+        }
+      ]
+    )
+
+    expect(sharees).toEqual([
+      ownerEntry,
+      {
+        userId: 'bob',
+        access: AddressBookAccessLevel.Editor,
+        href: 'mailto:bob@example.com'
+      }
+    ])
   })
 })

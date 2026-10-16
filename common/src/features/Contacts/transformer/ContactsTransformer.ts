@@ -346,18 +346,21 @@ export const buildFullShareesList = (
     href: `principals/users/${userDataId}`
   })
 
-  invitedMembers.forEach(m => {
-    if (m.openpaasId) {
-      shareesMap.set(m.openpaasId, {
+  // the owner entry must never be overwritten, whatever the members or updates say
+  invitedMembers
+    .filter(m => m.openpaasId && m.openpaasId !== userDataId)
+    .forEach(m => {
+      shareesMap.set(m.openpaasId as string, {
         role: m.role ?? AddressBookAccessLevel.Viewer,
         href: m.href || `mailto:${m.email}`
       })
-    }
-  })
+    })
 
-  updates.forEach(u => {
-    shareesMap.set(u.userId, { role: u.role, href: u.href })
-  })
+  updates
+    .filter(u => u.userId !== userDataId)
+    .forEach(u => {
+      shareesMap.set(u.userId, { role: u.role, href: u.href })
+    })
 
   return Array.from(shareesMap.entries()).map(([userId, data]) => ({
     userId,

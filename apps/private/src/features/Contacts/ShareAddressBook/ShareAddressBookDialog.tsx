@@ -4,7 +4,8 @@ import {
   DialogTitle,
   DialogContent,
   IconButton,
-  Stack
+  Stack,
+  Alert
 } from '@linagora/twake-mui'
 import { Cross, Icon } from '@linagora/twake-icons'
 import { useI18n } from 'twake-i18n'
@@ -16,6 +17,8 @@ import {
 import { AddressBookAccessLevel } from '@common/features/Contacts/davTypes'
 import { userData as UserDataType } from '@common/features/User/userDataTypes'
 import { buildFullShareesList } from '@common/features/Contacts/transformer/ContactsTransformer'
+import { toContactsErrorKey } from '@common/features/Contacts/contactsUtils'
+import { RejectedError } from '@common/utils/errorUtils'
 
 import { AddressBookInfoCard } from './AddressBookInfoCard'
 import { InviteSection } from './InviteSection'
@@ -88,6 +91,7 @@ interface ExecuteShareUpdatesParams {
   onSuccess?: () => void
   onError?: (error: unknown) => void
   onSettled?: () => void
+  reportError: (errorKey: string | null) => void
 }
 
 const executeShareUpdates = async ({
@@ -98,9 +102,11 @@ const executeShareUpdates = async ({
   updates,
   onSuccess,
   onError,
-  onSettled
+  onSettled,
+  reportError
 }: ExecuteShareUpdatesParams): Promise<void> => {
   if (!userDataId || !bookId) return
+  reportError(null)
 
   const sharees = buildFullShareesList(userDataId, invitedMembers, updates)
 
@@ -123,6 +129,9 @@ const executeShareUpdates = async ({
   } catch (error) {
     console.error('Failed to update shares', error)
     onError?.(error)
+    reportError(
+      toContactsErrorKey(error as RejectedError, 'contacts.errors.share')
+    )
   } finally {
     onSettled?.()
   }
@@ -134,6 +143,7 @@ interface HandleShareParams {
   invitedMembers: UserDataType[]
   dispatch: ReturnType<typeof useAppDispatch>
   setIsSharing: (s: boolean) => void
+  reportError: (errorKey: string | null) => void
 }
 
 const createHandleShare =
@@ -142,7 +152,8 @@ const createHandleShare =
     bookId,
     invitedMembers,
     dispatch,
-    setIsSharing
+    setIsSharing,
+    reportError
   }: HandleShareParams): ((
     users: UserDataType[],
     role: AddressBookAccessLevel
@@ -166,7 +177,8 @@ const createHandleShare =
       invitedMembers,
       dispatch,
       updates,
-      onSettled: () => setIsSharing(false)
+      onSettled: () => setIsSharing(false),
+      reportError
     })
   }
 
@@ -177,6 +189,7 @@ interface HandleUpdateMemberParams {
   dispatch: ReturnType<typeof useAppDispatch>
   setRemovedIds: React.Dispatch<React.SetStateAction<string[]>>
   setUpdatingMemberId: (id: string | null) => void
+  reportError: (errorKey: string | null) => void
 }
 
 const createHandleUpdateMember =
@@ -186,7 +199,8 @@ const createHandleUpdateMember =
     invitedMembers,
     dispatch,
     setRemovedIds,
-    setUpdatingMemberId
+    setUpdatingMemberId,
+    reportError
   }: HandleUpdateMemberParams): ((
     user: UserDataType,
     role: AddressBookAccessLevel
@@ -219,7 +233,8 @@ const createHandleUpdateMember =
           setRemovedIds(prev => prev.filter(id => id !== user.openpaasId))
         }
       },
-      onSettled: () => setUpdatingMemberId(null)
+      onSettled: () => setUpdatingMemberId(null),
+      reportError
     })
   }
 
@@ -231,6 +246,7 @@ interface AddressBookSharingActionsParams {
   setIsSharing: (s: boolean) => void
   setUpdatingMemberId: (id: string | null) => void
   setRemovedIds: React.Dispatch<React.SetStateAction<string[]>>
+  reportError: (errorKey: string | null) => void
 }
 
 const useAddressBookSharingActions = ({
@@ -240,7 +256,8 @@ const useAddressBookSharingActions = ({
   invitedMembers,
   setIsSharing,
   setUpdatingMemberId,
-  setRemovedIds
+  setRemovedIds,
+  reportError
 }: AddressBookSharingActionsParams): {
   handleShare: (
     users: UserDataType[],
@@ -258,11 +275,19 @@ const useAddressBookSharingActions = ({
         bookId: book?.id,
         invitedMembers,
         dispatch,
-        setIsSharing
+        setIsSharing,
+        reportError
       })
       await handler(users, role)
     },
-    [userData.openpaasId, book?.id, invitedMembers, dispatch, setIsSharing]
+    [
+      userData.openpaasId,
+      book?.id,
+      invitedMembers,
+      dispatch,
+      setIsSharing,
+      reportError
+    ]
   )
 
   const handleUpdateMember = useCallback(
@@ -273,7 +298,8 @@ const useAddressBookSharingActions = ({
         invitedMembers,
         dispatch,
         setRemovedIds,
-        setUpdatingMemberId
+        setUpdatingMemberId,
+        reportError
       })
       await handler(user, role)
     },
@@ -283,7 +309,8 @@ const useAddressBookSharingActions = ({
       invitedMembers,
       dispatch,
       setRemovedIds,
-      setUpdatingMemberId
+      setUpdatingMemberId,
+      reportError
     ]
   )
 
@@ -312,6 +339,7 @@ export const ShareAddressBookDialog: React.FC<ShareAddressBookDialogProps> = ({
     invitedMembers,
     activeInvitedMembers
   } = useAddressBookSharingState(userData, book, dispatch)
+  const [shareError, setShareError] = React.useState<string | null>(null)
 
   const { handleShare, handleUpdateMember } = useAddressBookSharingActions({
     userData,
@@ -320,7 +348,8 @@ export const ShareAddressBookDialog: React.FC<ShareAddressBookDialogProps> = ({
     invitedMembers,
     setIsSharing,
     setUpdatingMemberId,
-    setRemovedIds
+    setRemovedIds,
+    reportError: setShareError
   })
 
   return (
@@ -341,7 +370,17 @@ export const ShareAddressBookDialog: React.FC<ShareAddressBookDialogProps> = ({
 
       <DialogContent className="u-pb-2 u-pt-1">
         <AddressBookInfoCard book={book} />
+        {shareError && (
+          <Alert
+            severity="error"
+            className="u-mt-1"
+            onClose={() => setShareError(null)}
+          >
+            {t(shareError)}
+          </Alert>
+        )}
         <InviteSection
+          currentUserId={userData.openpaasId}
           invitedMembers={activeInvitedMembers}
           onShare={(users, role) => void handleShare(users, role)}
           loading={isSharing}
