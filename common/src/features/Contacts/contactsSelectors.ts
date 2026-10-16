@@ -90,6 +90,7 @@ export const selectWritableBooks = createSelector(
   [selectAddressBooks],
   (books): AddressBook[] =>
     Object.values(books).filter(
-      book => book.canWrite && book.id !== 'collected'
+      // the domain book is writable but must not be edited from here
+      book => book.canWrite && book.id !== 'collected' && book.id !== 'dab'
     )
 )

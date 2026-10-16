@@ -65,6 +65,38 @@ function renderPage(initialEntries: string[]): ReturnType<typeof render> {
           acl: [],
           canWrite: true,
           contacts: []
+        },
+        alphaShared: {
+          id: 'alphaShared',
+          userId: 'u1',
+          ownerId: 'u2',
+          ownerDisplayName: 'Bob Owner',
+          name: 'Alpha Shared',
+          contactsCount: null,
+          acl: [],
+          canWrite: true,
+          contacts: []
+        },
+        readOnlyShared: {
+          id: 'readOnlyShared',
+          userId: 'u1',
+          ownerId: 'u2',
+          ownerDisplayName: 'Bob Owner',
+          name: 'Read Only Shared',
+          contactsCount: null,
+          acl: [],
+          canWrite: false,
+          contacts: []
+        },
+        dab: {
+          id: 'dab',
+          userId: 'u1',
+          ownerId: 'domain1',
+          name: 'Domain members',
+          contactsCount: null,
+          acl: [],
+          canWrite: true,
+          contacts: []
         }
       },
       loading: false,
@@ -200,6 +232,23 @@ describe('CreateContactPage', () => {
 
     const addressBookSelect = screen.getByLabelText('Address book')
     expect(addressBookSelect).toHaveTextContent('Book 1')
+  })
+
+  it('lists own, then writable shared address books, without the domain book', () => {
+    renderPage(['/contacts/new'])
+
+    fireEvent.mouseDown(screen.getByLabelText('Address book'))
+    const listbox = within(screen.getByRole('listbox'))
+
+    expect(
+      listbox.getAllByRole('option').map(option => option.textContent)
+    ).toEqual([
+      'My contacts',
+      'Book 1',
+      'Book 2',
+      'Shared',
+      'Alpha SharedBob Owner'
+    ])
   })
 
   it('links back to main page for hidden address books', () => {
