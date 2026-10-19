@@ -50,6 +50,13 @@
       "newContact": "Nuovo contatto",
       "invalidEmail": "Indirizzo email non valido"
     },
+    "edit": {
+      "title": "Modifica rubrica",
+      "name": "Nome",
+      "description": "Descrizione",
+      "cancel": "Annulla",
+      "save": "Salva"
+    },
     "types": {
       "cell": "Cellulare",
       "work": "Lavoro",
@@ -92,7 +99,8 @@
       "forbidden": "Non hai i permessi per modificare questa rubrica",
       "share": "Impossibile condividere la rubrica",
       "subscribe": "Impossibile aggiungere la rubrica",
-      "deleteAddressBook": "Impossibile rimuovere la rubrica"
+      "deleteAddressBook": "Impossibile rimuovere la rubrica",
+      "updateAddressBook": "Impossibile aggiornare la rubrica"
     },
     "addressBook": {
       "createTitle": "Nuova rubrica",
@@ -116,7 +124,9 @@
       "deleteConfirm": "Elimina",
       "removeDescription": "“%{name}” verrà rimossa dalla tua lista. Potrai aggiungerla di nuovo cercando il suo proprietario.",
       "removeTitle": "Rimuovere questa rubrica?",
-      "removeConfirm": "Rimuovi"
+      "removeConfirm": "Rimuovi",
+      "editTitle": "Modifica rubrica",
+      "editSuccess": "Rubrica aggiornata con successo"
     },
     "share": {
       "title": "Condividi %{name}",

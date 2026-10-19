@@ -50,6 +50,13 @@
       "newContact": "Nouveau contact",
       "invalidEmail": "Adresse email invalide"
     },
+    "edit": {
+      "title": "Modifier le carnet d'adresses",
+      "name": "Nom",
+      "description": "Description",
+      "cancel": "Annuler",
+      "save": "Enregistrer"
+    },
     "types": {
       "cell": "Mobile",
       "work": "Travail",
@@ -92,7 +99,8 @@
       "forbidden": "Vous n'avez pas le droit de modifier ce carnet d'adresses",
       "share": "Échec du partage du carnet d'adresses",
       "subscribe": "Impossible d'ajouter le carnet d'adresses",
-      "deleteAddressBook": "Impossible de retirer le carnet d'adresses"
+      "deleteAddressBook": "Impossible de retirer le carnet d'adresses",
+      "updateAddressBook": "Impossible de modifier le carnet d'adresses"
     },
     "addressBook": {
       "createTitle": "Nouveau carnet d'adresses",
@@ -116,7 +124,9 @@
       "deleteConfirm": "Supprimer",
       "removeDescription": "« %{name} » sera retiré de votre liste. Vous pourrez le retrouver en recherchant son propriétaire.",
       "removeTitle": "Retirer ce carnet d'adresses ?",
-      "removeConfirm": "Retirer"
+      "removeConfirm": "Retirer",
+      "editTitle": "Modifier le carnet d'adresses",
+      "editSuccess": "Carnet d'adresses modifié avec succès"
     },
     "share": {
       "title": "Partager %{name}",

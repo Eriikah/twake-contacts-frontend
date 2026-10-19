@@ -50,6 +50,13 @@
       "newContact": "Neuer Kontakt",
       "invalidEmail": "Ungültige E-Mail-Adresse"
     },
+    "edit": {
+      "title": "Adressbuch bearbeiten",
+      "name": "Name",
+      "description": "Beschreibung",
+      "cancel": "Abbrechen",
+      "save": "Speichern"
+    },
     "types": {
       "cell": "Mobil",
       "work": "Arbeit",
@@ -92,7 +99,8 @@
       "forbidden": "Sie haben keine Berechtigung, dieses Adressbuch zu ändern",
       "share": "Adressbuch konnte nicht freigegeben werden",
       "subscribe": "Adressbuch konnte nicht hinzugefügt werden",
-      "deleteAddressBook": "Adressbuch konnte nicht entfernt werden"
+      "deleteAddressBook": "Adressbuch konnte nicht entfernt werden",
+      "updateAddressBook": "Adressbuch konnte nicht aktualisiert werden"
     },
     "addressBook": {
       "createTitle": "Neues Adressbuch",
@@ -116,7 +124,9 @@
       "deleteConfirm": "Löschen",
       "removeDescription": "„%{name}“ wird aus Ihrer Liste entfernt. Sie können es wieder hinzufügen, indem Sie nach dem Eigentümer suchen.",
       "removeTitle": "Dieses Adressbuch entfernen?",
-      "removeConfirm": "Entfernen"
+      "removeConfirm": "Entfernen",
+      "editTitle": "Adressbuch bearbeiten",
+      "editSuccess": "Adressbuch erfolgreich aktualisiert"
     },
     "share": {
       "title": "%{name} teilen",

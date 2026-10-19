@@ -522,3 +522,19 @@ export async function deleteAddressBook(
     headers: { Accept: 'application/vcard+json' }
   })
 }
+
+export const updateAddressBook = async (
+  userId: string,
+  addressBookId: string,
+  { name }: { name: string }
+): Promise<void> => {
+  await api(`dav/addressbooks/${userId}/${addressBookId}.json`, {
+    method: 'PROPPATCH',
+    headers: { Accept: 'application/vcard+json' },
+    body: JSON.stringify({
+      'dav:name': name,
+      'carddav:description': '',
+      state: ''
+    })
+  })
+}
