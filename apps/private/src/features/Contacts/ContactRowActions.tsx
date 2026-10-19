@@ -1,4 +1,4 @@
-import { IconButton, Stack, Tooltip } from '@linagora/twake-mui'
+import { IconButton, Stack, Tooltip, useBreakpoints } from '@linagora/twake-mui'
 import { Icon, Pen, Dots } from '@linagora/twake-icons'
 import { useAppDispatch, useAppSelector } from '@common/app/hooks'
 import { deleteContact } from '@common/features/Contacts/ContactsSlice'
@@ -25,6 +25,7 @@ export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
   readOnly
 }) => {
   const { t } = useI18n()
+  const { isMobile } = useBreakpoints()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
   const openpaasId = useAppSelector(state => state.user.userData.openpaasId)
@@ -51,6 +52,7 @@ export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
   }
 
   const handleEdit = (): void => {
+    setAnchorEl(null)
     void navigate(`/contacts/${addressBookId}/${contact.id}/edit`)
   }
 
@@ -73,12 +75,17 @@ export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
 
   return (
     <>
-      <Stack direction="row" spacing={1} className="u-flex-justify-end">
+      <Stack
+        direction="row"
+        spacing={1}
+        className="u-flex-justify-end"
+        onClick={event => event.stopPropagation()}
+      >
         {/* TEMPORARY: reveal on row hover through CSS until twake-mui ships a
             MuiTableRow rule for hover-only actions. VirtualizedTable owns the
             row, so the old isHovered state is no longer reachable from here.
             The menu is portaled, so the row loses :hover while it is open. */}
-        {!isReadOnly && (
+        {!isReadOnly && !isMobile && (
           <Tooltip disableInteractive title={t('contacts.menu.edit')}>
             <IconButton
               size="medium"
@@ -106,6 +113,7 @@ export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
           contact={contact}
           anchorEl={anchorEl}
           onClose={handleMenuClose}
+          onEdit={handleEdit}
           onOpenDeleteDialog={handleOpenDeleteDialog}
           readOnly={isReadOnly}
         />

@@ -5,7 +5,7 @@ import en from '@common/locales/en.json'
 import { TwakeMuiThemeProvider } from '@linagora/twake-mui'
 import { act, fireEvent, render, screen } from '@testing-library/react'
 import { Provider } from 'react-redux'
-import { MemoryRouter, Route, Routes } from 'react-router'
+import { Link, MemoryRouter, Route, Routes } from 'react-router'
 import I18n from 'twake-i18n'
 import { ContactsPage } from './ContactsPage'
 
@@ -55,8 +55,14 @@ function renderPage(): ReturnType<typeof setupStore> {
           <MemoryRouter initialEntries={['/contacts']}>
             <Routes>
               <Route path="/contacts" element={<ContactsPage />}>
-                <Route index element={<div />} />
-                <Route path=":addressBookId" element={<div />} />
+                <Route
+                  index
+                  element={<Link to="/contacts/book1">Open address book</Link>}
+                />
+                <Route
+                  path=":addressBookId"
+                  element={<div>Address book page</div>}
+                />
               </Route>
             </Routes>
           </MemoryRouter>
@@ -75,8 +81,9 @@ describe('ContactsPage error banner', () => {
       en.contacts.errors.forbidden
     )
 
-    fireEvent.click(screen.getByText('Book 1'))
+    fireEvent.click(screen.getByRole('link', { name: 'Open address book' }))
 
+    expect(screen.getByText('Address book page')).toBeInTheDocument()
     expect(screen.queryByRole('alert')).not.toBeInTheDocument()
     expect(store.getState().contacts.error).toBeNull()
   })

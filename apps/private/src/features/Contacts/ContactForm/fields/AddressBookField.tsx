@@ -4,7 +4,8 @@ import {
   ListItemText,
   ListSubheader,
   MenuItem,
-  TextField
+  TextField,
+  useBreakpoints
 } from '@linagora/twake-mui'
 import { Icon, People } from '@linagora/twake-icons'
 import { useAppSelector } from '@common/app/hooks'
@@ -31,6 +32,7 @@ export const AddressBookField: React.FC<AddressBookFieldProps> = ({
   onChange
 }) => {
   const { t } = useI18n()
+  const { isMobile } = useBreakpoints()
   const openpaasId = useAppSelector(state => state.user.userData.openpaasId)
   // same grouping as the sidebar: own books, then the books shared with the
   // user; the domain book is never listed
@@ -53,7 +55,7 @@ export const AddressBookField: React.FC<AddressBookFieldProps> = ({
 
   return (
     <FormRow>
-      <Grid size={8}>
+      <Grid size={isMobile ? 12 : 8}>
         <TextField
           select
           fullWidth

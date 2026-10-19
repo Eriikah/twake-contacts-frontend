@@ -12,7 +12,8 @@ import {
   Sidebar,
   Button,
   NavDesktopDropdown,
-  Stack
+  Stack,
+  useBreakpoints
 } from '@linagora/twake-mui'
 import { Link, useMatch, useNavigate, useParams } from 'react-router'
 import { useI18n } from 'twake-i18n'
@@ -27,11 +28,15 @@ import { CreateAddressBookButton } from './ContactsSidebar/CreateAddressBookButt
 export interface ContactsSidebarProps {
   onOpenCreateBook: () => void
   onOpenSubscribe: () => void
+  open?: boolean
+  onClose?: () => void
 }
 
 export const ContactsSidebar: React.FC<ContactsSidebarProps> = ({
   onOpenCreateBook,
-  onOpenSubscribe
+  onOpenSubscribe,
+  open = true,
+  onClose
 }) => {
   const [isMyContactsExpanded, setIsMyContactsExpanded] = useState(true)
   const { t } = useI18n()
@@ -39,6 +44,8 @@ export const ContactsSidebar: React.FC<ContactsSidebarProps> = ({
   const navigate = useNavigate()
   const isOnMyContacts = useMatch('/contacts') !== null
   const openpaasId = useAppSelector(state => state.user.userData.openpaasId)
+  const { isMobile } = useBreakpoints()
+
   const addressBooks = useAppSelector(state => state.contacts.addressBooks)
   const currentBook = addressBookId ? addressBooks[addressBookId] : undefined
   const createLink = getCreateContactLink(addressBookId, currentBook)
@@ -48,20 +55,29 @@ export const ContactsSidebar: React.FC<ContactsSidebarProps> = ({
     t
   )
 
+  const handleItemClick = (path: string): void => {
+    void navigate(path)
+    if (isMobile) {
+      onClose?.()
+    }
+  }
+
   return (
-    <Sidebar>
-      <Box className="u-mh-1 u-mt-1">
-        <Button
-          variant="contained"
-          fullWidth
-          startIcon={<Icon size={12} icon={Plus} />}
-          component={Link}
-          to={createLink}
-          className="u-bdrs-6 u-fz-small"
-        >
-          {t('contacts.create')}
-        </Button>
-      </Box>
+    <Sidebar anchor="left" open={open} onClose={onClose}>
+      {!isMobile && (
+        <Box className="u-mh-1 u-mt-1">
+          <Button
+            variant="contained"
+            fullWidth
+            startIcon={<Icon size={12} icon={Plus} />}
+            component={Link}
+            to={createLink}
+            className="u-bdrs-6 u-fz-small"
+          >
+            {t('contacts.create')}
+          </Button>
+        </Box>
+      )}
       <Box className="u-flex-auto u-ov-auto u-mt-1-half">
         <Nav className="u-mv-0">
           <MyContactsNavItem
@@ -79,7 +95,12 @@ export const ContactsSidebar: React.FC<ContactsSidebarProps> = ({
                 void navigate('/contacts')
               }
             }}
-            onOpenCreateBook={onOpenCreateBook}
+            onOpenCreateBook={() => {
+              onOpenCreateBook()
+              if (isMobile) {
+                onClose?.()
+              }
+            }}
           />
 
           {isMyContactsExpanded &&
@@ -95,9 +116,7 @@ export const ContactsSidebar: React.FC<ContactsSidebarProps> = ({
           {domainBooks.map(book => (
             <NavItem key={book.id}>
               <NavLink
-                onClick={() => {
-                  void navigate(`/contacts/${book.id}`)
-                }}
+                onClick={() => handleItemClick(`/contacts/${book.id}`)}
                 selected={addressBookId === book.id}
               >
                 <NavIcon icon={Company} />

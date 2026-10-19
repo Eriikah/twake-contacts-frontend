@@ -57,13 +57,15 @@ describe('AppRoutes', () => {
     setMobile(false)
   })
 
-  it('shows the mobile placeholder and hides the routes on mobile', () => {
+  it('renders the contact creation route on mobile', () => {
     setMobile(true)
     render(appRoutesTree())
 
-    expect(screen.getByText(en.mobile.comingSoon.title)).toBeInTheDocument()
     expect(
-      screen.queryByRole('textbox', { name: 'First name' })
+      screen.getByRole('textbox', { name: 'First name' })
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText(en.mobile.comingSoon.title)
     ).not.toBeInTheDocument()
   })
 
@@ -76,7 +78,12 @@ describe('AppRoutes', () => {
 
     setMobile(true)
     rerender(appRoutesTree(store))
-    expect(screen.getByText(en.mobile.comingSoon.title)).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: 'First name' })).toHaveValue(
+      'Resize'
+    )
+    expect(
+      screen.queryByText(en.mobile.comingSoon.title)
+    ).not.toBeInTheDocument()
 
     setMobile(false)
     rerender(appRoutesTree(store))
