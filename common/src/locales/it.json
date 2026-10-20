@@ -96,7 +96,6 @@
       "create": "Impossibile creare il contatto",
       "update": "Impossibile aggiornare il contatto",
       "delete": "Impossibile eliminare il contatto",
-      "forbidden": "Non hai i permessi per modificare questa rubrica",
       "share": "Impossibile condividere la rubrica",
       "subscribe": "Impossibile aggiungere la rubrica",
       "deleteAddressBook": "Impossibile rimuovere la rubrica",
@@ -140,7 +139,12 @@
       "viewer": "Spettatore",
       "contactsCount": "%{smart_count} contatto |||| %{smart_count} contatti",
       "you": "Tu",
-      "defaultAddressBookName": "Rubrica"
+      "defaultAddressBookName": "Rubrica",
+      "discovery": {
+        "title": "Scopribilità",
+        "description": "Consenti ad altri di trovare e aggiungere questa rubrica tramite la ricerca.",
+        "toggleTooltip": "Attiva/disattiva la scoperta pubblica"
+      }
     }
   },
   "error": {
