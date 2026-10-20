@@ -11,7 +11,8 @@ import {
   Trash,
   EmailOpen,
   CalendarToday,
-  Discuss
+  Discuss,
+  Share
 } from '@linagora/twake-icons'
 import { useI18n } from 'twake-i18n'
 import { useAppSelector } from '@common/app/hooks'
@@ -25,6 +26,7 @@ interface ContactRowDropdownMenuProps {
   anchorEl: null | HTMLElement
   onClose: () => void
   onEdit?: () => void
+  onShare: () => void
   onOpenDeleteDialog: () => void
   readOnly?: boolean
 }
@@ -43,6 +45,7 @@ export const ContactRowDropdownMenu: React.FC<ContactRowDropdownMenuProps> = ({
   anchorEl,
   onClose,
   onEdit,
+  onShare,
   onOpenDeleteDialog,
   readOnly
 }) => {
@@ -95,6 +98,12 @@ export const ContactRowDropdownMenu: React.FC<ContactRowDropdownMenuProps> = ({
           <ListItemText>{t('contacts.menu.edit')}</ListItemText>
         </ActionsMenuItem>
       )}
+      <ActionsMenuItem onClick={onShare}>
+        <ListItemIcon>
+          <Icon icon={Share} />
+        </ListItemIcon>
+        <ListItemText>{t('contacts.menu.share')}</ListItemText>
+      </ActionsMenuItem>
       <ActionsMenuItem onClick={handleSendMail} disabled={!firstEmail}>
         <ListItemIcon>
           <Icon icon={EmailOpen} />

@@ -141,6 +141,12 @@
       "contactsCount": "%{smart_count} контакт |||| %{smart_count} контакта |||| %{smart_count} контактов",
       "you": "Вы",
       "defaultAddressBookName": "Адресная книга"
+    },
+    "shareContact": {
+      "title": "Поделиться %{name}",
+      "send": "Написать письмо",
+      "emailSubject": "Контакт: %{name}",
+      "emailBody": "Здравствуйте!\n\nЯ хочу поделиться с вами контактом «%{name}». Перейдите по ссылке, чтобы добавить его в свои контакты:\n%{url}"
     }
   },
   "error": {

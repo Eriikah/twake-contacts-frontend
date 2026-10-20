@@ -141,6 +141,12 @@
       "contactsCount": "%{smart_count} liên hệ",
       "you": "Bạn",
       "defaultAddressBookName": "Sổ địa chỉ"
+    },
+    "shareContact": {
+      "title": "Chia sẻ %{name}",
+      "send": "Soạn email",
+      "emailSubject": "Liên hệ được chia sẻ: %{name}",
+      "emailBody": "Xin chào,\n\nTôi muốn chia sẻ liên hệ “%{name}” với bạn. Hãy dùng liên kết này để thêm vào danh bạ của bạn:\n%{url}"
     }
   },
   "error": {

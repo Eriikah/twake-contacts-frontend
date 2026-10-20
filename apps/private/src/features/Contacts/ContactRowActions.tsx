@@ -10,6 +10,8 @@ import { useNavigate } from 'react-router'
 import { useI18n } from 'twake-i18n'
 import { DeleteContactDialog } from './DeleteContactDialog'
 import { ContactRowDropdownMenu } from './ContactRowDropdownMenu'
+import { ShareContactDialog } from './ShareAddressBook/ShareContactDialog'
+import { buildSharedContactUrl } from '@/features/Contacts/sharedContact'
 
 interface ContactRowActionsProps {
   contact: Contact
@@ -17,7 +19,7 @@ interface ContactRowActionsProps {
   readOnly?: boolean
 }
 
-type OpenDialog = 'delete' | null
+type OpenDialog = 'delete' | 'share' | null
 
 export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
   contact,
@@ -41,6 +43,10 @@ export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
   const handleOpenDeleteDialog = (): void => {
     setAnchorEl(null)
     setOpenDialog('delete')
+  }
+
+  const handleOpenShareDialog = (): void => {
+    void navigator.clipboard.writeText(buildSharedContactUrl(contact))
   }
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLElement>): void => {
@@ -114,6 +120,7 @@ export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
           anchorEl={anchorEl}
           onClose={handleMenuClose}
           onEdit={handleEdit}
+          onShare={handleOpenShareDialog}
           onOpenDeleteDialog={handleOpenDeleteDialog}
           readOnly={isReadOnly}
         />
@@ -124,6 +131,9 @@ export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
           onClose={handleCloseDialog}
           onConfirm={() => void handleDelete()}
         />
+      )}
+      {openDialog === 'share' && (
+        <ShareContactDialog contact={contact} onClose={handleCloseDialog} />
       )}
       <ErrorSnackbar error={deleteError} onClose={() => setDeleteError(null)} />
     </>

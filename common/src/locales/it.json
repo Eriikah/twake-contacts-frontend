@@ -141,6 +141,12 @@
       "contactsCount": "%{smart_count} contatto |||| %{smart_count} contatti",
       "you": "Tu",
       "defaultAddressBookName": "Rubrica"
+    },
+    "shareContact": {
+      "title": "Condividi %{name}",
+      "send": "Scrivi email",
+      "emailSubject": "Contatto condiviso: %{name}",
+      "emailBody": "Ciao,\n\nvorrei condividere con te il contatto “%{name}”. Usa questo link per aggiungerlo ai tuoi contatti:\n%{url}"
     }
   },
   "error": {

@@ -141,6 +141,12 @@
       "contactsCount": "%{smart_count} contact |||| %{smart_count} contacts",
       "you": "You",
       "defaultAddressBookName": "Address book"
+    },
+    "shareContact": {
+      "title": "Share %{name}",
+      "send": "Compose email",
+      "emailSubject": "Contact shared: %{name}",
+      "emailBody": "Hi,\n\nI'd like to share the contact “%{name}” with you. Use this link to add it to your contacts:\n%{url}"
     }
   },
   "error": {

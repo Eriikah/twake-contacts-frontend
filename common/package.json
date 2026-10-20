@@ -9,6 +9,7 @@
     "@linagora/twake-icons": "^2.14.0",
     "@linagora/twake-mui": "^15.1.0",
     "@linagora/twake-oidc": "^1.0.0",
+    "@linagora/twake-utils": "../../twake-libs/packages/twake-utils/dist",
     "@linagora/twake-websocket": "^1.2.0",
     "@mui/icons-material": "^9.0.1",
     "@mui/material": "^9.0.1",

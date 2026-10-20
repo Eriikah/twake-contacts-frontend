@@ -9,5 +9,5 @@
       "@common/*": ["./src/*"]
     }
   },
-  "include": ["src", "*.ts", "../*.d.ts"]
+  "include": ["src", "*.ts", "../*.d.ts", "../apps/private/src/features/Contacts/sharedContact.ts"]
 }

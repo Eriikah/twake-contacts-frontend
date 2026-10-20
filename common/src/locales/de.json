@@ -141,6 +141,12 @@
       "contactsCount": "%{smart_count} Kontakt |||| %{smart_count} Kontakte",
       "you": "Du",
       "defaultAddressBookName": "Adressbuch"
+    },
+    "shareContact": {
+      "title": "%{name} teilen",
+      "send": "E-Mail verfassen",
+      "emailSubject": "Kontakt geteilt: %{name}",
+      "emailBody": "Hallo,\n\nich möchte den Kontakt „%{name}“ mit Ihnen teilen. Über diesen Link können Sie ihn zu Ihren Kontakten hinzufügen:\n%{url}"
     }
   },
   "error": {
