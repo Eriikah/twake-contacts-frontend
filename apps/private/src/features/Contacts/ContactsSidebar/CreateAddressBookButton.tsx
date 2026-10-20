@@ -1,5 +1,5 @@
 import React from 'react'
-import { Icon, Plus } from '@linagora/twake-icons'
+import { Icon, PlusSmall } from '@linagora/twake-icons'
 import { IconButton, Tooltip } from '@linagora/twake-mui'
 
 export interface CreateAddressBookButtonProps {
@@ -13,14 +13,14 @@ export const CreateAddressBookButton: React.FC<
   return (
     <Tooltip disableInteractive title={label}>
       <IconButton
-        size="xsmall"
+        size="small"
         aria-label={label}
         onClick={e => {
           e.stopPropagation()
           onClick()
         }}
       >
-        <Icon icon={Plus} size={14} />
+        <Icon icon={PlusSmall} size={16} />
       </IconButton>
     </Tooltip>
   )

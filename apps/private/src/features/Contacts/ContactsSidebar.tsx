@@ -13,7 +13,8 @@ import {
   Button,
   NavDesktopDropdown,
   Stack,
-  useBreakpoints
+  useBreakpoints,
+  Skeleton
 } from '@linagora/twake-mui'
 import { Link, useMatch, useNavigate, useParams } from 'react-router'
 import { useI18n } from 'twake-i18n'
@@ -48,9 +49,9 @@ export const ContactsSidebar: React.FC<ContactsSidebarProps> = ({
   const { isMobile } = useBreakpoints()
 
   const addressBooks = useAppSelector(state => state.contacts.addressBooks)
-  const loading = useAppSelector(state => state.contacts.loading)
+  const isLoading = useAppSelector(state => state.contacts.loading)
   const currentBook = addressBookId ? addressBooks[addressBookId] : undefined
-  const createLink = getCreateContactLink(addressBookId, currentBook, loading)
+  const createLink = getCreateContactLink(addressBookId, currentBook, isLoading)
   const { personalBooks, sharedBooks, domainBooks } = categorizeAddressBooks(
     addressBooks,
     openpaasId,
@@ -83,7 +84,7 @@ export const ContactsSidebar: React.FC<ContactsSidebarProps> = ({
       <Box className="u-flex-auto u-ov-auto u-mt-1-half">
         <Nav className="u-mv-0">
           <MyContactsNavItem
-            hasBooks={personalBooks.length > 0}
+            hasBooks={isLoading || personalBooks.length > 0}
             isExpanded={isMyContactsExpanded}
             isSelected={addressBookId === undefined}
             onToggle={() => setIsMyContactsExpanded(!isMyContactsExpanded)}
@@ -106,6 +107,15 @@ export const ContactsSidebar: React.FC<ContactsSidebarProps> = ({
           />
 
           {isMyContactsExpanded &&
+            isLoading &&
+            Array.from({ length: 3 }, (_, index) => (
+              <NavItem key={index} variant="secondary">
+                <Skeleton variant="text" width={170} height={40} />
+              </NavItem>
+            ))}
+
+          {isMyContactsExpanded &&
+            !isLoading &&
             personalBooks.map(book => (
               <AddressBookNavItem
                 key={book.id}
@@ -146,14 +156,20 @@ export const ContactsSidebar: React.FC<ContactsSidebarProps> = ({
             }
             limit={0}
           >
-            {sharedBooks?.map(book => (
-              <AddressBookNavItem
-                key={book.id}
-                book={book}
-                variant="primary"
-                selected={addressBookId === book.id}
-              />
-            ))}
+            {isLoading
+              ? Array.from({ length: 3 }, (_, index) => (
+                  <NavItem key={index} variant="primary">
+                    <Skeleton variant="text" width={200} height={45} />
+                  </NavItem>
+                ))
+              : sharedBooks.map(book => (
+                  <AddressBookNavItem
+                    key={book.id}
+                    book={book}
+                    variant="primary"
+                    selected={addressBookId === book.id}
+                  />
+                ))}
           </NavDesktopDropdown>
         </Nav>
       </Box>
