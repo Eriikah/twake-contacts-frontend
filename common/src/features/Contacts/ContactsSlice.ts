@@ -16,6 +16,7 @@ import {
 import { fetchUpdatedContactsThunk } from './services/fetchUpdatedContactsAsync'
 import { subscribeAddressBookThunk } from './services/subscribeAddressBookAsync'
 import { deleteAddressBookThunk } from './services/deleteAddressBookAsync'
+import { updateAddressBookThunk } from './services/updateAddressBookAsync'
 
 const initialState: ContactsState = {
   addressBooks: {},
@@ -61,7 +62,8 @@ const ContactsSlice = createAppSlice({
     fetchAddressBookDetail: fetchAddressBookDetailThunk(create),
     updateAddressBookShares: updateAddressBookSharesThunk(create),
     subscribeAddressBook: subscribeAddressBookThunk(create),
-    deleteAddressBook: deleteAddressBookThunk(create)
+    deleteAddressBook: deleteAddressBookThunk(create),
+    updateAddressBook: updateAddressBookThunk(create)
   })
 })
 
@@ -79,6 +81,7 @@ export const {
   createAddressBook,
   fetchAddressBookDetail,
   updateAddressBookShares,
+  updateAddressBook,
   subscribeAddressBook,
   deleteAddressBook
 } = ContactsSlice.actions

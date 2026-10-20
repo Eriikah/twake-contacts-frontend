@@ -50,6 +50,13 @@
       "newContact": "Nuevo contacto",
       "invalidEmail": "Dirección de correo electrónico no válida"
     },
+    "edit": {
+      "title": "Editar libreta de direcciones",
+      "name": "Nombre",
+      "description": "Descripción",
+      "cancel": "Cancelar",
+      "save": "Guardar"
+    },
     "types": {
       "cell": "Móvil",
       "work": "Trabajo",
@@ -92,7 +99,8 @@
       "forbidden": "No tiene permiso para modificar esta libreta de direcciones",
       "share": "No se ha podido compartir la libreta de direcciones",
       "subscribe": "No se ha podido añadir la libreta de direcciones",
-      "deleteAddressBook": "No se ha podido quitar la libreta de direcciones"
+      "deleteAddressBook": "No se ha podido quitar la libreta de direcciones",
+      "updateAddressBook": "No se ha podido actualizar la libreta de direcciones"
     },
     "addressBook": {
       "createTitle": "Nueva libreta de direcciones",
@@ -116,7 +124,9 @@
       "deleteConfirm": "Eliminar",
       "removeDescription": "«%{name}» se quitará de su lista. Podrá volver a añadirla buscando a su propietario.",
       "removeTitle": "¿Quitar esta libreta de direcciones?",
-      "removeConfirm": "Quitar"
+      "removeConfirm": "Quitar",
+      "editTitle": "Editar libreta de direcciones",
+      "editSuccess": "Libreta de direcciones actualizada correctamente"
     },
     "share": {
       "title": "Compartir %{name}",

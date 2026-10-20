@@ -50,6 +50,13 @@
       "newContact": "Liên hệ mới",
       "invalidEmail": "Địa chỉ email không hợp lệ"
     },
+    "edit": {
+      "title": "Chỉnh sửa sổ địa chỉ",
+      "name": "Tên",
+      "description": "Mô tả",
+      "cancel": "Hủy",
+      "save": "Lưu"
+    },
     "types": {
       "cell": "Di động",
       "work": "Công việc",
@@ -92,7 +99,8 @@
       "forbidden": "Bạn không có quyền chỉnh sửa sổ địa chỉ này",
       "share": "Không thể chia sẻ sổ địa chỉ",
       "subscribe": "Không thể thêm sổ địa chỉ",
-      "deleteAddressBook": "Không thể xóa sổ địa chỉ"
+      "deleteAddressBook": "Không thể xóa sổ địa chỉ",
+      "updateAddressBook": "Không thể cập nhật sổ địa chỉ"
     },
     "addressBook": {
       "createTitle": "Sổ địa chỉ mới",
@@ -116,7 +124,9 @@
       "deleteConfirm": "Xóa",
       "removeDescription": "“%{name}” sẽ bị gỡ khỏi danh sách của bạn. Bạn có thể thêm lại bằng cách tìm chủ sở hữu.",
       "removeTitle": "Gỡ sổ địa chỉ này?",
-      "removeConfirm": "Gỡ"
+      "removeConfirm": "Gỡ",
+      "editTitle": "Chỉnh sửa sổ địa chỉ",
+      "editSuccess": "Đã cập nhật sổ địa chỉ thành công"
     },
     "share": {
       "title": "Chia sẻ %{name}",

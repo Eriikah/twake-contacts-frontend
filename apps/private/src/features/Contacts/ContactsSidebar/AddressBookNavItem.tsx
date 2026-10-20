@@ -6,6 +6,7 @@ import {
   Dots,
   Icon,
   Peoples,
+  Pen,
   ShareExternal
 } from '@linagora/twake-icons'
 import {
@@ -27,8 +28,12 @@ import { useI18n } from 'twake-i18n'
 import { ShareAddressBookDialog } from '../ShareAddressBook/ShareAddressBookDialog'
 import { getAriaCurrent } from './sidebarHelpers'
 import { useAppDispatch } from '@common/app/hooks'
-import { deleteAddressBook } from '@common/features/Contacts/ContactsSlice'
+import {
+  deleteAddressBook,
+  updateAddressBook
+} from '@common/features/Contacts/ContactsSlice'
 import { DeleteAddressBookDialog } from '../DeleteAddressBookDialog'
+import { EditAddressBookDialog } from '../EditAddressBookDialog'
 
 export interface AddressBookNavItemProps {
   book: AddressBook
@@ -48,6 +53,7 @@ export const AddressBookNavItem: React.FC<AddressBookNavItemProps> = ({
   const [isShareDialogOpen, setIsShareDialogOpen] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  const [isEditOpen, setIsEditOpen] = useState(false)
 
   const dispatch = useAppDispatch()
   const isCopy = Boolean(book.ownerId)
@@ -77,6 +83,11 @@ export const AddressBookNavItem: React.FC<AddressBookNavItemProps> = ({
 
   const handleMenuClose = (): void => {
     setAnchorEl(null)
+  }
+
+  const handleEdit = (): void => {
+    handleMenuClose()
+    setIsEditOpen(true)
   }
 
   const handleShare = (): void => {
@@ -119,6 +130,14 @@ export const AddressBookNavItem: React.FC<AddressBookNavItemProps> = ({
                       <Icon icon={ShareExternal} />
                     </ListItemIcon>
                     <ListItemText>{t('contacts.menu.share')}</ListItemText>
+                  </ActionsMenuItem>
+                )}
+                {book.canWrite && !isCopy && (
+                  <ActionsMenuItem onClick={handleEdit}>
+                    <ListItemIcon>
+                      <Icon icon={Pen} />
+                    </ListItemIcon>
+                    <ListItemText>{t('contacts.menu.edit')}</ListItemText>
                   </ActionsMenuItem>
                 )}
                 <ActionsMenuItem onClick={handleDelete}>
@@ -169,6 +188,22 @@ export const AddressBookNavItem: React.FC<AddressBookNavItemProps> = ({
           onConfirm={() => {
             setIsConfirmOpen(false)
             removeBook()
+          }}
+        />
+      )}
+      {isEditOpen && (
+        <EditAddressBookDialog
+          book={book}
+          onClose={() => setIsEditOpen(false)}
+          onConfirm={({ name }) => {
+            setIsEditOpen(false)
+            void dispatch(
+              updateAddressBook({
+                userId: book.userId,
+                addressBookId: book.id,
+                name
+              })
+            )
           }}
         />
       )}

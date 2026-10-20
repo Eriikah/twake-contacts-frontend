@@ -72,7 +72,16 @@
       "deleteConfirm": "Delete",
       "removeDescription": "“%{name}” will be removed from your list. You can find it again by searching for its owner.",
       "removeTitle": "Remove this address book?",
-      "removeConfirm": "Remove"
+      "removeConfirm": "Remove",
+      "editTitle": "Edit address book",
+      "editSuccess": "Address book updated successfully"
+    },
+    "edit": {
+      "title": "Edit address book",
+      "name": "Name",
+      "description": "Description",
+      "cancel": "Cancel",
+      "save": "Save"
     },
     "types": {
       "cell": "Mobile",
@@ -116,7 +125,8 @@
       "forbidden": "You don't have permission to modify this address book",
       "share": "Failed to share address book",
       "subscribe": "Failed to add address book",
-      "deleteAddressBook": "Failed to remove address book"
+      "deleteAddressBook": "Failed to remove address book",
+      "updateAddressBook": "Failed to update address book"
     },
     "share": {
       "title": "Share %{name}",
