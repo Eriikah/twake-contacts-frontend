@@ -382,25 +382,32 @@ async function resolveInviteMember(
 export async function fetchAddressBookDetails(
   userId: string,
   addressBookId: string
-): Promise<userData[]> {
+): Promise<{ members: userData[]; isPublic: boolean }> {
   try {
     const response = await api(
       `dav/addressbooks/${userId}/${addressBookId}.json`,
       {
         method: 'PROPFIND',
         json: {
-          properties: ['{DAV:}invite']
+          properties: ['{DAV:}invite', 'acl']
         }
       }
     ).json<DavAddressBookItem>()
 
     const invites = response['{DAV:}invite']
+    const acl = response.acl ?? []
 
-    if (!invites) return []
+    const isPublic = acl.some(
+      entry => entry.principal === '{DAV:}authenticated'
+    )
 
-    const members = await Promise.all(invites.map(resolveInviteMember))
+    const members = invites
+      ? await Promise.all(invites.map(resolveInviteMember)).then(list =>
+          list.filter((user): user is userData => user != null)
+        )
+      : []
 
-    return members.filter((user): user is userData => user != null)
+    return { members, isPublic }
   } catch (error) {
     console.error('Failed to fetch address book details:', error)
     throw error
@@ -536,5 +543,20 @@ export const updateAddressBook = async (
       'carddav:description': '',
       state: ''
     })
+  })
+}
+
+export async function setAddressBookPublished(
+  userId: string,
+  addressBookId: string,
+  publish: boolean
+): Promise<void> {
+  await api.post(`dav/addressbooks/${userId}/${addressBookId}.json`, {
+    headers: {
+      Accept: 'application/json, text/plain, */*'
+    },
+    json: publish
+      ? { 'dav:publish-addressbook': { privilege: '{DAV:}read' } }
+      : { 'dav:unpublish-addressbook': true }
   })
 }

@@ -16,6 +16,7 @@ export interface AddressBook {
   ownerDisplayName?: string
   invitedMembers?: userData[]
   syncToken?: number
+  isPublic?: boolean
 }
 
 export interface ContactName {
@@ -109,6 +110,7 @@ export interface ContactsState {
   listings: Record<string, ContactListing>
   loading: boolean
   detailsLoading?: boolean
+  detailRequestIds?: Record<string, string>
   error: string | null
 }
 

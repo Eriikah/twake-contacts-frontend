@@ -140,7 +140,12 @@
       "viewer": "Lecteur",
       "contactsCount": "%{smart_count} contact |||| %{smart_count} contacts",
       "you": "Vous",
-      "defaultAddressBookName": "Carnet d'adresses"
+      "defaultAddressBookName": "Carnet d'adresses",
+      "discovery": {
+        "title": "Découvrabilité",
+        "description": "Permettre aux autres de trouver et d'ajouter ce carnet d'adresses via la recherche.",
+        "toggleTooltip": "Activer/désactiver la découverte publique"
+      }
     }
   },
   "error": {

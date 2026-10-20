@@ -85,6 +85,12 @@ export interface DavInvite {
   principal: string
 }
 
+export interface AclEntry {
+  privilege: string
+  principal: string
+  protected?: boolean
+}
+
 /** One address book, as embedded under `dav:addressbook`. */
 export interface DavAddressBookItem {
   /** `/addressbooks/<userId>/<bookId>.json`, `userId` being the owner of the book. */
@@ -96,7 +102,7 @@ export interface DavAddressBookItem {
   'dav:acl'?: string[]
   'dav:share-access'?: number | null
   '{DAV:}displayname'?: string
-  '{DAV:}acl'?: string[]
+  acl?: AclEntry[]
   '{http://open-paas.org/contacts}numberOfContacts'?: number | null
   '{http://open-paas.org/contacts}type'?: string
   '{http://open-paas.org/contacts}state'?: string
