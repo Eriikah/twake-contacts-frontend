@@ -56,14 +56,6 @@ describe('UserAutocomplete', () => {
     jest.clearAllMocks()
   })
 
-  it('labels the popup indicator in the user language', () => {
-    renderAutocomplete(jest.fn(), jest.fn(), { lang: 'fr', dict: fr })
-
-    expect(
-      screen.getByRole('button', { name: fr.contacts.form.open })
-    ).toBeInTheDocument()
-  })
-
   it('labels the clear button in the user language', async () => {
     renderAutocomplete(jest.fn(), jest.fn(), { lang: 'fr', dict: fr })
 

@@ -56,6 +56,7 @@ export const UserAutocomplete: React.FC<{
         onSelect(user)
       }}
       filterOptions={x => x}
+      forcePopupIcon={false}
       getOptionLabel={userLabel}
       isOptionEqualToValue={(option, v) => option.id === v.id}
       noOptionsText={query.trim() ? t('contacts.addressBook.noUserFound') : ''}
