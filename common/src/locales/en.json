@@ -66,7 +66,13 @@
       "subscribe": "Add",
       "subscribeSuccess": "Address book added successfully",
       "loadError": "Could not load this user's address books",
-      "contactsCount": "%{smart_count} contact |||| %{smart_count} contacts"
+      "contactsCount": "%{smart_count} contact |||| %{smart_count} contacts",
+      "deleteTitle": "Delete this address book?",
+      "deleteDescription": "“%{name}” and all its contacts will be permanently deleted.",
+      "deleteConfirm": "Delete",
+      "removeDescription": "“%{name}” will be removed from your list. You can find it again by searching for its owner.",
+      "removeTitle": "Remove this address book?",
+      "removeConfirm": "Remove"
     },
     "types": {
       "cell": "Mobile",
@@ -84,7 +90,8 @@
       "chat": "Chat",
       "mail": "Send email",
       "schedule": "Schedule",
-      "share": "Share"
+      "share": "Share",
+      "remove": "Remove from my list"
     },
     "delete": {
       "title": "Delete this contact?",
@@ -108,7 +115,8 @@
       "delete": "Failed to delete contact",
       "forbidden": "You don't have permission to modify this address book",
       "share": "Failed to share address book",
-      "subscribe": "Failed to add address book"
+      "subscribe": "Failed to add address book",
+      "deleteAddressBook": "Failed to remove address book"
     },
     "share": {
       "title": "Share %{name}",

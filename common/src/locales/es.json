@@ -66,7 +66,8 @@
       "chat": "Chat",
       "mail": "Enviar correo",
       "schedule": "Programar",
-      "share": "Compartir"
+      "share": "Compartir",
+      "remove": "Quitar de mi lista"
     },
     "delete": {
       "title": "¿Eliminar este contacto?",
@@ -90,7 +91,8 @@
       "delete": "No se ha podido eliminar el contacto",
       "forbidden": "No tiene permiso para modificar esta libreta de direcciones",
       "share": "No se ha podido compartir la libreta de direcciones",
-      "subscribe": "No se ha podido añadir la libreta de direcciones"
+      "subscribe": "No se ha podido añadir la libreta de direcciones",
+      "deleteAddressBook": "No se ha podido quitar la libreta de direcciones"
     },
     "addressBook": {
       "createTitle": "Nueva libreta de direcciones",
@@ -108,7 +110,13 @@
       "subscribe": "Añadir",
       "subscribeSuccess": "Libreta de direcciones añadida correctamente",
       "loadError": "No se han podido cargar las libretas de direcciones de este usuario",
-      "contactsCount": "%{smart_count} contacto |||| %{smart_count} contactos"
+      "contactsCount": "%{smart_count} contacto |||| %{smart_count} contactos",
+      "deleteTitle": "¿Eliminar esta libreta de direcciones?",
+      "deleteDescription": "«%{name}» y todos sus contactos se eliminarán de forma permanente.",
+      "deleteConfirm": "Eliminar",
+      "removeDescription": "«%{name}» se quitará de su lista. Podrá volver a añadirla buscando a su propietario.",
+      "removeTitle": "¿Quitar esta libreta de direcciones?",
+      "removeConfirm": "Quitar"
     },
     "share": {
       "title": "Compartir %{name}",
