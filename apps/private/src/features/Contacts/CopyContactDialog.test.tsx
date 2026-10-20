@@ -4,8 +4,11 @@ import { Provider } from 'react-redux'
 import { TwakeMuiThemeProvider } from '@linagora/twake-mui'
 import I18n from 'twake-i18n'
 import { setupStore } from '@common/app/store'
-import { copyContact } from '@common/features/Contacts/ContactsDao'
-import { copyContact as copyContactAction } from '@common/features/Contacts/ContactsSlice'
+import { copyContact, moveContact } from '@common/features/Contacts/ContactsDao'
+import {
+  copyContact as copyContactAction,
+  moveContact as moveContactAction
+} from '@common/features/Contacts/ContactsSlice'
 import { AddressBookWithContacts } from '@common/features/Contacts/contactsTypes'
 import en from '@common/locales/en.json'
 import { ContactTransferSnackbar } from './ContactTransferSnackbar'
@@ -24,6 +27,7 @@ const book = (id: string, canWrite = true): AddressBookWithContacts => ({
   contacts: []
 })
 const renderDialog = (
+  mode: 'copy' | 'move' = 'copy',
   sourceCanWrite = true
 ): {
   store: ReturnType<typeof setupStore>
@@ -54,6 +58,7 @@ const renderDialog = (
       <>
         {open && (
           <ContactTransferDialog
+            mode={mode}
             contact={contact}
             addressBookId="source"
             onClose={() => {
@@ -89,85 +94,121 @@ const selectDestination = (name = 'target'): void => {
   fireEvent.click(screen.getByRole('option', { name }))
 }
 
-describe('CopyContactDialog', () => {
-  beforeEach(() => jest.clearAllMocks())
-
-  it('copies to a writable destination and preserves the source', async () => {
-    jest.mocked(copyContact).mockResolvedValue('new-card-id')
-    const { store, onClose } = renderDialog()
-    expect(screen.getByRole('button', { name: 'Copy' })).toBeDisabled()
+it.each(['copy', 'move'] as const)(
+  'blocks %s from a read-only shared source before calling the API',
+  async mode => {
+    jest.clearAllMocks()
+    const { store } = renderDialog(mode, false)
     selectDestination()
-    fireEvent.click(screen.getByRole('button', { name: 'Copy' }))
+    expect(
+      screen.getByRole('button', { name: mode === 'copy' ? 'Copy' : 'Move' })
+    ).toBeDisabled()
+    const args = {
+      fromAddressBookId: 'source',
+      toAddressBookId: 'target',
+      contact
+    }
+    const action =
+      mode === 'copy'
+        ? await store.dispatch(copyContactAction(args))
+        : await store.dispatch(
+            moveContactAction({ ...args, userId: 'owner-source' })
+          )
+    expect(action.meta.requestStatus).toBe('rejected')
+    expect(copyContact).not.toHaveBeenCalled()
+    expect(moveContact).not.toHaveBeenCalled()
+    expect(store.getState().contacts.addressBooks.source.contacts).toEqual([
+      contact
+    ])
+    expect(store.getState().contacts.addressBooks.target.contacts).toEqual([])
+  }
+)
+
+const transferCases = [
+  {
+    mode: 'copy',
+    dao: copyContact,
+    label: 'Copy',
+    messages: en.contacts.copyContact
+  },
+  {
+    mode: 'move',
+    dao: moveContact,
+    label: 'Move',
+    messages: en.contacts.moveContact
+  }
+] as const
+
+it.each(transferCases)(
+  'transfers with $mode and updates the appropriate books',
+  async ({ mode, dao, label, messages }) => {
+    jest.clearAllMocks()
+    jest.mocked(copyContact).mockResolvedValue('new-card-id')
+    jest.mocked(moveContact).mockResolvedValue()
+    const { store, onClose } = renderDialog(mode)
+    expect(screen.getByRole('button', { name: label })).toBeDisabled()
+    selectDestination()
+    fireEvent.click(screen.getByRole('button', { name: label }))
     await waitFor(() => expect(onClose).toHaveBeenCalled())
-    expect(screen.getByRole('alert')).toHaveTextContent(
-      en.contacts.copyContact.success
-    )
+    expect(screen.getByRole('alert')).toHaveTextContent(messages.success)
     fireEvent.click(screen.getByRole('button', { name: 'Close' }))
     expect(store.getState().contacts.transferSuccess).toBeNull()
-    expect(copyContact).toHaveBeenCalledWith(
+    expect(dao).toHaveBeenCalledWith(
       { userId: 'owner-source', addressBookId: 'source' },
       { userId: 'owner-target', addressBookId: 'target' },
       'c1'
     )
-    expect(store.getState().contacts.addressBooks.source.contacts).toEqual([
-      contact
+    const books = store.getState().contacts.addressBooks
+    expect(books.source.contacts).toEqual(mode === 'copy' ? [contact] : [])
+    expect(books.source.contactsCount).toBe(mode === 'copy' ? 1 : 0)
+    expect(books.target.contacts).toEqual([
+      { ...contact, id: mode === 'copy' ? 'new-card-id' : contact.id }
     ])
-    expect(store.getState().contacts.addressBooks.target.contacts).toEqual([
-      { ...contact, id: 'new-card-id' }
-    ])
-    expect(store.getState().contacts.addressBooks.target.contactsCount).toBe(1)
-  })
+    expect(books.target.contactsCount).toBe(1)
+  }
+)
 
-  it('keeps the dialog and destination unchanged when copying fails', async () => {
-    jest.mocked(copyContact).mockRejectedValue(new Error('Copy failed'))
-    const { store, onClose } = renderDialog()
+it.each(transferCases)(
+  'preserves both books and allows retry when $mode fails',
+  async ({ mode, dao, label, messages }) => {
+    jest.clearAllMocks()
+    jest.mocked(dao).mockRejectedValue(new Error('Transfer failed'))
+    const { store, onClose } = renderDialog(mode)
+    const before = store.getState().contacts.addressBooks
     selectDestination()
-    fireEvent.click(screen.getByRole('button', { name: 'Copy' }))
-    expect(await screen.findByRole('alert')).toHaveTextContent(
-      en.contacts.copyContact.error
-    )
+    fireEvent.click(screen.getByRole('button', { name: label }))
+    expect(await screen.findByRole('alert')).toHaveTextContent(messages.error)
     expect(onClose).not.toHaveBeenCalled()
     expect(store.getState().contacts.transferSuccess).toBeUndefined()
-    expect(store.getState().contacts.addressBooks.target.contacts).toEqual([])
-    expect(screen.getByRole('button', { name: 'Copy' })).toBeEnabled()
-  })
-})
-
-it('blocks copy from a read-only shared source before calling the API', async () => {
-  jest.clearAllMocks()
-  const { store } = renderDialog(false)
-  selectDestination()
-  expect(screen.getByRole('button', { name: 'Copy' })).toBeDisabled()
-  const args = {
-    fromAddressBookId: 'source',
-    toAddressBookId: 'target',
-    contact
+    expect(store.getState().contacts.addressBooks).toEqual(before)
+    expect(screen.getByRole('combobox')).toHaveTextContent('target')
+    expect(screen.getByRole('button', { name: label })).toBeEnabled()
+    fireEvent.click(screen.getByRole('button', { name: label }))
+    await waitFor(() => expect(dao).toHaveBeenCalledTimes(2))
+    expect(onClose).not.toHaveBeenCalled()
   }
-  const action = await store.dispatch(copyContactAction(args))
-  expect(action.meta.requestStatus).toBe('rejected')
-  expect(copyContact).not.toHaveBeenCalled()
-  expect(store.getState().contacts.addressBooks.source.contacts).toEqual([
-    contact
-  ])
-  expect(store.getState().contacts.addressBooks.target.contacts).toEqual([])
-})
+)
 
-it('allows copy into My contacts', async () => {
-  jest.clearAllMocks()
-  jest.mocked(copyContact).mockResolvedValue('new-card-id')
-  const { store, onClose } = renderDialog()
-  selectDestination('My contacts')
-  fireEvent.click(screen.getByRole('button', { name: 'Copy' }))
-  await waitFor(() => expect(onClose).toHaveBeenCalled())
-  expect(copyContact).toHaveBeenCalledWith(
-    { userId: 'owner-source', addressBookId: 'source' },
-    { userId: 'owner-contacts', addressBookId: 'contacts' },
-    'c1'
-  )
-  expect(store.getState().contacts.addressBooks.contacts.contacts).toEqual([
-    { ...contact, id: 'new-card-id' }
-  ])
-  expect(store.getState().contacts.addressBooks.source.contacts).toEqual([
-    contact
-  ])
-})
+it.each(transferCases)(
+  'allows $mode into My contacts',
+  async ({ mode, label }) => {
+    jest.clearAllMocks()
+    jest.mocked(copyContact).mockResolvedValue('new-card-id')
+    jest.mocked(moveContact).mockResolvedValue()
+    const { store, onClose } = renderDialog(mode)
+    selectDestination('My contacts')
+    fireEvent.click(screen.getByRole('button', { name: label }))
+    await waitFor(() => expect(onClose).toHaveBeenCalled())
+    expect(mode === 'copy' ? copyContact : moveContact).toHaveBeenCalledWith(
+      { userId: 'owner-source', addressBookId: 'source' },
+      { userId: 'owner-contacts', addressBookId: 'contacts' },
+      'c1'
+    )
+    expect(store.getState().contacts.addressBooks.contacts.contacts).toEqual([
+      { ...contact, id: mode === 'copy' ? 'new-card-id' : contact.id }
+    ])
+    expect(store.getState().contacts.addressBooks.source.contacts).toEqual(
+      mode === 'copy' ? [contact] : []
+    )
+  }
+)

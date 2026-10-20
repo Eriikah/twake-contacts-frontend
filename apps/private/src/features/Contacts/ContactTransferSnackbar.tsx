@@ -29,7 +29,11 @@ export const ContactTransferSnackbar: React.FC = () => {
         closeText={t('contacts.form.close')}
         onClose={handleClose}
       >
-        {t('contacts.copyContact.success')}
+        {t(
+          success.operation === 'copy'
+            ? 'contacts.copyContact.success'
+            : 'contacts.moveContact.success'
+        )}
       </Alert>
     </Snackbar>
   )

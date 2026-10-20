@@ -1,6 +1,6 @@
 /** @jest-environment jsdom */
 import { api } from '@common/utils/apiUtils'
-import { copyContact } from './ContactsDao'
+import { copyContact, moveContact } from './ContactsDao'
 
 jest.mock('@common/utils/apiUtils', () => ({ api: jest.fn() }))
 
@@ -22,6 +22,32 @@ it('sends COPY through the proxy with a Sabre-relative destination', async () =>
         Accept: 'application/json, text/plain, */*',
         'Content-Type': 'application/json;charset=UTF-8',
         Destination: `/addressbooks/target-user/target/${destinationContactId}.vcf`,
+        Overwrite: 'F'
+      }
+    }
+  )
+})
+
+it('sends MOVE through the proxy with a Sabre-relative destination and original UID', async () => {
+  window.SIDE_SERVICE_BASE_URL = 'https://contacts.example.com/services/'
+  jest
+    .mocked(api)
+    .mockClear()
+    .mockResolvedValue({} as Response)
+  await moveContact(
+    { userId: 'source-user', addressBookId: 'source' },
+    { userId: 'target-user', addressBookId: 'target' },
+    'card id'
+  )
+  expect(api).toHaveBeenCalledTimes(1)
+  expect(api).toHaveBeenCalledWith(
+    'dav/addressbooks/source-user/source/card%20id.vcf',
+    {
+      method: 'MOVE',
+      headers: {
+        Accept: 'application/json, text/plain, */*',
+        'Content-Type': 'application/json;charset=UTF-8',
+        Destination: '/addressbooks/target-user/target/card%20id.vcf',
         Overwrite: 'F'
       }
     }

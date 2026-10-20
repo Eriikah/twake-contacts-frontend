@@ -1,6 +1,12 @@
 {
   "locale": "de-de",
   "contacts": {
+    "moveContact": {
+      "success": "Kontakt erfolgreich verschoben",
+      "title": "Kontakt verschieben",
+      "confirm": "Verschieben",
+      "error": "Der Kontakt konnte nicht verschoben werden. Er ist möglicherweise bereits im Zieladressbuch vorhanden."
+    },
     "copyContact": {
       "success": "Kontakt erfolgreich kopiert",
       "title": "Kontakt kopieren",

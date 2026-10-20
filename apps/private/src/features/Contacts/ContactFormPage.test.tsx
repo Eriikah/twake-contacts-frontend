@@ -373,13 +373,9 @@ describe('EditContactPage', () => {
       })
     )
     expect(moveContactDao).toHaveBeenCalledWith(
-      'u1',
-      'book1',
-      'book2',
-      expect.objectContaining({
-        id: 'c1',
-        displayName: 'Alice Updated Roche'
-      })
+      { userId: 'u1', addressBookId: 'book1' },
+      { userId: 'u1', addressBookId: 'book2' },
+      'c1'
     )
   })
 

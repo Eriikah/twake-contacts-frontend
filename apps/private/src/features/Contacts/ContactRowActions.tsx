@@ -6,9 +6,9 @@ import { selectBook } from '@common/features/Contacts/contactsSelectors'
 import { Contact } from '@common/features/Contacts/contactsTypes'
 import { ErrorSnackbar } from '@common/components/Error/ErrorSnackbar'
 import { useState } from 'react'
-import { useNavigate } from 'react-router'
+import { useNavigate, useParams } from 'react-router'
 import { useI18n } from 'twake-i18n'
-import { CopyContactDialog } from './CopyContactDialog'
+import { CopyContactDialog, MoveContactDialog } from './CopyContactDialog'
 import { DeleteContactDialog } from './DeleteContactDialog'
 import { ContactRowDropdownMenu } from './ContactRowDropdownMenu'
 
@@ -18,7 +18,7 @@ interface ContactRowActionsProps {
   readOnly?: boolean
 }
 
-type OpenDialog = 'delete' | 'copy' | null
+type OpenDialog = 'delete' | 'copy' | 'move' | null
 
 export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
   contact,
@@ -29,6 +29,7 @@ export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
   const { isMobile } = useBreakpoints()
   const dispatch = useAppDispatch()
   const navigate = useNavigate()
+  const params = useParams()
   const openpaasId = useAppSelector(state => state.user.userData.openpaasId)
   const book = useAppSelector(state => selectBook(state, addressBookId))
   const [openDialog, setOpenDialog] = useState<OpenDialog>(null)
@@ -119,6 +120,10 @@ export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
             setAnchorEl(null)
             setOpenDialog('copy')
           }}
+          onOpenMoveDialog={() => {
+            setAnchorEl(null)
+            setOpenDialog('move')
+          }}
           onOpenDeleteDialog={handleOpenDeleteDialog}
           readOnly={isReadOnly}
         />
@@ -128,6 +133,21 @@ export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
           contact={contact}
           addressBookId={addressBookId}
           onClose={handleCloseDialog}
+        />
+      )}
+      {openDialog === 'move' && (
+        <MoveContactDialog
+          contact={contact}
+          addressBookId={addressBookId}
+          onClose={handleCloseDialog}
+          onSuccess={destinationId => {
+            if (
+              params.addressBookId === addressBookId &&
+              params.contactId === contact.id
+            ) {
+              void navigate(`/contacts/${destinationId}/${contact.id}`)
+            }
+          }}
         />
       )}
       {openDialog === 'delete' && (

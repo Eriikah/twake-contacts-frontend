@@ -1,6 +1,12 @@
 {
   "locale": "es-es",
   "contacts": {
+    "moveContact": {
+      "success": "Contacto movido correctamente",
+      "title": "Mover contacto",
+      "confirm": "Mover",
+      "error": "No se pudo mover el contacto. Puede que ya exista en la libreta de direcciones de destino."
+    },
     "copyContact": {
       "success": "Contacto copiado correctamente",
       "title": "Copiar contacto",

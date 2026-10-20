@@ -1,6 +1,12 @@
 {
   "locale": "vi",
   "contacts": {
+    "moveContact": {
+      "success": "Đã di chuyển liên hệ thành công",
+      "title": "Di chuyển liên hệ",
+      "confirm": "Di chuyển",
+      "error": "Không thể di chuyển liên hệ. Liên hệ có thể đã tồn tại trong sổ địa chỉ đích."
+    },
     "copyContact": {
       "success": "Đã sao chép liên hệ thành công",
       "title": "Sao chép liên hệ",

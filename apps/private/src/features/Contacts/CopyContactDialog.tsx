@@ -14,7 +14,10 @@ import {
 } from '@linagora/twake-mui'
 import { useI18n } from 'twake-i18n'
 import { useAppDispatch, useAppSelector } from '@common/app/hooks'
-import { copyContact } from '@common/features/Contacts/ContactsSlice'
+import {
+  copyContact,
+  moveContact
+} from '@common/features/Contacts/ContactsSlice'
 import {
   AddressBookWithContacts,
   Contact
@@ -30,7 +33,7 @@ interface ContactTransferDialogProps {
   addressBookId: string
   onClose: () => void
   onSuccess?: (destinationId: string) => void
-  mode?: 'copy'
+  mode?: 'copy' | 'move'
 }
 
 const useContactTransfer = ({
@@ -74,7 +77,11 @@ const useContactTransfer = ({
         toAddressBookId: destinationId,
         contact
       }
-      await dispatch(copyContact(args)).unwrap()
+      if (mode === 'move') {
+        await dispatch(moveContact({ ...args, userId: source.userId })).unwrap()
+      } else {
+        await dispatch(copyContact(args)).unwrap()
+      }
       onClose()
       onSuccess?.(destinationId)
     } catch {
@@ -103,7 +110,8 @@ export const ContactTransferDialog: React.FC<ContactTransferDialogProps> = ({
   mode = 'copy'
 }) => {
   const { t } = useI18n()
-  const translationKey = 'contacts.copyContact'
+  const translationKey =
+    mode === 'move' ? 'contacts.moveContact' : 'contacts.copyContact'
   const {
     books,
     destinationId,
@@ -163,7 +171,9 @@ export const ContactTransferDialog: React.FC<ContactTransferDialogProps> = ({
           disabled={!canTransfer}
           onClick={() => void transfer()}
         >
-          {t('contacts.copy')}
+          {mode === 'move'
+            ? t('contacts.moveContact.confirm')
+            : t('contacts.copy')}
         </Button>
       </DialogActions>
     </Dialog>
@@ -173,3 +183,7 @@ export const ContactTransferDialog: React.FC<ContactTransferDialogProps> = ({
 export const CopyContactDialog: React.FC<
   Omit<ContactTransferDialogProps, 'mode'>
 > = props => <ContactTransferDialog {...props} mode="copy" />
+
+export const MoveContactDialog: React.FC<
+  Omit<ContactTransferDialogProps, 'mode'>
+> = props => <ContactTransferDialog {...props} mode="move" />

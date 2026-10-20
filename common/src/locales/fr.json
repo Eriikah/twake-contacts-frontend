@@ -1,6 +1,12 @@
 {
   "locale": "fr-fr",
   "contacts": {
+    "moveContact": {
+      "success": "Contact déplacé avec succès",
+      "title": "Déplacer le contact",
+      "confirm": "Déplacer",
+      "error": "Impossible de déplacer le contact. Il existe peut-être déjà dans le carnet d’adresses de destination."
+    },
     "copyContact": {
       "success": "Contact copié avec succès",
       "title": "Copier le contact",

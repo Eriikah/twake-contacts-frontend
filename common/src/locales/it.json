@@ -1,6 +1,12 @@
 {
   "locale": "it-it",
   "contacts": {
+    "moveContact": {
+      "success": "Contatto spostato con successo",
+      "title": "Sposta contatto",
+      "confirm": "Sposta",
+      "error": "Impossibile spostare il contatto. Potrebbe già esistere nella rubrica di destinazione."
+    },
     "copyContact": {
       "success": "Contatto copiato con successo",
       "title": "Copia contatto",
