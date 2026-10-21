@@ -1,3 +1,4 @@
+import { copyContactThunk } from './services/copyContactAsync'
 import { createAppSlice } from '@common/app/createAppSlice'
 import { DEFAULT_ADDRESS_BOOK_ID, DEFAULT_CONTACT_SORT } from './constants'
 import { Contact, ContactSort, ContactsState } from './contactsTypes'
@@ -33,6 +34,9 @@ const ContactsSlice = createAppSlice({
   name: DEFAULT_ADDRESS_BOOK_ID,
   initialState,
   reducers: create => ({
+    clearTransferSuccess: create.reducer(state => {
+      state.transferSuccess = null
+    }),
     clearContactsError: create.reducer(state => {
       state.error = null
     }),
@@ -66,6 +70,7 @@ const ContactsSlice = createAppSlice({
     createContact: createContactThunk(create),
     updateContact: updateContactThunk(create),
     moveContact: moveContactThunk(create),
+    copyContact: copyContactThunk(create),
     deleteContact: deleteContactThunk(create),
     createAddressBook: createAddressBookThunk(create),
     fetchAddressBookDetail: fetchAddressBookDetailThunk(create),
@@ -80,6 +85,7 @@ const ContactsSlice = createAppSlice({
 export const {
   addContactFromSearch,
   clearContactsError,
+  clearTransferSuccess,
   createContact,
   deleteContact,
   fetchContact,
@@ -88,6 +94,7 @@ export const {
   fetchUpdatedContacts,
   moveContact,
   setContactSort,
+  copyContact,
   updateContact,
   createAddressBook,
   fetchAddressBookDetail,

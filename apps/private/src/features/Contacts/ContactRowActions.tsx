@@ -8,6 +8,7 @@ import { ErrorSnackbar } from '@common/components/Error/ErrorSnackbar'
 import { useState } from 'react'
 import { useNavigate } from 'react-router'
 import { useI18n } from 'twake-i18n'
+import { CopyContactDialog } from './CopyContactDialog'
 import { DeleteContactDialog } from './DeleteContactDialog'
 import { ContactRowDropdownMenu } from './ContactRowDropdownMenu'
 
@@ -17,7 +18,7 @@ interface ContactRowActionsProps {
   readOnly?: boolean
 }
 
-type OpenDialog = 'delete' | null
+type OpenDialog = 'delete' | 'copy' | null
 
 export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
   contact,
@@ -114,10 +115,21 @@ export const ContactRowActions: React.FC<ContactRowActionsProps> = ({
           anchorEl={anchorEl}
           onClose={handleMenuClose}
           onEdit={handleEdit}
+          onOpenCopyDialog={() => {
+            setAnchorEl(null)
+            setOpenDialog('copy')
+          }}
           onOpenDeleteDialog={handleOpenDeleteDialog}
           readOnly={isReadOnly}
         />
       </Stack>
+      {openDialog === 'copy' && (
+        <CopyContactDialog
+          contact={contact}
+          addressBookId={addressBookId}
+          onClose={handleCloseDialog}
+        />
+      )}
       {openDialog === 'delete' && (
         <DeleteContactDialog
           contact={contact}

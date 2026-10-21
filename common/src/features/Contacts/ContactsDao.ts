@@ -269,6 +269,27 @@ export async function deleteContact(
   )
 }
 
+export async function copyContact(
+  source: AddressBookRef,
+  destination: AddressBookRef,
+  contactId: string
+): Promise<string> {
+  const destinationContactId = crypto.randomUUID()
+  const path = (book: AddressBookRef, cardId: string): string =>
+    `/addressbooks/${encodeDavSegment(book.userId)}/${encodeDavSegment(book.addressBookId)}/${encodeDavSegment(cardId)}.vcf`
+  await api(`dav${path(source, contactId)}`, {
+    method: 'COPY',
+    headers: {
+      Accept: 'application/json, text/plain, */*',
+      'Content-Type': 'application/json;charset=UTF-8',
+      // Sabre resolves this header internally; /dav belongs to the API proxy.
+      Destination: path(destination, destinationContactId),
+      Overwrite: 'F'
+    }
+  })
+  return destinationContactId
+}
+
 export async function moveContact(
   userId: string,
   fromBookId: string,

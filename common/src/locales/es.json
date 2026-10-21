@@ -1,6 +1,13 @@
 {
   "locale": "es-es",
   "contacts": {
+    "copyContact": {
+      "success": "Contacto copiado correctamente",
+      "title": "Copiar contacto",
+      "destination": "Libreta de direcciones de destino",
+      "empty": "No hay libretas de direcciones disponibles con permiso de escritura.",
+      "error": "No se pudo copiar el contacto. Puede que ya exista en la libreta de direcciones de destino."
+    },
     "title": "Contactos",
     "tabs": { "mine": "Mis contactos", "shared": "Compartido conmigo" },
     "myContacts": "Mis contactos",

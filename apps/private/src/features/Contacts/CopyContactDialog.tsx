@@ -1,0 +1,175 @@
+import { Dispatch, SetStateAction, useState } from 'react'
+import {
+  Alert,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  ListItemText,
+  MenuItem,
+  Stack,
+  TextField,
+  Typography
+} from '@linagora/twake-mui'
+import { useI18n } from 'twake-i18n'
+import { useAppDispatch, useAppSelector } from '@common/app/hooks'
+import { copyContact } from '@common/features/Contacts/ContactsSlice'
+import {
+  AddressBookWithContacts,
+  Contact
+} from '@common/features/Contacts/contactsTypes'
+import {
+  getAddressBookDisplayName,
+  sortAddressBooks,
+  isContactTransferDestination
+} from '@common/features/Contacts/contactsUtils'
+
+interface ContactTransferDialogProps {
+  contact: Contact
+  addressBookId: string
+  onClose: () => void
+  onSuccess?: (destinationId: string) => void
+  mode?: 'copy'
+}
+
+const useContactTransfer = ({
+  contact,
+  addressBookId,
+  onClose,
+  onSuccess,
+  mode
+}: ContactTransferDialogProps): {
+  books: AddressBookWithContacts[]
+  destinationId: string
+  setDestinationId: Dispatch<SetStateAction<string>>
+  transferring: boolean
+  error: boolean
+  canTransfer: boolean
+  transfer: () => Promise<void>
+} => {
+  const { t } = useI18n()
+  const dispatch = useAppDispatch()
+  const addressBooks = useAppSelector(state => state.contacts.addressBooks)
+  const books = sortAddressBooks(
+    Object.values(addressBooks).filter(
+      (book): book is AddressBookWithContacts =>
+        isContactTransferDestination(book, addressBookId)
+    ),
+    t
+  )
+  const [destinationId, setDestinationId] = useState('')
+  const [transferring, setTransferring] = useState(false)
+  const [error, setError] = useState(false)
+  const destination = books.find(book => book.id === destinationId)
+  const source = addressBooks[addressBookId]
+  const canTransfer = !!source?.canWrite && !!destination && !transferring
+  const handleTransfer = async (): Promise<void> => {
+    if (!canTransfer) return
+    setTransferring(true)
+    setError(false)
+    try {
+      const args = {
+        fromAddressBookId: addressBookId,
+        toAddressBookId: destinationId,
+        contact
+      }
+      await dispatch(copyContact(args)).unwrap()
+      onClose()
+      onSuccess?.(destinationId)
+    } catch {
+      setError(true)
+    } finally {
+      setTransferring(false)
+    }
+  }
+
+  return {
+    books,
+    destinationId,
+    setDestinationId,
+    transferring,
+    error,
+    canTransfer,
+    transfer: handleTransfer
+  }
+}
+
+export const ContactTransferDialog: React.FC<ContactTransferDialogProps> = ({
+  contact,
+  addressBookId,
+  onClose,
+  onSuccess,
+  mode = 'copy'
+}) => {
+  const { t } = useI18n()
+  const translationKey = 'contacts.copyContact'
+  const {
+    books,
+    destinationId,
+    setDestinationId,
+    transferring,
+    error,
+    canTransfer,
+    transfer
+  } = useContactTransfer({ contact, addressBookId, onClose, onSuccess, mode })
+
+  return (
+    <Dialog
+      open
+      fullWidth
+      maxWidth="sm"
+      onClose={transferring ? undefined : onClose}
+      aria-labelledby={`${mode}-contact-title`}
+      onClick={event => event.stopPropagation()}
+    >
+      <DialogTitle id={`${mode}-contact-title`}>
+        {t(`${translationKey}.title`)}
+      </DialogTitle>
+      <DialogContent>
+        <Stack spacing={2}>
+          {error && (
+            <Alert severity="error">{t(`${translationKey}.error`)}</Alert>
+          )}
+          {books.length === 0 ? (
+            <Typography>{t('contacts.copyContact.empty')}</Typography>
+          ) : (
+            <TextField
+              select
+              fullWidth
+              label={t('contacts.copyContact.destination')}
+              value={destinationId}
+              disabled={transferring}
+              onChange={event => setDestinationId(event.target.value)}
+            >
+              {books.map(book => (
+                <MenuItem key={book.id} value={book.id}>
+                  <ListItemText
+                    primary={getAddressBookDisplayName(book, t)}
+                    secondary={book.ownerDisplayName}
+                  />
+                </MenuItem>
+              ))}
+            </TextField>
+          )}
+        </Stack>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} disabled={transferring}>
+          {t('contacts.form.cancel')}
+        </Button>
+        <Button
+          variant="contained"
+          disabled={!canTransfer}
+          onClick={() => void transfer()}
+        >
+          {t('contacts.copy')}
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
+}
+
+export const CopyContactDialog: React.FC<
+  Omit<ContactTransferDialogProps, 'mode'>
+> = props => <ContactTransferDialog {...props} mode="copy" />

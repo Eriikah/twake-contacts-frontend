@@ -1,6 +1,13 @@
 {
   "locale": "en-gb",
   "contacts": {
+    "copyContact": {
+      "success": "Contact copied successfully",
+      "title": "Copy contact",
+      "destination": "Destination address book",
+      "empty": "No writable address books available.",
+      "error": "Could not copy the contact. It may already exist in the destination address book."
+    },
     "title": "Contacts",
     "tabs": { "mine": "My contacts", "shared": "Shared with me" },
     "myContacts": "My contacts",

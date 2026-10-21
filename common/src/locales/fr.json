@@ -1,6 +1,13 @@
 {
   "locale": "fr-fr",
   "contacts": {
+    "copyContact": {
+      "success": "Contact copié avec succès",
+      "title": "Copier le contact",
+      "destination": "Carnet d’adresses de destination",
+      "empty": "Aucun carnet d’adresses modifiable disponible.",
+      "error": "Impossible de copier le contact. Il existe peut-être déjà dans le carnet d’adresses de destination."
+    },
     "title": "Contacts",
     "tabs": { "mine": "Mes contacts", "shared": "Partagé avec moi" },
     "myContacts": "Mes contacts",
