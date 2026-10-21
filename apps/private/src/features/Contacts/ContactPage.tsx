@@ -9,7 +9,7 @@ import {
   Icon,
   Label,
   Left,
-  Location,
+  LocationOutlined,
   Matrix,
   Telephone
 } from '@linagora/twake-icons'
@@ -238,7 +238,7 @@ export const ContactPage: React.FC = () => {
             {contact.addresses?.map(address => (
               <ContactField
                 key={formatAddress(address)}
-                icon={Location}
+                icon={LocationOutlined}
                 value={formatAddress(address)}
                 type={address.type}
                 copyToastMessage={t('contacts.addressWasCopied')}

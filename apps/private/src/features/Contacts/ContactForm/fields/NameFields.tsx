@@ -21,6 +21,7 @@ export const NameFields: React.FC<NameFieldsProps> = ({
         <TextField
           fullWidth
           autoFocus
+          size="small"
           variant="outlined"
           label={t('contacts.form.firstName')}
           value={givenName}
@@ -33,6 +34,7 @@ export const NameFields: React.FC<NameFieldsProps> = ({
       <Grid size={isMobile ? 12 : 4}>
         <TextField
           fullWidth
+          size="small"
           variant="outlined"
           label={t('contacts.form.lastName')}
           value={familyName}

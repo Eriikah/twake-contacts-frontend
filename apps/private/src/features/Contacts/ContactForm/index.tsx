@@ -8,7 +8,7 @@ import {
 import {
   Icon,
   Left,
-  Location,
+  LocationOutlined,
   Plus,
   Telephone,
   Email
@@ -212,7 +212,7 @@ export const ContactForm: React.FC<ContactFormProps> = ({
         />
 
         <EntryList
-          icon={Location}
+          icon={LocationOutlined}
           entries={values.addresses}
           types={ADDRESS_TYPES}
           label={t('contacts.form.address')}

@@ -72,4 +72,14 @@ describe('ContactAvatar', () => {
       ).background
     ).toContain('#F8D280')
   })
+
+  it('shows a people icon without a display name', () => {
+    const { container } = render(
+      <TwakeMuiThemeProvider>
+        <ContactAvatar size="s" displayName="  " />
+      </TwakeMuiThemeProvider>
+    )
+
+    expect(container.querySelector('.MuiAvatar-root svg')).toBeInTheDocument()
+  })
 })

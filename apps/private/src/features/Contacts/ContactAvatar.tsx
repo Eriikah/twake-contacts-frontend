@@ -5,6 +5,7 @@ import {
   Typography,
   TypographyProps
 } from '@linagora/twake-mui'
+import { Icon, People } from '@linagora/twake-icons'
 import { getInitials } from './getInitials'
 
 interface ContactAvatarProps {
@@ -33,7 +34,9 @@ export const ContactAvatar: React.FC<ContactAvatarProps> = ({
 
   return (
     <Avatar size={size} src={src} color={nameToColor(displayName) ?? 'sunrise'}>
-      {initialsVariant ? (
+      {!initials ? (
+        <Icon icon={People} size="50%" />
+      ) : initialsVariant ? (
         <Typography variant={initialsVariant} component="span" color="inherit">
           {initials}
         </Typography>

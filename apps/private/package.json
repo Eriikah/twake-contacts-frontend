@@ -5,7 +5,7 @@
   "dependencies": {
     "@contacts/common": "*",
     "@linagora/twake-css": "^1.0.0",
-    "@linagora/twake-icons": "^2.15.0",
+    "@linagora/twake-icons": "^2.16.0",
     "@linagora/twake-mui": "^15.1.0",
     "@linagora/twake-oidc": "^1.0.0",
     "@mui/icons-material": "^9.0.1",
