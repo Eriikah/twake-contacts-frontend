@@ -7,3 +7,7 @@ dist/
 
 # Env files
 .env*
+
+# Local reports of the e2e suite
+e2e/test-results/
+e2e/playwright-report/
