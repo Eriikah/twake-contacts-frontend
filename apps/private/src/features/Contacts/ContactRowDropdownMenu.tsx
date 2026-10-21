@@ -11,7 +11,9 @@ import {
   Trash,
   EmailOpen,
   CalendarToday,
-  Discuss
+  Discuss,
+  Copy,
+  Moveto
 } from '@linagora/twake-icons'
 import { useI18n } from 'twake-i18n'
 import { useAppSelector } from '@common/app/hooks'
@@ -26,6 +28,8 @@ interface ContactRowDropdownMenuProps {
   onClose: () => void
   onEdit?: () => void
   onOpenDeleteDialog: () => void
+  onOpenCopyDialog?: () => void
+  onOpenMoveDialog?: () => void
   readOnly?: boolean
 }
 
@@ -44,6 +48,8 @@ export const ContactRowDropdownMenu: React.FC<ContactRowDropdownMenuProps> = ({
   onClose,
   onEdit,
   onOpenDeleteDialog,
+  onOpenCopyDialog,
+  onOpenMoveDialog,
   readOnly
 }) => {
   const { t } = useI18n()
@@ -115,6 +121,22 @@ export const ContactRowDropdownMenu: React.FC<ContactRowDropdownMenuProps> = ({
         </ListItemIcon>
         <ListItemText>{t('contacts.menu.createEvent')}</ListItemText>
       </ActionsMenuItem>
+      {!readOnly && onOpenCopyDialog && (
+        <ActionsMenuItem onClick={onOpenCopyDialog}>
+          <ListItemIcon>
+            <Icon icon={Copy} />
+          </ListItemIcon>
+          <ListItemText>{t('contacts.copyContact.title')}</ListItemText>
+        </ActionsMenuItem>
+      )}
+      {!readOnly && onOpenMoveDialog && (
+        <ActionsMenuItem onClick={onOpenMoveDialog}>
+          <ListItemIcon>
+            <Icon icon={Moveto} />
+          </ListItemIcon>
+          <ListItemText>{t('contacts.moveContact.title')}</ListItemText>
+        </ActionsMenuItem>
+      )}
       {!readOnly && (
         <ActionsMenuItem onClick={onOpenDeleteDialog}>
           <ListItemIcon>

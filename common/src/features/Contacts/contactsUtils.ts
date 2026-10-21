@@ -31,6 +31,13 @@ export function canShareAddressBook(book: AddressBook): boolean {
   )
 }
 
+export function isContactTransferDestination(
+  book: AddressBook | undefined,
+  sourceId: string
+): boolean {
+  return !!book?.canWrite && book.id !== 'dab' && book.id !== sourceId
+}
+
 /** Maps a rejected request to the i18n key of a user-friendly message. */
 export function toContactsErrorKey(
   error: RejectedError | undefined,

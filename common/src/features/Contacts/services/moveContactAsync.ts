@@ -6,6 +6,7 @@ import {
   Contact,
   ContactsState
 } from '../contactsTypes'
+import { isContactTransferDestination } from '../contactsUtils'
 import { placeContactInListings } from '../contactListings'
 
 export interface MoveContactArgs {
@@ -55,13 +56,29 @@ export const moveContactThunk = (create: ReducerCreators<ContactsState>) =>
     MoveContactArgs,
     { rejectValue: RejectedError }
   >(
-    async (args, { rejectWithValue }) => {
+    async (args, { getState, rejectWithValue }) => {
       try {
+        const { contacts } = getState() as { contacts: ContactsState }
+        const source = contacts.addressBooks[args.fromAddressBookId]
+        const destination = contacts.addressBooks[args.toAddressBookId]
+        if (
+          !source?.canWrite ||
+          source.id === 'dab' ||
+          !destination ||
+          !isContactTransferDestination(destination, source.id)
+        ) {
+          throw new Error('Invalid move destination or source permissions')
+        }
         await moveContact(
-          args.userId,
-          args.fromAddressBookId,
-          args.toAddressBookId,
-          args.contact
+          {
+            userId: source?.userId || args.userId,
+            addressBookId: args.fromAddressBookId
+          },
+          {
+            userId: destination?.userId || args.userId,
+            addressBookId: args.toAddressBookId
+          },
+          args.contact.id
         )
         return args
       } catch (err) {
@@ -70,6 +87,10 @@ export const moveContactThunk = (create: ReducerCreators<ContactsState>) =>
     },
     {
       fulfilled: (state, action) => {
+        state.transferSuccess = {
+          operation: 'move',
+          requestId: action.meta.requestId
+        }
         const { fromAddressBookId, toAddressBookId, contact } = action.payload
         const fromBook = state.addressBooks[fromAddressBookId]
         if (fromBook) {

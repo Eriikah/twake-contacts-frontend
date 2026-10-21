@@ -22,6 +22,7 @@ import { getAddressBookDisplayName } from '@common/features/Contacts/contactsUti
 import { useEffect, useState } from 'react'
 import { Link, Outlet, useLocation, useParams } from 'react-router'
 import { useI18n } from 'twake-i18n'
+import { ContactTransferSnackbar } from './ContactTransferSnackbar'
 import { ContactsSidebar } from './ContactsSidebar'
 import { ContactSearchBar } from './ContactSearchBar'
 import { CreateAddressBookDialog } from './CreateAddressBookDialog'
@@ -236,6 +237,7 @@ export const ContactsPage: React.FC = () => {
           {t('contacts.addressBook.subscribeSuccess')}
         </Alert>
       </Snackbar>
+      <ContactTransferSnackbar />
     </Layout>
   )
 }

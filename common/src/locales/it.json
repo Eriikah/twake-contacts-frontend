@@ -1,6 +1,19 @@
 {
   "locale": "it-it",
   "contacts": {
+    "moveContact": {
+      "success": "Contatto spostato con successo",
+      "title": "Sposta contatto",
+      "confirm": "Sposta",
+      "error": "Impossibile spostare il contatto. Potrebbe già esistere nella rubrica di destinazione."
+    },
+    "copyContact": {
+      "success": "Contatto copiato con successo",
+      "title": "Copia contatto",
+      "destination": "Rubrica di destinazione",
+      "empty": "Nessuna rubrica modificabile disponibile.",
+      "error": "Impossibile copiare il contatto. Potrebbe già esistere nella rubrica di destinazione."
+    },
     "title": "Contatti",
     "tabs": { "mine": "I miei contatti", "shared": "Condiviso con me" },
     "myContacts": "I miei contatti",

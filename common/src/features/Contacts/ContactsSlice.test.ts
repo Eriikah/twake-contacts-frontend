@@ -707,7 +707,10 @@ describe('moveContact', () => {
 
   it('sets an error when the move fails', async () => {
     jest.mocked(moveContactDao).mockRejectedValue(new Error('Move failed'))
-    const store = makeStore({ book1: makeBook('book1', [alice]) })
+    const store = makeStore({
+      book1: makeBook('book1', [alice]),
+      book2: makeBook('book2', [])
+    })
 
     await store.dispatch(
       moveContact({

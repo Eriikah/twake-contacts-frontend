@@ -1,6 +1,19 @@
 {
   "locale": "vi",
   "contacts": {
+    "moveContact": {
+      "success": "Đã di chuyển liên hệ thành công",
+      "title": "Di chuyển liên hệ",
+      "confirm": "Di chuyển",
+      "error": "Không thể di chuyển liên hệ. Liên hệ có thể đã tồn tại trong sổ địa chỉ đích."
+    },
+    "copyContact": {
+      "success": "Đã sao chép liên hệ thành công",
+      "title": "Sao chép liên hệ",
+      "destination": "Sổ địa chỉ đích",
+      "empty": "Không có sổ địa chỉ nào có thể chỉnh sửa.",
+      "error": "Không thể sao chép liên hệ. Liên hệ có thể đã tồn tại trong sổ địa chỉ đích."
+    },
     "title": "Danh bạ",
     "tabs": { "mine": "Danh bạ của tôi", "shared": "Đã chia sẻ với tôi" },
     "myContacts": "Danh bạ của tôi",

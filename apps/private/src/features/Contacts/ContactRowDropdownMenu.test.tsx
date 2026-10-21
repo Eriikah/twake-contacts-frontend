@@ -8,7 +8,7 @@ import { UserState } from '@common/features/User/UserSlice'
 import en from '@common/locales/en.json'
 import { ContactRowDropdownMenu } from './ContactRowDropdownMenu'
 
-const renderMenu = (contact: Contact): void => {
+const renderMenu = (contact: Contact, readOnly = false): void => {
   const store = setupStore({
     user: { userData: { openpaasId: 'u1' } } as UserState
   })
@@ -21,6 +21,9 @@ const renderMenu = (contact: Contact): void => {
             anchorEl={document.body}
             onClose={jest.fn()}
             onOpenDeleteDialog={jest.fn()}
+            onOpenCopyDialog={jest.fn()}
+            onOpenMoveDialog={jest.fn()}
+            readOnly={readOnly}
           />
         </I18n>
       </TwakeMuiThemeProvider>
@@ -54,4 +57,24 @@ describe('ContactRowDropdownMenu', () => {
       screen.getByRole('menuitem', { name: 'Create event' })
     ).not.toHaveAttribute('aria-disabled')
   })
+})
+
+it('hides copy and move for read-only contacts', () => {
+  renderMenu({ id: 'c1', displayName: 'Alice', emails: [] }, true)
+  expect(
+    screen.queryByRole('menuitem', { name: 'Copy contact' })
+  ).not.toBeInTheDocument()
+  expect(
+    screen.queryByRole('menuitem', { name: 'Move contact' })
+  ).not.toBeInTheDocument()
+})
+
+it('offers copy and move for writable contacts', () => {
+  renderMenu({ id: 'c1', displayName: 'Alice', emails: [] })
+  expect(
+    screen.getByRole('menuitem', { name: 'Copy contact' })
+  ).toBeInTheDocument()
+  expect(
+    screen.getByRole('menuitem', { name: 'Move contact' })
+  ).toBeInTheDocument()
 })
