@@ -68,6 +68,7 @@ export const AddressBookField: React.FC<AddressBookFieldProps> = ({
         <TextField
           select
           fullWidth
+          size="small"
           variant="outlined"
           disabled={disabled}
           value={value}

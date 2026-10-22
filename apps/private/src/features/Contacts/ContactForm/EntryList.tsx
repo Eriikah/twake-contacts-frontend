@@ -1,6 +1,7 @@
+import { Cross, Icon } from '@linagora/twake-icons'
 import {
-  Button,
   Grid,
+  IconButton,
   InputAdornment,
   MenuItem,
   Select,
@@ -9,7 +10,6 @@ import {
   Tooltip,
   useBreakpoints
 } from '@linagora/twake-mui'
-import { Cross, Icon } from '@linagora/twake-icons'
 import { useI18n } from 'twake-i18n'
 import { FormRow } from './FormRow'
 import { ContactFormEntry } from './types'
@@ -72,6 +72,7 @@ export const EntryList: React.FC<EntryListProps> = ({
           <Grid size={textFieldSize}>
             <TextField
               fullWidth
+              size="small"
               variant="outlined"
               label={label}
               value={entry.value}
@@ -95,6 +96,7 @@ export const EntryList: React.FC<EntryListProps> = ({
             <Grid size={isMobile ? 4 : 3}>
               <Select
                 fullWidth
+                size="small"
                 variant="outlined"
                 value={entry.type || ''}
                 onChange={e => onChange(index, { type: e.target.value })}
@@ -114,13 +116,12 @@ export const EntryList: React.FC<EntryListProps> = ({
             <Grid size={isMobile ? 2 : 1}>
               {index > 0 && (
                 <Tooltip disableInteractive title={t('contacts.form.remove')}>
-                  <Button
-                    variant="text"
+                  <IconButton
                     onClick={() => onRemove(index)}
                     aria-label={t('contacts.form.remove')}
                   >
                     <Icon icon={Cross} />
-                  </Button>
+                  </IconButton>
                 </Tooltip>
               )}
             </Grid>

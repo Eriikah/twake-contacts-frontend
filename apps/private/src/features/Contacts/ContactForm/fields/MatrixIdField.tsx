@@ -25,6 +25,7 @@ export const MatrixIdField: React.FC<MatrixIdFieldProps> = ({
       <Grid size={isMobile ? 12 : 8}>
         <TextField
           fullWidth
+          size="small"
           variant="outlined"
           label={t('contacts.form.matrixId')}
           value={value}
