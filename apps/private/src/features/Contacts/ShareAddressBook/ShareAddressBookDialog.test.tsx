@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Provider } from 'react-redux'
 import { TwakeMuiThemeProvider } from '@linagora/twake-mui'
@@ -35,7 +35,7 @@ const bob = {
   role: AddressBookAccessLevel.Viewer
 } as userData
 
-function renderShareDialog(): void {
+function renderDialog(onClose = jest.fn()): jest.Mock {
   const store = setupStore({
     user: {
       userData: {
@@ -65,11 +65,12 @@ function renderShareDialog(): void {
     <Provider store={store}>
       <TwakeMuiThemeProvider>
         <I18n dictRequire={() => en} lang="en">
-          <ShareAddressBookDialog addressBookId="book1" onClose={jest.fn()} />
+          <ShareAddressBookDialog addressBookId="book1" onClose={onClose} />
         </I18n>
       </TwakeMuiThemeProvider>
     </Provider>
   )
+  return onClose
 }
 
 describe('ShareAddressBookDialog', () => {
@@ -89,7 +90,7 @@ describe('ShareAddressBookDialog', () => {
         emails: ['bob@open-paas.org']
       }
     ])
-    renderShareDialog()
+    renderDialog()
 
     userEvent.click(await screen.findByRole('button', { name: 'Remove' }))
     await waitFor(() => expect(mockedFetchDetails).toHaveBeenCalledTimes(2))
@@ -104,36 +105,54 @@ describe('ShareAddressBookDialog', () => {
     expect(mockedFetchDetails).toHaveBeenCalledTimes(3)
   })
 
-  it('gives the focus back to the role selector after changing a role', async () => {
+  it('keeps the focus on the role selector after a role change', async () => {
     mockedFetchDetails.mockResolvedValue({ members: [bob], isPublic: false })
-    mockedUpdateShares.mockResolvedValue(undefined)
-    renderShareDialog()
+    let resolveUpdate: () => void = () => undefined
+    mockedUpdateShares.mockReturnValue(
+      new Promise<void>(resolve => {
+        resolveUpdate = resolve
+      })
+    )
+    const onClose = renderDialog()
 
-    const roleSelector = await screen.findByRole('button', {
+    const selector = await screen.findByRole('button', {
       name: 'Role of bob bob'
     })
-    userEvent.click(roleSelector)
-    userEvent.click(screen.getByRole('menuitemradio', { name: 'Editor' }))
+    userEvent.click(selector)
+    userEvent.click(
+      within(screen.getByRole('menu')).getByRole('menuitemradio', {
+        name: 'Editor'
+      })
+    )
 
-    expect(roleSelector).toBeDisabled()
-    // Browsers drop the focus of a disabled element, jsdom does not
-    act(() => roleSelector.blur())
-    expect(roleSelector).not.toHaveFocus()
-    await waitFor(() => expect(roleSelector).toHaveFocus())
-    expect(roleSelector).toBeEnabled()
-    expect(mockedUpdateShares).toHaveBeenCalled()
+    await waitFor(() => expect(mockedUpdateShares).toHaveBeenCalled())
+    await waitFor(() => expect(selector).toHaveFocus())
+    expect(selector).toBeEnabled()
+    resolveUpdate()
+    await waitFor(() => expect(mockedFetchDetails).toHaveBeenCalledTimes(2))
+    expect(selector).toHaveFocus()
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+
+    userEvent.keyboard('{Escape}')
+    expect(onClose).toHaveBeenCalled()
   })
 
-  it('moves the focus to the "Add contacts" field after removing a member', async () => {
+  it('moves the focus to the "Add contacts" field after a removal', async () => {
     mockedFetchDetails
       .mockResolvedValueOnce({ members: [bob], isPublic: false })
       .mockResolvedValue({ members: [], isPublic: false })
     mockedUpdateShares.mockResolvedValue(undefined)
-    renderShareDialog()
+    const onClose = renderDialog()
 
-    userEvent.click(await screen.findByRole('button', { name: 'Remove' }))
+    const removeButton = await screen.findByRole('button', { name: 'Remove' })
+    removeButton.focus()
+    userEvent.click(removeButton)
 
+    await waitFor(() => expect(mockedFetchDetails).toHaveBeenCalledTimes(2))
     expect(screen.queryByText('bob bob')).not.toBeInTheDocument()
     expect(screen.getByPlaceholderText('Add contacts')).toHaveFocus()
+
+    userEvent.keyboard('{Escape}')
+    expect(onClose).toHaveBeenCalled()
   })
 })
