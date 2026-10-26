@@ -127,11 +127,7 @@ export const InviteSection: React.FC<InviteSectionProps> = ({
                             'aria-label': t('contacts.share.role')
                           }}
                           value={selectedRole}
-                          onChange={e =>
-                            setSelectedRole(
-                              e.target.value as AddressBookAccessLevel
-                            )
-                          }
+                          onChange={setSelectedRole}
                         />
                       </InputAdornment>
                     )
