@@ -37,15 +37,15 @@ describe('MemberRow', () => {
     renderMemberRow(bob(AddressBookAccessLevel.ReadWrite))
 
     expect(
-      screen.getByRole('button', { name: 'Read & write' })
-    ).toBeInTheDocument()
+      screen.getByRole('button', { name: 'Role of bob bob' })
+    ).toHaveTextContent('Read & write')
   })
 
   it('changes a read-write member to Viewer', () => {
     const member = bob(AddressBookAccessLevel.ReadWrite)
     const onUpdateMember = renderMemberRow(member)
 
-    userEvent.click(screen.getByRole('button', { name: 'Read & write' }))
+    userEvent.click(screen.getByRole('button', { name: 'Role of bob bob' }))
     userEvent.click(
       within(screen.getByRole('menu')).getByRole('menuitemradio', {
         name: 'Viewer'
@@ -61,7 +61,7 @@ describe('MemberRow', () => {
   it('does not offer read-write to a Viewer', () => {
     renderMemberRow(bob(AddressBookAccessLevel.Viewer))
 
-    userEvent.click(screen.getByRole('button', { name: 'Viewer' }))
+    userEvent.click(screen.getByRole('button', { name: 'Role of bob bob' }))
 
     expect(
       within(screen.getByRole('menu'))
@@ -74,7 +74,7 @@ describe('MemberRow', () => {
     renderMemberRow(bob(AddressBookAccessLevel.Viewer))
 
     expect(
-      screen.getByRole('combobox', { name: 'Role of bob bob' })
+      screen.getByRole('button', { name: 'Role of bob bob' })
     ).toHaveTextContent('Viewer')
   })
 })

@@ -45,7 +45,7 @@ describe('InviteSection', () => {
   it('names the role selector', () => {
     renderInviteSection()
 
-    expect(screen.getByRole('combobox', { name: 'Role' })).toHaveTextContent(
+    expect(screen.getByRole('button', { name: 'Role' })).toHaveTextContent(
       'Viewer'
     )
   })
