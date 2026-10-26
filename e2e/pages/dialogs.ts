@@ -136,10 +136,10 @@ export class ShareDialog {
     this.root = page.getByRole('dialog').filter({ hasText: 'Invite people' })
     this.title = this.root.getByRole('heading').first()
     this.userInput = this.root.getByPlaceholder('Add contacts')
-    // The invitation picker precedes the role buttons in the member list.
-    this.inviteRole = this.root
-      .getByRole('button', { name: /^(Viewer|Editor)$/ })
-      .first()
+    this.inviteRole = this.root.getByRole('button', {
+      name: 'Role',
+      exact: true
+    })
     this.sendButton = this.root.getByRole('button', { name: 'Send' })
     this.closeButton = this.root.getByRole('button', { name: 'Close' })
     this.emptyMembers = this.root.getByText('No one has been added yet')
@@ -154,9 +154,7 @@ export class ShareDialog {
   }
 
   memberRole(text: string): Locator {
-    return this.member(text).getByRole('button', {
-      name: /^(Viewer|Editor|Read & write)$/
-    })
+    return this.member(text).getByRole('button', { name: /^Role of / })
   }
 
   async chooseMemberRole(

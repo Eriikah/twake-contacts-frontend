@@ -123,9 +123,7 @@ export const InviteSection: React.FC<InviteSectionProps> = ({
                         style={{ position: 'absolute', right: 8 }}
                       >
                         <RoleSelector
-                          inputProps={{
-                            'aria-label': t('contacts.share.role')
-                          }}
+                          aria-label={t('contacts.share.role')}
                           value={selectedRole}
                           onChange={setSelectedRole}
                         />

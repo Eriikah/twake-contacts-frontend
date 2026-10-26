@@ -20,12 +20,14 @@ interface RoleSelectorProps {
   value: AddressBookAccessLevel
   onChange: (role: AddressBookAccessLevel) => void
   disabled?: boolean
+  'aria-label'?: string
 }
 
 export const RoleSelector: React.FC<RoleSelectorProps> = ({
   value,
   onChange,
-  disabled = false
+  disabled = false,
+  'aria-label': ariaLabel
 }) => {
   const { t } = useI18n()
   const anchorRef = useRef<HTMLButtonElement>(null)
@@ -46,6 +48,7 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
         size="small"
         color="inherit"
         disabled={disabled}
+        aria-label={ariaLabel}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
