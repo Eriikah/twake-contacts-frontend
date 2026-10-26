@@ -24,13 +24,15 @@ interface InviteSectionProps {
   invitedMembers?: userData[]
   onShare: (users: userData[], role: AddressBookAccessLevel) => void
   loading?: boolean
+  searchInputRef?: React.RefObject<HTMLInputElement | null>
 }
 
 export const InviteSection: React.FC<InviteSectionProps> = ({
   currentUserId,
   invitedMembers = [],
   onShare,
-  loading = false
+  loading = false,
+  searchInputRef: externalSearchInputRef
 }) => {
   const { t } = useI18n()
 
@@ -40,7 +42,8 @@ export const InviteSection: React.FC<InviteSectionProps> = ({
     AddressBookAccessLevel.Viewer
   )
   // Send gets disabled while focused: keep the focus inside the dialog
-  const searchInputRef = useRef<HTMLInputElement>(null)
+  const ownSearchInputRef = useRef<HTMLInputElement>(null)
+  const searchInputRef = externalSearchInputRef ?? ownSearchInputRef
 
   const nonInvitableIds = useMemo(
     () => getNonInvitableUserIds(invitedMembers, currentUserId),

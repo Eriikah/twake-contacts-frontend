@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useMemo } from 'react'
+import React, { useEffect, useCallback, useMemo, useRef } from 'react'
 import {
   Dialog,
   DialogTitle,
@@ -350,6 +350,8 @@ export const ShareAddressBookDialog: React.FC<ShareAddressBookDialogProps> = ({
     activeInvitedMembers
   } = useAddressBookSharingState(userData, book, dispatch)
   const [shareError, setShareError] = React.useState<string | null>(null)
+  // Removing a member unmounts its focused row: keep the focus in the dialog
+  const searchInputRef = useRef<HTMLInputElement>(null)
 
   const { handleShare, handleUpdateMember } = useAddressBookSharingActions({
     userData,
@@ -398,11 +400,17 @@ export const ShareAddressBookDialog: React.FC<ShareAddressBookDialogProps> = ({
           invitedMembers={activeInvitedMembers}
           onShare={(users, role) => void handleShare(users, role)}
           loading={isSharing}
+          searchInputRef={searchInputRef}
         />
         <MembersList
           userData={userData}
           invitedMembers={activeInvitedMembers}
-          onUpdateMember={(user, role) => void handleUpdateMember(user, role)}
+          onUpdateMember={(user, role) => {
+            if (role === AddressBookAccessLevel.None) {
+              searchInputRef.current?.focus()
+            }
+            void handleUpdateMember(user, role)
+          }}
           updatingMemberId={updatingMemberId}
         />
         <DiscoverySection

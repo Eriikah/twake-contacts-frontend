@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { Provider } from 'react-redux'
 import { TwakeMuiThemeProvider } from '@linagora/twake-mui'
@@ -35,7 +35,46 @@ const bob = {
   role: AddressBookAccessLevel.Viewer
 } as userData
 
+function renderShareDialog(): void {
+  const store = setupStore({
+    user: {
+      userData: {
+        openpaasId: 'alice',
+        name: 'alice alice',
+        email: 'alice@open-paas.org'
+      }
+    } as UserState,
+    contacts: {
+      addressBooks: {
+        book1: {
+          id: 'book1',
+          userId: 'alice',
+          name: 'Friends',
+          contactsCount: 0,
+          acl: [],
+          canWrite: true,
+          contacts: []
+        }
+      },
+      listings: {},
+      loading: false,
+      error: null
+    }
+  })
+  render(
+    <Provider store={store}>
+      <TwakeMuiThemeProvider>
+        <I18n dictRequire={() => en} lang="en">
+          <ShareAddressBookDialog addressBookId="book1" onClose={jest.fn()} />
+        </I18n>
+      </TwakeMuiThemeProvider>
+    </Provider>
+  )
+}
+
 describe('ShareAddressBookDialog', () => {
+  afterEach(() => jest.resetAllMocks())
+
   it('lists a member shared again right after being removed', async () => {
     mockedFetchDetails
       .mockResolvedValueOnce({ members: [bob], isPublic: false })
@@ -50,40 +89,7 @@ describe('ShareAddressBookDialog', () => {
         emails: ['bob@open-paas.org']
       }
     ])
-    const store = setupStore({
-      user: {
-        userData: {
-          openpaasId: 'alice',
-          name: 'alice alice',
-          email: 'alice@open-paas.org'
-        }
-      } as UserState,
-      contacts: {
-        addressBooks: {
-          book1: {
-            id: 'book1',
-            userId: 'alice',
-            name: 'Friends',
-            contactsCount: 0,
-            acl: [],
-            canWrite: true,
-            contacts: []
-          }
-        },
-        listings: {},
-        loading: false,
-        error: null
-      }
-    })
-    render(
-      <Provider store={store}>
-        <TwakeMuiThemeProvider>
-          <I18n dictRequire={() => en} lang="en">
-            <ShareAddressBookDialog addressBookId="book1" onClose={jest.fn()} />
-          </I18n>
-        </TwakeMuiThemeProvider>
-      </Provider>
-    )
+    renderShareDialog()
 
     userEvent.click(await screen.findByRole('button', { name: 'Remove' }))
     await waitFor(() => expect(mockedFetchDetails).toHaveBeenCalledTimes(2))
@@ -96,5 +102,38 @@ describe('ShareAddressBookDialog', () => {
 
     expect(await screen.findByText('bob bob')).toBeInTheDocument()
     expect(mockedFetchDetails).toHaveBeenCalledTimes(3)
+  })
+
+  it('gives the focus back to the role selector after changing a role', async () => {
+    mockedFetchDetails.mockResolvedValue({ members: [bob], isPublic: false })
+    mockedUpdateShares.mockResolvedValue(undefined)
+    renderShareDialog()
+
+    const roleSelector = await screen.findByRole('button', {
+      name: 'Role of bob bob'
+    })
+    userEvent.click(roleSelector)
+    userEvent.click(screen.getByRole('menuitemradio', { name: 'Editor' }))
+
+    expect(roleSelector).toBeDisabled()
+    // Browsers drop the focus of a disabled element, jsdom does not
+    act(() => roleSelector.blur())
+    expect(roleSelector).not.toHaveFocus()
+    await waitFor(() => expect(roleSelector).toHaveFocus())
+    expect(roleSelector).toBeEnabled()
+    expect(mockedUpdateShares).toHaveBeenCalled()
+  })
+
+  it('moves the focus to the "Add contacts" field after removing a member', async () => {
+    mockedFetchDetails
+      .mockResolvedValueOnce({ members: [bob], isPublic: false })
+      .mockResolvedValue({ members: [], isPublic: false })
+    mockedUpdateShares.mockResolvedValue(undefined)
+    renderShareDialog()
+
+    userEvent.click(await screen.findByRole('button', { name: 'Remove' }))
+
+    expect(screen.queryByText('bob bob')).not.toBeInTheDocument()
+    expect(screen.getByPlaceholderText('Add contacts')).toHaveFocus()
   })
 })
