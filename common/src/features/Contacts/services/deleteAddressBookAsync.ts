@@ -32,9 +32,13 @@ export const deleteAddressBookThunk = (
         delete state.addressBooks[addressBookId]
       },
       rejected: (state, action) => {
+        const { addressBookId } = action.meta.arg
+        const isCopy = Boolean(state.addressBooks[addressBookId]?.ownerId)
         state.error = toContactsErrorKey(
           action.payload,
-          'contacts.errors.delete'
+          isCopy
+            ? 'contacts.errors.removeAddressBook'
+            : 'contacts.errors.deleteAddressBook'
         )
       }
     }

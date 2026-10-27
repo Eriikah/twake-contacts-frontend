@@ -201,6 +201,36 @@ describe('ContactsPage address book success toast', () => {
     ).not.toBeInTheDocument()
   })
 
+  it('reports a failed deletion of an own address book', async () => {
+    mockDeleteAddressBook.mockRejectedValue(new Error('boom'))
+    const store = renderPage()
+
+    await act(async () => {
+      await store.dispatch(
+        deleteAddressBook({ userId: 'u1', addressBookId: 'book1' })
+      )
+    })
+
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      en.contacts.errors.deleteAddressBook
+    )
+  })
+
+  it('reports a failed removal of a shared address book from the list', async () => {
+    mockDeleteAddressBook.mockRejectedValue(new Error('boom'))
+    const store = renderPage({ lang: 'fr', dict: fr }, { ownerId: 'u2' })
+
+    await act(async () => {
+      await store.dispatch(
+        deleteAddressBook({ userId: 'u1', addressBookId: 'book1' })
+      )
+    })
+
+    expect(screen.getByRole('alert')).toHaveTextContent(
+      fr.contacts.errors.removeAddressBook
+    )
+  })
+
   it('clears the toast when it is closed', async () => {
     mockUpdateAddressBook.mockResolvedValue(undefined)
     const store = renderPage()
