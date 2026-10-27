@@ -2,13 +2,11 @@ import {
   Button,
   Dialog,
   DialogActions,
+  DialogCloseButton,
   DialogContent,
   DialogTitle,
-  IconButton,
-  Stack,
   Typography
 } from '@linagora/twake-mui'
-import { Cross, Icon } from '@linagora/twake-icons'
 import { useI18n } from 'twake-i18n'
 import {
   AddressBook,
@@ -37,16 +35,10 @@ export const SubscribeAddressBookDialog: React.FC<Props> = ({
     usePublicAddressBooks()
   return (
     <Dialog open onClose={onClose} fullWidth maxWidth="sm">
-      <Stack direction="row" className="u-flex-items-center">
-        <DialogTitle>{t('contacts.addressBook.subscribeTitle')}</DialogTitle>
-        <IconButton
-          className="u-mr-1"
-          aria-label={t('contacts.form.close')}
-          onClick={onClose}
-        >
-          <Icon icon={Cross} />
-        </IconButton>
-      </Stack>
+      <DialogTitle className="dialogTitleWithClose">
+        {t('contacts.addressBook.subscribeTitle')}
+      </DialogTitle>
+      <DialogCloseButton onClick={onClose} />
       <DialogContent>
         <Typography className="u-mb-1">
           {t('contacts.addressBook.userLabel')}
