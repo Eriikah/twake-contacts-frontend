@@ -6,12 +6,22 @@ interface SdkSession {
   signingIn: Promise<void> | null
 }
 
+// The bar shows an avatar skeleton while the token exchange is pending: past
+// this delay it shows the fallback user, then turns ready if the exchange ends.
+export const SDK_WAITING_TIMEOUT = 5000
+
 const sessions = new Map<string, SdkSession>()
 
 const getSession = (platformURL: string): SdkSession => {
   let session = sessions.get(platformURL)
   if (!session) {
-    session = { sdk: createSdk({ platformURL }), signingIn: null }
+    session = {
+      sdk: createSdk({
+        platformURL,
+        waitingTimeout: SDK_WAITING_TIMEOUT
+      }),
+      signingIn: null
+    }
     sessions.set(platformURL, session)
   }
   return session
