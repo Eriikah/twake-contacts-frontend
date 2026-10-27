@@ -49,6 +49,12 @@ const ContactsSlice = createAppSlice({
     clearContactsError: create.reducer(state => {
       state.error = null
     }),
+    // the failed listings load their next page again
+    clearListingFailures: create.reducer(state => {
+      Object.values(state.listings).forEach(listing => {
+        delete listing.failed
+      })
+    }),
     // the loaded pages are in the previous order: the listings restart
     setContactSort: create.reducer(
       (state, action: { payload: ContactSort }) => {
@@ -100,6 +106,7 @@ export const {
   addContactFromSearch,
   clearAddressBookSuccess,
   clearContactsError,
+  clearListingFailures,
   clearTransferSuccess,
   createContact,
   deleteContact,

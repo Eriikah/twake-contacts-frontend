@@ -247,6 +247,75 @@ describe('AddressBookPage lazy loading', () => {
   })
 })
 
+describe('AddressBookPage load failure', () => {
+  const failure = { response: { status: 500 }, message: 'Server error' }
+
+  it('shows an error with a retry, not the empty state, when the first page fails', async () => {
+    jest
+      .mocked(fetchContactsPage)
+      .mockRejectedValueOnce(failure)
+      .mockResolvedValueOnce({
+        entries: [{ addressBookId: 'book1', contact: alice }],
+        next: null
+      })
+    renderPage('/contacts/book1', { book1: makeBook('book1', []) })
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      en.contacts.errors.load
+    )
+    expect(screen.queryByText(en.contacts.empty.title)).not.toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: en.error.retry }))
+
+    expect(await screen.findByText('Alice Roche')).toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+
+  it('loads a failed book again on its next visit', async () => {
+    jest
+      .mocked(fetchContactsPage)
+      .mockRejectedValueOnce(failure)
+      .mockResolvedValue({
+        entries: [{ addressBookId: 'book1', contact: alice }],
+        next: null
+      })
+    renderPage(
+      '/contacts/book1',
+      { book1: makeBook('book1', []), book2: makeBook('book2', []) },
+      { book2: makeListing('book2', [], null) }
+    )
+    expect(await screen.findByRole('alert')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByText('Go to book2'))
+    fireEvent.click(screen.getByText('Go to book1'))
+
+    expect(await screen.findByText('Alice Roche')).toBeInTheDocument()
+    expect(screen.queryByText(en.contacts.empty.title)).not.toBeInTheDocument()
+  })
+
+  it('keeps the loaded contacts with a retry when a later page fails', async () => {
+    jest
+      .mocked(fetchContactsPage)
+      .mockRejectedValueOnce(failure)
+      .mockResolvedValueOnce({
+        entries: [{ addressBookId: 'book1', contact: bob }],
+        next: null
+      })
+    renderPage(
+      '/contacts/book1',
+      { book1: makeBook('book1', [alice]) },
+      { book1: makeListing('book1', [alice], 'cursor1') }
+    )
+
+    expect(await screen.findByRole('alert')).toBeInTheDocument()
+    expect(screen.getByText('Alice Roche')).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('button', { name: en.error.retry }))
+
+    expect(await screen.findByText('Bob Martin')).toBeInTheDocument()
+  })
+})
+
 describe('AddressBookPage sort', () => {
   it('loads the first page again in the order of a clicked column', async () => {
     jest.mocked(fetchContactsPage).mockResolvedValue({

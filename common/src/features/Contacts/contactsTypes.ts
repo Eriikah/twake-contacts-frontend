@@ -104,6 +104,8 @@ export interface ContactListing {
   loadingRequestId: string | null
   // restarted from its first page after the server rejected its cursor
   restarted?: boolean
+  // its last page failed: no page loads until the failure is cleared
+  failed?: boolean
 }
 
 /** The order the server sorts the pages of every listing in. */

@@ -68,7 +68,10 @@ export const fetchMoreContactsThunk = (
           return (
             (listingKey === ALL_CONTACTS_LISTING ||
               addressBooks[listingKey] !== undefined) &&
-            (!listing || (listing.hasMore && listing.loadingRequestId === null))
+            (!listing ||
+              (listing.hasMore &&
+                !listing.failed &&
+                listing.loadingRequestId === null))
           )
         }
       },
@@ -116,8 +119,9 @@ export const fetchMoreContactsThunk = (
           }
           return
         }
-        // the api already retried: the listing stops until the next reload
-        listing.hasMore = false
+        // the api already retried: the listing keeps its remaining pages but
+        // stops loading them until a retry or the next visit of its view
+        listing.failed = true
         if (action.payload?.status !== 401) {
           state.error = toContactsErrorKey(
             action.payload,

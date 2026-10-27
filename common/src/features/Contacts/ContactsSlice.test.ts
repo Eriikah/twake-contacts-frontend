@@ -12,6 +12,7 @@ import {
   subscribeToAddressBook
 } from './ContactsDao'
 import {
+  clearListingFailures,
   createContact,
   deleteContact,
   fetchContact,
@@ -366,11 +367,11 @@ describe('fetchMoreContacts', () => {
 
     const state = store.getState().contacts
     expect(getListedIds(state, 'book1')).toStrictEqual(['c1'])
-    expect(state.listings.book1.hasMore).toBe(false)
+    expect(state.listings.book1.failed).toBe(true)
     expect(state.error).not.toBe(null)
   })
 
-  it('reports a page that fails and stops its listing', async () => {
+  it('reports a page that fails and stops its listing without completing it', async () => {
     jest
       .mocked(fetchContactsPage)
       .mockRejectedValue({ response: { status: 400 }, message: 'Bad request' })
@@ -379,11 +380,42 @@ describe('fetchMoreContacts', () => {
     await store.dispatch(
       fetchMoreContacts({ userId: 'u1', listingKey: 'book1' })
     )
+    await store.dispatch(
+      fetchMoreContacts({ userId: 'u1', listingKey: 'book1' })
+    )
 
     const state = store.getState().contacts
-    expect(state.listings.book1.refs).toStrictEqual([])
-    expect(state.listings.book1.hasMore).toBe(false)
+    expect(state.listings.book1).toEqual(
+      expect.objectContaining({ refs: [], hasMore: true, failed: true })
+    )
     expect(state.error).not.toBe(null)
+    expect(fetchContactsPage).toHaveBeenCalledTimes(1)
+  })
+
+  it('loads a failed listing again once its failure is cleared', async () => {
+    jest
+      .mocked(fetchContactsPage)
+      .mockRejectedValueOnce({ response: { status: 400 }, message: 'Bad' })
+      .mockResolvedValueOnce({
+        entries: [{ addressBookId: 'book1', contact: alice }],
+        next: null
+      })
+    const store = makeStore({ book1: makeBook('book1', []) })
+
+    await store.dispatch(
+      fetchMoreContacts({ userId: 'u1', listingKey: 'book1' })
+    )
+    store.dispatch(clearListingFailures())
+    await store.dispatch(
+      fetchMoreContacts({ userId: 'u1', listingKey: 'book1' })
+    )
+
+    const state = store.getState().contacts
+    expect(getListedIds(state, 'book1')).toStrictEqual(['c1'])
+    expect(state.listings.book1).toEqual(
+      expect.objectContaining({ hasMore: false })
+    )
+    expect(state.listings.book1.failed).toBeUndefined()
   })
 })
 
