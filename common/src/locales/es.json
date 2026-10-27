@@ -107,6 +107,7 @@
     },
     "errors": {
       "load": "No se han podido cargar los contactos",
+      "loadMembers": "No se pudieron cargar los miembros de esta libreta de direcciones",
       "create": "No se ha podido crear el contacto",
       "update": "No se ha podido actualizar el contacto",
       "delete": "No se ha podido eliminar el contacto",

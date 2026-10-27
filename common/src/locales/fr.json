@@ -107,6 +107,7 @@
     },
     "errors": {
       "load": "Échec du chargement des contacts",
+      "loadMembers": "Impossible de charger les membres de ce carnet d'adresses",
       "create": "Échec de la création du contact",
       "update": "Échec de la modification du contact",
       "delete": "Échec de la suppression du contact",

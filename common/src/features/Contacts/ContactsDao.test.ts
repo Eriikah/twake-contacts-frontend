@@ -12,10 +12,16 @@ import {
   fetchContact,
   fetchContactsPage,
   fetchSubscribableAddressBooks,
+  resolveAddressBookMember,
   subscribeToAddressBook
 } from './ContactsDao'
 import { formatAddress } from './contactsUtils'
-import { DavContactItem, DavContactsResponse, JCalCard } from './davTypes'
+import {
+  AddressBookAccessLevel,
+  DavContactItem,
+  DavContactsResponse,
+  JCalCard
+} from './davTypes'
 import { AddressBook } from './contactsTypes'
 import { DEFAULT_CONTACT_SORT } from './constants'
 
@@ -690,5 +696,45 @@ describe('fetchSubscribableAddressBooks', () => {
       searchParams: { personal: 'true', contactsCount: 'true' },
       headers: { Accept: 'application/vcard+json' }
     })
+  })
+})
+
+describe('resolveAddressBookMember', () => {
+  const invited = {
+    email: 'bob@open-paas.org',
+    given_name: '',
+    family_name: '',
+    name: 'bob@open-paas.org',
+    sid: 'bob-id',
+    sub: 'bob-id',
+    openpaasId: 'bob-id',
+    role: AddressBookAccessLevel.Editor,
+    href: 'mailto:bob@open-paas.org'
+  }
+
+  beforeEach(() => jest.mocked(fetchUserById).mockReset())
+
+  it('completes the member with its profile, keeping its role', async () => {
+    jest.mocked(fetchUserById).mockResolvedValue({
+      id: 'bob-id',
+      firstname: 'bob',
+      lastname: 'bob',
+      preferredEmail: 'bob@open-paas.org'
+    } as never)
+
+    const member = await resolveAddressBookMember(invited)
+
+    expect(member).toMatchObject({
+      name: 'bob bob',
+      openpaasId: 'bob-id',
+      role: AddressBookAccessLevel.Editor,
+      href: 'mailto:bob@open-paas.org'
+    })
+  })
+
+  it('keeps the member as invited when its profile cannot be fetched', async () => {
+    jest.mocked(fetchUserById).mockRejectedValue(new Error('not found'))
+
+    await expect(resolveAddressBookMember(invited)).resolves.toBe(invited)
   })
 })

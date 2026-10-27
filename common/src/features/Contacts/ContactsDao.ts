@@ -410,25 +410,47 @@ export async function createAddressBook(
     canWrite: true
   }
 }
-async function resolveInviteMember(
-  invite: DavInvite
-): Promise<userData | null> {
-  const principalStr = invite.principal || invite.href || ''
-  const memberUserId = principalStr.split('/').pop()
+const MAILTO_PREFIX = 'mailto:'
 
-  if (!memberUserId) return null
+/**
+ * Builds a member from its invite alone, listable before (or without) the
+ * lookup of its profile: identified by its principal, named by its email.
+ */
+function toInviteMember(invite: DavInvite): userData {
+  const memberUserId =
+    (invite.principal || invite.href || '').split('/').pop() || undefined
+  const email = invite.href?.startsWith(MAILTO_PREFIX)
+    ? invite.href.slice(MAILTO_PREFIX.length)
+    : ''
+
+  return {
+    email,
+    given_name: '',
+    family_name: '',
+    name: email || memberUserId || '',
+    sid: memberUserId ?? '',
+    sub: memberUserId ?? '',
+    openpaasId: memberUserId,
+    role: invite.access,
+    href: invite.href
+  }
+}
+
+/**
+ * Completes a member built from its invite with its profile. Never rejects:
+ * a member whose profile cannot be fetched is kept as it is.
+ */
+export async function resolveAddressBookMember(
+  member: userData
+): Promise<userData> {
+  if (!member.openpaasId) return member
 
   try {
-    const user = await fetchUserById(memberUserId)
-    const mappedUser = ToUserData(user)
-    if (!mappedUser) return null
-
-    mappedUser.role = invite.access
-    mappedUser.href = invite.href
-    return mappedUser
+    const user = ToUserData(await fetchUserById(member.openpaasId))
+    return user ? { ...user, role: member.role, href: member.href } : member
   } catch (e) {
-    console.warn('Failed to fetch user', memberUserId, e)
-    return null
+    console.warn('Failed to fetch user', member.openpaasId, e)
+    return member
   }
 }
 
@@ -454,11 +476,7 @@ export async function fetchAddressBookDetails(
       entry => entry.principal === '{DAV:}authenticated'
     )
 
-    const members = invites
-      ? await Promise.all(invites.map(resolveInviteMember)).then(list =>
-          list.filter((user): user is userData => user != null)
-        )
-      : []
+    const members = (invites ?? []).map(toInviteMember)
 
     return { members, isPublic }
   } catch (error) {

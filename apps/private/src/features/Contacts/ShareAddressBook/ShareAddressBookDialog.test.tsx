@@ -6,6 +6,7 @@ import I18n from 'twake-i18n'
 import { setupStore } from '@common/app/store'
 import {
   fetchAddressBookDetails,
+  resolveAddressBookMember,
   updateAddressBookShares
 } from '@common/features/Contacts/ContactsDao'
 import { AddressBookAccessLevel } from '@common/features/Contacts/davTypes'
@@ -25,6 +26,9 @@ const mockedFetchDetails = fetchAddressBookDetails as jest.MockedFunction<
 >
 const mockedUpdateShares = updateAddressBookShares as jest.MockedFunction<
   typeof updateAddressBookShares
+>
+const mockedResolveMember = resolveAddressBookMember as jest.MockedFunction<
+  typeof resolveAddressBookMember
 >
 const mockedSearchUsers = searchUsers as jest.MockedFunction<typeof searchUsers>
 
@@ -74,7 +78,66 @@ function renderDialog(onClose = jest.fn()): jest.Mock {
 }
 
 describe('ShareAddressBookDialog', () => {
+  beforeEach(() => mockedResolveMember.mockImplementation(async m => m))
   afterEach(() => jest.resetAllMocks())
+
+  it('lists a member whose profile lookup has not answered yet', async () => {
+    const invitedBob = { ...bob, name: bob.email } as userData
+    mockedFetchDetails.mockResolvedValue({
+      members: [invitedBob],
+      isPublic: false
+    })
+    mockedResolveMember.mockReturnValue(new Promise(() => undefined))
+    renderShareDialog()
+
+    expect(
+      await screen.findByRole('button', { name: 'Role of bob@open-paas.org' })
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText('No one has been added yet')
+    ).not.toBeInTheDocument()
+  })
+
+  it('reports in the dialog a failure to fetch the members', async () => {
+    mockedFetchDetails.mockRejectedValue(new Error('Bad Request'))
+    renderShareDialog()
+
+    expect(
+      await screen.findByText('Failed to load the members of this address book')
+    ).toBeInTheDocument()
+    expect(
+      screen.queryByText('No one has been added yet')
+    ).not.toBeInTheDocument()
+  })
+
+  it('lists the members once they are fetched after a failure', async () => {
+    mockedFetchDetails
+      .mockRejectedValueOnce(new Error('Bad Request'))
+      .mockResolvedValue({ members: [bob], isPublic: false })
+    mockedUpdateShares.mockResolvedValue(undefined)
+    mockedSearchUsers.mockResolvedValue([
+      {
+        id: 'bob',
+        firstname: 'bob',
+        lastname: 'bob',
+        emails: ['bob@open-paas.org']
+      }
+    ])
+    renderShareDialog()
+
+    expect(
+      await screen.findByText('Failed to load the members of this address book')
+    ).toBeInTheDocument()
+    userEvent.type(screen.getByPlaceholderText('Add contacts'), 'bob')
+    await waitFor(() => expect(mockedSearchUsers).toHaveBeenCalled())
+    userEvent.click(await screen.findByText('bob@open-paas.org'))
+    userEvent.click(screen.getByRole('button', { name: 'Send' }))
+
+    expect(await screen.findByText('bob bob')).toBeInTheDocument()
+    expect(
+      screen.queryByText('Failed to load the members of this address book')
+    ).not.toBeInTheDocument()
+  })
 
   it('lists a member shared again right after being removed', async () => {
     mockedFetchDetails

@@ -18,7 +18,7 @@ describe('sharingHelpers', () => {
   }
 
   describe('partitionMembers', () => {
-    it('returns currentUser in me when current user is in invitedMembers', () => {
+    it('returns currentUser with its role in me when current user is in invitedMembers', () => {
       const invited: userData[] = [
         {
           openpaasId: 'user-1',
@@ -44,8 +44,32 @@ describe('sharingHelpers', () => {
 
       const { me, others } = partitionMembers(invited, currentUser)
 
-      expect(me).toEqual(invited[0])
+      expect(me).toEqual({ ...currentUser, role: AddressBookAccessLevel.Owner })
       expect(others).toEqual([invited[1]])
+    })
+
+    it('keeps the profile of the current user when its own entry is not looked up', () => {
+      const invited: userData[] = [
+        {
+          openpaasId: 'user-1',
+          name: 'user-1',
+          email: '',
+          role: AddressBookAccessLevel.Owner,
+          href: 'principals/users/user-1',
+          family_name: '',
+          given_name: '',
+          sid: 'user-1',
+          sub: 'user-1'
+        }
+      ]
+
+      const { me } = partitionMembers(invited, currentUser)
+
+      expect(me).toEqual({
+        ...currentUser,
+        role: AddressBookAccessLevel.Owner,
+        href: 'principals/users/user-1'
+      })
     })
 
     it('falls back to currentUser when current user is not in invitedMembers', () => {
