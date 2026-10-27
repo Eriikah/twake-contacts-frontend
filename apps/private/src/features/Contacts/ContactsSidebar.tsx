@@ -122,6 +122,7 @@ export const ContactsSidebar: React.FC<ContactsSidebarProps> = ({
                 book={book}
                 variant="secondary"
                 selected={addressBookId === book.id}
+                onNavigate={handleItemClick}
               />
             ))}
 
@@ -168,6 +169,7 @@ export const ContactsSidebar: React.FC<ContactsSidebarProps> = ({
                     book={book}
                     variant="primary"
                     selected={addressBookId === book.id}
+                    onNavigate={handleItemClick}
                   />
                 ))}
           </NavDesktopDropdown>

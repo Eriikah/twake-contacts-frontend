@@ -42,12 +42,14 @@ export interface AddressBookNavItemProps {
   book: AddressBook
   selected: boolean
   variant: 'primary' | 'secondary' | 'tertiary' | undefined
+  onNavigate: (path: string) => void
 }
 
 export const AddressBookNavItem: React.FC<AddressBookNavItemProps> = ({
   book,
   selected,
-  variant
+  variant,
+  onNavigate
 }) => {
   const { t } = useI18n()
   const navigate = useNavigate()
@@ -159,9 +161,7 @@ export const AddressBookNavItem: React.FC<AddressBookNavItemProps> = ({
         }
       >
         <NavLink
-          onClick={() => {
-            void navigate(`/contacts/${book.id}`)
-          }}
+          onClick={() => onNavigate(`/contacts/${book.id}`)}
           selected={selected}
           aria-current={getAriaCurrent(selected)}
         >

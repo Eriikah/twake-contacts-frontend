@@ -45,7 +45,8 @@ function LocationDisplay(): React.ReactElement {
 
 function renderSidebar(
   path: string,
-  addressBooks?: Record<string, AddressBookWithContacts>
+  addressBooks?: Record<string, AddressBookWithContacts>,
+  onClose?: () => void
 ): ReturnType<typeof render> {
   const store = setupStore({
     user: { userData: { openpaasId: 'u1' } } as UserState,
@@ -92,7 +93,16 @@ function renderSidebar(
         <I18n dictRequire={() => en} lang="en">
           <MemoryRouter initialEntries={[path]}>
             <Routes>
-              <Route path="/contacts" element={<ContactsSidebar />}>
+              <Route
+                path="/contacts"
+                element={
+                  <ContactsSidebar
+                    onOpenCreateBook={jest.fn()}
+                    onOpenSubscribe={jest.fn()}
+                    onClose={onClose}
+                  />
+                }
+              >
                 <Route path=":addressBookId" element={<div />} />
               </Route>
             </Routes>
@@ -209,6 +219,67 @@ describe('ContactsSidebar', () => {
     expect(
       screen.queryByRole('link', { name: en.contacts.create })
     ).not.toBeInTheDocument()
+  })
+
+  describe('mobile drawer', () => {
+    const books = Object.fromEntries(
+      [
+        makeBook(DEFAULT_ADDRESS_BOOK_ID, 'My contacts'),
+        makeBook('own', 'Own book'),
+        makeBook('other', 'Other book'),
+        { ...makeBook('shared', 'Shared book'), ownerId: 'bob' },
+        makeBook('dab', 'Domain')
+      ].map(book => [book.id, book])
+    )
+
+    beforeEach(() => {
+      mockUseBreakpoints.mockReturnValue({
+        isMobile: true,
+        isTablet: false,
+        isDesktop: false,
+        isExtraLarge: false
+      })
+    })
+
+    afterEach(() => {
+      mockUseBreakpoints.mockReturnValue({
+        isMobile: false,
+        isTablet: false,
+        isDesktop: true,
+        isExtraLarge: false
+      })
+    })
+
+    it.each([
+      ['own', 'Own book'],
+      ['shared', 'Shared book'],
+      ['dab', en.contacts.domainAddressBook]
+    ])(
+      'closes the drawer when tapping the current address book %s',
+      (id, name) => {
+        const onClose = jest.fn()
+        renderSidebar(`/contacts/${id}`, books, onClose)
+
+        fireEvent.click(screen.getByText(name))
+
+        expect(onClose).toHaveBeenCalledTimes(1)
+        expect(screen.getByTestId('location')).toHaveTextContent(
+          `/contacts/${id}`
+        )
+      }
+    )
+
+    it('closes the drawer and opens another address book', () => {
+      const onClose = jest.fn()
+      renderSidebar('/contacts/own', books, onClose)
+
+      fireEvent.click(screen.getByText('Other book'))
+
+      expect(onClose).toHaveBeenCalledTimes(1)
+      expect(screen.getByTestId('location')).toHaveTextContent(
+        '/contacts/other'
+      )
+    })
   })
 
   describe('current address book', () => {
