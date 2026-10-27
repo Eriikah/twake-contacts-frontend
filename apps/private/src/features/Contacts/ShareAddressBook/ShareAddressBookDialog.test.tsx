@@ -128,9 +128,11 @@ describe('ShareAddressBookDialog', () => {
     await waitFor(() => expect(mockedUpdateShares).toHaveBeenCalled())
     await waitFor(() => expect(selector).toHaveFocus())
     expect(selector).toBeEnabled()
+    expect(selector).toHaveAttribute('aria-disabled', 'true')
     resolveUpdate()
     await waitFor(() => expect(mockedFetchDetails).toHaveBeenCalledTimes(2))
     expect(selector).toHaveFocus()
+    expect(selector).toHaveAttribute('aria-disabled', 'false')
     expect(screen.queryByRole('menu')).not.toBeInTheDocument()
 
     userEvent.keyboard('{Escape}')

@@ -51,6 +51,7 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
         size="small"
         color="inherit"
         disabled={disabled}
+        aria-disabled={readOnly}
         aria-label={ariaLabel}
         aria-haspopup="menu"
         aria-expanded={open}
