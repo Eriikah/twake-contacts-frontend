@@ -17,17 +17,17 @@ import { AddressBookAccessLevel } from '@common/features/Contacts/davTypes'
 import { getRoleTranslationKey } from './sharingHelpers'
 
 interface RoleSelectorProps {
+  ariaLabel: string
   value: AddressBookAccessLevel
   onChange: (role: AddressBookAccessLevel) => void
   disabled?: boolean
-  'aria-label'?: string
 }
 
 export const RoleSelector: React.FC<RoleSelectorProps> = ({
+  ariaLabel,
   value,
   onChange,
-  disabled = false,
-  'aria-label': ariaLabel
+  disabled = false
 }) => {
   const { t } = useI18n()
   const anchorRef = useRef<HTMLButtonElement>(null)
