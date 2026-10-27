@@ -104,6 +104,31 @@ it('tracks requests independently for each address book', () => {
   expect(state.addressBooks.book.isPublic).toBe(true)
 })
 
+it('keeps the known profile of a member listed again, with its new role', () => {
+  const request = { addressBookId: 'book', requestId: 'refresh' }
+  let state = reducer(
+    {
+      ...initial,
+      addressBooks: {
+        book: { ...initial.addressBooks.book, invitedMembers: [resolvedBob] }
+      }
+    },
+    fetchAddressBookDetail.pending('refresh', { ...arg, silent: true })
+  )
+  state = reducer(
+    state,
+    addressBookDetailReceived({
+      ...request,
+      members: [{ ...invitedBob, role: AddressBookAccessLevel.Editor }],
+      isPublic: false,
+      silent: true
+    })
+  )
+  expect(state.addressBooks.book.invitedMembers).toEqual([
+    { ...resolvedBob, role: AddressBookAccessLevel.Editor }
+  ])
+})
+
 describe('fetchAddressBookDetail', () => {
   afterEach(() => jest.resetAllMocks())
 
@@ -130,6 +155,27 @@ describe('fetchAddressBookDetail', () => {
 
     answerLookup(resolvedBob)
     await request
+
+    expect(store.getState().contacts.addressBooks.book.invitedMembers).toEqual([
+      resolvedBob
+    ])
+  })
+
+  it('keeps the known profile of a member whose lookup fails', async () => {
+    jest
+      .mocked(fetchAddressBookDetails)
+      .mockResolvedValue({ members: [invitedBob], isPublic: false })
+    jest.mocked(resolveAddressBookMember).mockImplementation(async m => m)
+    const store = setupStore({
+      contacts: {
+        ...initial,
+        addressBooks: {
+          book: { ...initial.addressBooks.book, invitedMembers: [resolvedBob] }
+        }
+      }
+    })
+
+    await store.dispatch(fetchAddressBookDetail({ ...arg, silent: true }))
 
     expect(store.getState().contacts.addressBooks.book.invitedMembers).toEqual([
       resolvedBob

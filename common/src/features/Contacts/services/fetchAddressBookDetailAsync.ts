@@ -35,6 +35,19 @@ const isLatestDetailRequest = (
   state.detailRequestIds?.[addressBookId] === requestId &&
   Boolean(state.addressBooks[addressBookId])
 
+/**
+ * A member already listed keeps its looked up profile, with its new role,
+ * instead of falling back to its invite until its lookup answers again.
+ */
+const keepKnownProfiles = (
+  known: userData[],
+  received: userData[]
+): userData[] =>
+  received.map(member => {
+    const knownMember = known.find(k => member.href && k.href === member.href)
+    return knownMember ? { ...knownMember, role: member.role } : member
+  })
+
 export const reduceAddressBookDetailReceived = (
   state: ContactsState,
   action: ReturnType<typeof addressBookDetailReceived>
@@ -44,9 +57,10 @@ export const reduceAddressBookDetailReceived = (
     state.detailsLoading = false
   }
   if (isLatestDetailRequest(state, action.payload)) {
+    const book = state.addressBooks[addressBookId]
     state.addressBooks[addressBookId] = {
-      ...state.addressBooks[addressBookId],
-      invitedMembers: members,
+      ...book,
+      invitedMembers: keepKnownProfiles(book.invitedMembers ?? [], members),
       isPublic
     }
   }
@@ -92,15 +106,18 @@ export const fetchAddressBookDetailThunk = (
         })
       )
       await Promise.all(
-        details.members.map(async member =>
+        details.members.map(async member => {
+          const resolved = await resolveAddressBookMember(member)
+          // a member whose lookup failed keeps the entry already listed
+          if (resolved === member) return
           dispatch(
             addressBookMemberResolved({
               addressBookId,
               requestId,
-              member: await resolveAddressBookMember(member)
+              member: resolved
             })
           )
-        )
+        })
       )
       return { addressBookId }
     },

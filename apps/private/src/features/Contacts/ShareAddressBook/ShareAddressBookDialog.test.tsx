@@ -109,6 +109,35 @@ describe('ShareAddressBookDialog', () => {
     ).not.toBeInTheDocument()
   })
 
+  it('lists the members once they are fetched after a failure', async () => {
+    mockedFetchDetails
+      .mockRejectedValueOnce(new Error('Bad Request'))
+      .mockResolvedValue({ members: [bob], isPublic: false })
+    mockedUpdateShares.mockResolvedValue(undefined)
+    mockedSearchUsers.mockResolvedValue([
+      {
+        id: 'bob',
+        firstname: 'bob',
+        lastname: 'bob',
+        emails: ['bob@open-paas.org']
+      }
+    ])
+    renderShareDialog()
+
+    expect(
+      await screen.findByText('Failed to load the members of this address book')
+    ).toBeInTheDocument()
+    userEvent.type(screen.getByPlaceholderText('Add contacts'), 'bob')
+    await waitFor(() => expect(mockedSearchUsers).toHaveBeenCalled())
+    userEvent.click(await screen.findByText('bob@open-paas.org'))
+    userEvent.click(screen.getByRole('button', { name: 'Send' }))
+
+    expect(await screen.findByText('bob bob')).toBeInTheDocument()
+    expect(
+      screen.queryByText('Failed to load the members of this address book')
+    ).not.toBeInTheDocument()
+  })
+
   it('lists a member shared again right after being removed', async () => {
     mockedFetchDetails
       .mockResolvedValueOnce({ members: [bob], isPublic: false })
