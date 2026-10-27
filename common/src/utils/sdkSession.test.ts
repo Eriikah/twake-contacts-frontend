@@ -1,5 +1,9 @@
 import { createSdk, type Sdk } from '@linagora/twake-sdk'
-import { ensureSdkSignedIn, getPlatformSdk } from './sdkSession'
+import {
+  ensureSdkSignedIn,
+  getPlatformSdk,
+  SDK_WAITING_TIMEOUT
+} from './sdkSession'
 
 jest.mock('@linagora/twake-sdk', () => ({ createSdk: jest.fn() }))
 
@@ -16,6 +20,10 @@ describe('SDK session', () => {
     jest.mocked(createSdk).mockReturnValueOnce(sdk)
 
     const first = ensureSdkSignedIn('https://alice.twake.app', 'id-token')
+    expect(createSdk).toHaveBeenCalledWith({
+      platformURL: 'https://alice.twake.app',
+      waitingTimeout: SDK_WAITING_TIMEOUT
+    })
     const second = ensureSdkSignedIn('https://alice.twake.app', 'id-token')
     expect(login).toHaveBeenCalledTimes(1)
     expect(getPlatformSdk('https://alice.twake.app')).toBe(sdk)

@@ -137,6 +137,17 @@ describe('TwakeBarHeader', () => {
     expect(screen.getByRole('button')).toBeInTheDocument()
   })
 
+  it('does not resolve the workplace fallback before the user is known', () => {
+    window.WORKPLACE_FQDN_FALLBACK = '{localpart}.twake.app'
+    renderBar({ signedIn: false, token: 'id-token' })
+    expect(ensureSdkSignedIn).not.toHaveBeenCalledWith(
+      'https://.twake.app',
+      expect.anything()
+    )
+    expect(getPlatformSdk).not.toHaveBeenCalledWith('https://.twake.app')
+    expect(screen.queryByTestId('sdk-provider')).not.toBeInTheDocument()
+  })
+
   it('supplies the platform client even before a token is available', () => {
     window.appList = undefined
     window.SUPPORT_URL = undefined

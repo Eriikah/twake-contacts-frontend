@@ -3,8 +3,10 @@ import { resolveUriTemplate } from '@linagora/twake-utils'
 
 export const selectPlatformURL = (state: RootState): string | null => {
   const user = state.user.userData
+  // Before the user is known a {localpart} template yields `https://.domain`
+  if (!user.email) return null
   const workplace = resolveUriTemplate('{workplaceFqdn}', {
-    localpart: user.email?.split('@')[0],
+    localpart: user.email.split('@')[0],
     workplaceFqdn: user.workplaceFqdn,
     workplaceFqdnFallback: window.WORKPLACE_FQDN_FALLBACK
   })
