@@ -107,6 +107,7 @@
     },
     "errors": {
       "load": "Kontakte konnten nicht geladen werden",
+      "loadMembers": "Die Mitglieder dieses Adressbuchs konnten nicht geladen werden",
       "create": "Kontakt konnte nicht erstellt werden",
       "update": "Kontakt konnte nicht aktualisiert werden",
       "delete": "Kontakt konnte nicht gelöscht werden",

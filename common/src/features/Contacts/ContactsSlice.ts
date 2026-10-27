@@ -19,6 +19,12 @@ import { fetchUpdatedContactsThunk } from './services/fetchUpdatedContactsAsync'
 import { subscribeAddressBookThunk } from './services/subscribeAddressBookAsync'
 import { deleteAddressBookThunk } from './services/deleteAddressBookAsync'
 import { updateAddressBookThunk } from './services/updateAddressBookAsync'
+import {
+  addressBookDetailReceived,
+  addressBookMemberResolved,
+  reduceAddressBookDetailReceived,
+  reduceAddressBookMemberResolved
+} from './services/fetchAddressBookDetailAsync'
 
 const initialState: ContactsState = {
   addressBooks: {},
@@ -82,7 +88,12 @@ const ContactsSlice = createAppSlice({
     deleteAddressBook: deleteAddressBookThunk(create),
     updateAddressBook: updateAddressBookThunk(create),
     publishAddressBook: publishAddressBookThunk(create)
-  })
+  }),
+  extraReducers: builder => {
+    builder
+      .addCase(addressBookDetailReceived, reduceAddressBookDetailReceived)
+      .addCase(addressBookMemberResolved, reduceAddressBookMemberResolved)
+  }
 })
 
 export const {
@@ -108,4 +119,5 @@ export const {
   deleteAddressBook,
   publishAddressBook
 } = ContactsSlice.actions
+export { addressBookDetailReceived, addressBookMemberResolved }
 export default ContactsSlice.reducer

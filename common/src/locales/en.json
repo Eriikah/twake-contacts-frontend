@@ -136,6 +136,7 @@
     },
     "errors": {
       "load": "Failed to load contacts",
+      "loadMembers": "Failed to load the members of this address book",
       "create": "Failed to create contact",
       "update": "Failed to update contact",
       "delete": "Failed to delete contact",

@@ -42,23 +42,42 @@ const useAddressBookSharingState = (
   setRemovedIds: React.Dispatch<React.SetStateAction<string[]>>
   invitedMembers: UserDataType[]
   activeInvitedMembers: UserDataType[]
+  detailsError: string | null
 } => {
   const [isSharing, setIsSharing] = React.useState(false)
   const [updatingMemberId, setUpdatingMemberId] = React.useState<string | null>(
     null
   )
   const [removedIds, setRemovedIds] = React.useState<string[]>([])
+  // the failure to fetch the members of a book, reported for that book only
+  const [detailsFailure, setDetailsFailure] = React.useState<{
+    bookId: string
+    errorKey: string
+  } | null>(null)
 
   useEffect(() => {
-    if (userData.openpaasId && book?.id) {
-      void dispatch(
-        fetchAddressBookDetail({
-          userId: userData.openpaasId,
-          addressBookId: book.id
-        })
-      )
-    }
+    const bookId = book?.id
+    if (!userData.openpaasId || !bookId) return
+    dispatch(
+      fetchAddressBookDetail({
+        userId: userData.openpaasId,
+        addressBookId: bookId
+      })
+    )
+      .unwrap()
+      .catch((error: RejectedError | undefined) => {
+        if (error?.status !== 401) {
+          setDetailsFailure({
+            bookId,
+            errorKey: toContactsErrorKey(error, 'contacts.errors.loadMembers')
+          })
+        }
+      })
   }, [dispatch, book?.id, userData.openpaasId])
+  const detailsError =
+    detailsFailure && detailsFailure.bookId === book?.id
+      ? detailsFailure.errorKey
+      : null
 
   const invitedMembers = useMemo(
     () => book?.invitedMembers || [],
@@ -79,7 +98,8 @@ const useAddressBookSharingState = (
     setUpdatingMemberId,
     setRemovedIds,
     invitedMembers,
-    activeInvitedMembers
+    activeInvitedMembers,
+    detailsError
   }
 }
 
@@ -347,7 +367,8 @@ export const ShareAddressBookDialog: React.FC<ShareAddressBookDialogProps> = ({
     setUpdatingMemberId,
     setRemovedIds,
     invitedMembers,
-    activeInvitedMembers
+    activeInvitedMembers,
+    detailsError
   } = useAddressBookSharingState(userData, book, dispatch)
   const [shareError, setShareError] = React.useState<string | null>(null)
   // Removing a member unmounts its focused row: keep the focus in the dialog
@@ -402,17 +423,23 @@ export const ShareAddressBookDialog: React.FC<ShareAddressBookDialogProps> = ({
           loading={isSharing}
           searchInputRef={searchInputRef}
         />
-        <MembersList
-          userData={userData}
-          invitedMembers={activeInvitedMembers}
-          onUpdateMember={(user, role) => {
-            if (role === AddressBookAccessLevel.None) {
-              searchInputRef.current?.focus()
-            }
-            void handleUpdateMember(user, role)
-          }}
-          updatingMemberId={updatingMemberId}
-        />
+        {detailsError ? (
+          <Alert severity="error" className="u-mt-1">
+            {t(detailsError)}
+          </Alert>
+        ) : (
+          <MembersList
+            userData={userData}
+            invitedMembers={activeInvitedMembers}
+            onUpdateMember={(user, role) => {
+              if (role === AddressBookAccessLevel.None) {
+                searchInputRef.current?.focus()
+              }
+              void handleUpdateMember(user, role)
+            }}
+            updatingMemberId={updatingMemberId}
+          />
+        )}
         <DiscoverySection
           userId={userData.openpaasId}
           addressBookId={book?.id}

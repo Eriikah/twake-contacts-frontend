@@ -23,8 +23,12 @@ export const partitionMembers = (
       m.role !== AddressBookAccessLevel.None
   )
 
+  // the profile of the current user is known already: only its role is taken,
+  // so that it shows even when the lookup of its own entry failed
   return {
-    me: meMatch || { ...currentUser },
+    me: meMatch
+      ? { ...currentUser, role: meMatch.role, href: meMatch.href }
+      : { ...currentUser },
     others: othersList
   }
 }

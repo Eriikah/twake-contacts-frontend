@@ -107,6 +107,7 @@
     },
     "errors": {
       "load": "Impossibile caricare i contatti",
+      "loadMembers": "Impossibile caricare i membri di questa rubrica",
       "create": "Impossibile creare il contatto",
       "update": "Impossibile aggiornare il contatto",
       "delete": "Impossibile eliminare il contatto",

@@ -1,6 +1,19 @@
 /** @jest-environment jsdom */
-import reducer, { fetchAddressBookDetail } from '../ContactsSlice'
+import { setupStore } from '@common/app/store'
+import { userData } from '@common/features/User/userDataTypes'
+import reducer, {
+  addressBookDetailReceived,
+  addressBookMemberResolved,
+  fetchAddressBookDetail
+} from '../ContactsSlice'
+import {
+  fetchAddressBookDetails,
+  resolveAddressBookMember
+} from '../ContactsDao'
 import { ContactsState } from '../contactsTypes'
+import { AddressBookAccessLevel } from '../davTypes'
+
+jest.mock('../ContactsDao')
 
 const arg = { userId: 'owner', addressBookId: 'book' }
 const initial: ContactsState = {
@@ -12,46 +25,56 @@ const initial: ContactsState = {
       contactsCount: 0,
       acl: [],
       canWrite: true,
-      contacts: [],
-      offset: 0,
-      hasMore: false
+      contacts: []
     }
   },
+  listings: {},
+  sort: { by: 'fn', order: 'asc' },
   loading: false,
   error: null
 }
+
+const invitedBob: userData = {
+  email: 'bob@open-paas.org',
+  family_name: '',
+  given_name: '',
+  name: 'bob@open-paas.org',
+  sid: 'bob',
+  sub: 'bob',
+  openpaasId: 'bob',
+  role: AddressBookAccessLevel.Viewer,
+  href: 'mailto:bob@open-paas.org'
+}
+const resolvedBob: userData = { ...invitedBob, name: 'bob bob' }
 
 it('ignores an older detail response after the latest response', () => {
   let state = reducer(initial, fetchAddressBookDetail.pending('old', arg))
   state = reducer(state, fetchAddressBookDetail.pending('new', arg))
   state = reducer(
     state,
-    fetchAddressBookDetail.fulfilled(
-      { addressBookId: 'book', members: [], isPublic: true },
-      'new',
-      arg
-    )
+    addressBookDetailReceived({
+      addressBookId: 'book',
+      requestId: 'new',
+      members: [],
+      isPublic: true
+    })
   )
   state = reducer(
     state,
-    fetchAddressBookDetail.fulfilled(
-      {
-        addressBookId: 'book',
-        members: [
-          {
-            email: 'stale@example.com',
-            family_name: '',
-            given_name: '',
-            name: '',
-            sid: '',
-            sub: ''
-          }
-        ],
-        isPublic: false
-      },
-      'old',
-      arg
-    )
+    addressBookDetailReceived({
+      addressBookId: 'book',
+      requestId: 'old',
+      members: [invitedBob],
+      isPublic: false
+    })
+  )
+  state = reducer(
+    state,
+    addressBookMemberResolved({
+      addressBookId: 'book',
+      requestId: 'old',
+      member: resolvedBob
+    })
   )
   expect(state.addressBooks.book.isPublic).toBe(true)
   expect(state.addressBooks.book.invitedMembers).toEqual([])
@@ -71,11 +94,57 @@ it('tracks requests independently for each address book', () => {
   )
   state = reducer(
     state,
-    fetchAddressBookDetail.fulfilled(
-      { addressBookId: 'book', members: [], isPublic: true },
-      'book-request',
-      arg
-    )
+    addressBookDetailReceived({
+      addressBookId: 'book',
+      requestId: 'book-request',
+      members: [],
+      isPublic: true
+    })
   )
   expect(state.addressBooks.book.isPublic).toBe(true)
+})
+
+describe('fetchAddressBookDetail', () => {
+  afterEach(() => jest.resetAllMocks())
+
+  it('lists the members before their profiles are looked up', async () => {
+    jest
+      .mocked(fetchAddressBookDetails)
+      .mockResolvedValue({ members: [invitedBob], isPublic: false })
+    let answerLookup!: (member: userData) => void
+    jest.mocked(resolveAddressBookMember).mockReturnValue(
+      new Promise(resolve => {
+        answerLookup = resolve
+      })
+    )
+    const store = setupStore({ contacts: initial })
+
+    const request = store.dispatch(fetchAddressBookDetail(arg))
+    await jest.mocked(fetchAddressBookDetails).mock.results[0].value
+    await Promise.resolve()
+
+    expect(store.getState().contacts.detailsLoading).toBe(false)
+    expect(store.getState().contacts.addressBooks.book.invitedMembers).toEqual([
+      invitedBob
+    ])
+
+    answerLookup(resolvedBob)
+    await request
+
+    expect(store.getState().contacts.addressBooks.book.invitedMembers).toEqual([
+      resolvedBob
+    ])
+  })
+
+  it('leaves the contact list error alone when the details cannot be fetched', async () => {
+    jest
+      .mocked(fetchAddressBookDetails)
+      .mockRejectedValue(new Error('Bad Request'))
+    const store = setupStore({ contacts: initial })
+
+    await store.dispatch(fetchAddressBookDetail(arg))
+
+    expect(store.getState().contacts.error).toBeNull()
+    expect(store.getState().contacts.detailsLoading).toBe(false)
+  })
 })

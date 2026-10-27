@@ -107,6 +107,7 @@
     },
     "errors": {
       "load": "Không thể tải danh bạ",
+      "loadMembers": "Không thể tải danh sách thành viên của sổ địa chỉ này",
       "create": "Không thể tạo liên hệ",
       "update": "Không thể cập nhật liên hệ",
       "delete": "Không thể xóa liên hệ",
