@@ -14,7 +14,7 @@ import {
   Email
 } from '@linagora/twake-icons'
 import { AddressBook, Contact } from '@common/features/Contacts/contactsTypes'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router'
 import { useI18n } from 'twake-i18n'
 import { AvatarHeader } from './fields/AvatarHeader'
@@ -69,6 +69,8 @@ export const ContactForm: React.FC<ContactFormProps> = ({
   const { isMobile } = useBreakpoints()
   const [values, setValues] = useState<ContactFormValues>(initialValues)
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const submittingRef = useRef(false)
 
   const displayName = [values.givenName.trim(), values.familyName.trim()]
     .filter(Boolean)
@@ -135,6 +137,18 @@ export const ContactForm: React.FC<ContactFormProps> = ({
     Boolean(values.givenName.trim() || values.familyName.trim()) &&
     !hasInvalidEmail
 
+  const handleSave = async (): Promise<void> => {
+    if (submittingRef.current) return
+    submittingRef.current = true
+    setSubmitting(true)
+    try {
+      await onSubmit(values)
+    } finally {
+      submittingRef.current = false
+      setSubmitting(false)
+    }
+  }
+
   return (
     <Stack spacing={3} useFlexGap>
       <Stack direction="row" className="u-flex u-flex-justify-between">
@@ -151,7 +165,8 @@ export const ContactForm: React.FC<ContactFormProps> = ({
             <Button
               variant="contained"
               disabled={!canSubmit}
-              onClick={() => void onSubmit(values)}
+              loading={submitting}
+              onClick={() => void handleSave()}
             >
               {t('contacts.form.save')}
             </Button>

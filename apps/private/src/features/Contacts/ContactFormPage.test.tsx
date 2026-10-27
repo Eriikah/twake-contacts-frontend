@@ -260,6 +260,48 @@ describe('CreateContactPage', () => {
     expect(caption).not.toHaveAttribute('aria-selected')
   })
 
+  it('creates the contact only once when Save is clicked twice', async () => {
+    let resolveSave: () => void = () => undefined
+    jest.mocked(saveContact).mockReset()
+    jest
+      .mocked(saveContact)
+      .mockImplementation(
+        () => new Promise<void>(resolve => (resolveSave = resolve))
+      )
+    renderPage(['/contacts/book1/new'])
+
+    fireEvent.change(screen.getByLabelText('First name'), {
+      target: { value: 'Dbl' }
+    })
+    const saveButton = screen.getByRole('button', { name: 'Save' })
+    fireEvent.click(saveButton)
+    fireEvent.click(saveButton)
+
+    expect(saveButton).toBeDisabled()
+    expect(saveContact).toHaveBeenCalledTimes(1)
+
+    resolveSave()
+
+    expect(await screen.findByText('Book')).toBeInTheDocument()
+    expect(saveContact).toHaveBeenCalledTimes(1)
+  })
+
+  it('re-enables Save when the creation fails', async () => {
+    jest.mocked(saveContact).mockReset()
+    jest.mocked(saveContact).mockRejectedValue(new Error('Server error'))
+    renderPage(['/contacts/book1/new'])
+
+    fireEvent.change(screen.getByLabelText('First name'), {
+      target: { value: 'Dbl' }
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled()
+    })
+    expect(saveContact).toHaveBeenCalledTimes(1)
+  })
+
   it('links back to main page for hidden address books', () => {
     renderPage(['/contacts/contacts/new'])
 
