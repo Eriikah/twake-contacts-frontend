@@ -142,7 +142,8 @@
       "forbidden": "You don't have permission to modify this address book",
       "share": "Failed to share address book",
       "subscribe": "Failed to add address book",
-      "deleteAddressBook": "Failed to remove address book",
+      "deleteAddressBook": "Failed to delete the address book",
+      "removeAddressBook": "Failed to remove the address book from your list",
       "updateAddressBook": "Failed to update address book"
     },
     "share": {

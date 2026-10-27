@@ -113,7 +113,8 @@
       "forbidden": "Vous n'avez pas le droit de modifier ce carnet d'adresses",
       "share": "Échec du partage du carnet d'adresses",
       "subscribe": "Impossible d'ajouter le carnet d'adresses",
-      "deleteAddressBook": "Impossible de retirer le carnet d'adresses",
+      "deleteAddressBook": "Impossible de supprimer le carnet d'adresses",
+      "removeAddressBook": "Impossible de retirer le carnet d'adresses de votre liste",
       "updateAddressBook": "Impossible de modifier le carnet d'adresses"
     },
     "addressBook": {

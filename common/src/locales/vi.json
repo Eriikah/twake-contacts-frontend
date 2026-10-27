@@ -114,6 +114,7 @@
       "share": "Không thể chia sẻ sổ địa chỉ",
       "subscribe": "Không thể thêm sổ địa chỉ",
       "deleteAddressBook": "Không thể xóa sổ địa chỉ",
+      "removeAddressBook": "Không thể gỡ sổ địa chỉ khỏi danh sách của bạn",
       "updateAddressBook": "Không thể cập nhật sổ địa chỉ"
     },
     "addressBook": {

@@ -112,7 +112,8 @@
       "delete": "Impossibile eliminare il contatto",
       "share": "Impossibile condividere la rubrica",
       "subscribe": "Impossibile aggiungere la rubrica",
-      "deleteAddressBook": "Impossibile rimuovere la rubrica",
+      "deleteAddressBook": "Impossibile eliminare la rubrica",
+      "removeAddressBook": "Impossibile rimuovere la rubrica dal tuo elenco",
       "updateAddressBook": "Impossibile aggiornare la rubrica"
     },
     "addressBook": {
