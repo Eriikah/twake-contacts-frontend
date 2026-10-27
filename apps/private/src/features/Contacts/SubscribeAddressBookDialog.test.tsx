@@ -49,6 +49,19 @@ describe('SubscribeAddressBookDialog', () => {
     expect(screen.queryByRole('listitem')).not.toBeInTheDocument()
   })
 
+  it('pins the close button to the dialog corner, outside of the title', () => {
+    renderDialog()
+
+    const closeButton = screen.getByRole('button', { name: 'Close' })
+    const heading = screen.getByRole('heading', {
+      name: 'Add a shared address book'
+    })
+    expect(closeButton).toHaveClass('dialogCloseButton')
+    expect(heading).toHaveClass('dialogTitleWithClose')
+    expect(heading).not.toContainElement(closeButton)
+    expect(closeButton.parentElement).toBe(heading.parentElement)
+  })
+
   it('closes from the close button', async () => {
     const onClose = renderDialog()
 
