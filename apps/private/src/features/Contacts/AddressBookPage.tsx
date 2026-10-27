@@ -1,5 +1,7 @@
 import { useAppDispatch, useAppSelector } from '@common/app/hooks'
 import {
+  clearContactsError,
+  clearListingFailures,
   fetchMoreContacts,
   setContactSort
 } from '@common/features/Contacts/ContactsSlice'
@@ -23,6 +25,7 @@ import {
 import { useCallback, useEffect } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router'
 import { useI18n } from 'twake-i18n'
+import { ContactsLoadErrorState } from './ContactsLoadErrorState'
 import { ContactsTable } from './ContactsTable'
 import { NoContactsEmptyState } from './NoContactsEmptyState'
 import { ImportContactsButton } from './ImportContactsButton'
@@ -58,12 +61,14 @@ export const AddressBookPage: React.FC = () => {
       ? state.contacts.listings[listingKeyToLoadMore]
       : undefined
   )
+  const loadFailed = !!listingToLoadMore?.failed
   const loadingMore = !!listingToLoadMore?.loadingRequestId
 
   // A list with a page to load and nothing to show, as after a sort, shows
   // the table with a page of skeleton rows: the table stays mounted, keeping
-  // its headers and height
-  const showTable = entries.length > 0 || loading || !!listingKeyToLoadMore
+  // its headers and height. A list whose first page failed shows an error.
+  const showTable =
+    entries.length > 0 || loading || (!!listingKeyToLoadMore && !loadFailed)
 
   const title = addressBookId
     ? getAddressBookDisplayName(book, t)
@@ -79,6 +84,17 @@ export const AddressBookPage: React.FC = () => {
       })
     )
   }, [dispatch, openpaasId, loading, listingKeyToLoadMore])
+
+  const retryLoad = useCallback(() => {
+    dispatch(clearContactsError())
+    dispatch(clearListingFailures())
+    loadMore()
+  }, [dispatch, loadMore])
+
+  // a listing that failed loads again on the next visit of its view
+  useEffect(() => {
+    dispatch(clearListingFailures())
+  }, [dispatch, addressBookId, scope])
 
   // The table only reports the end of the rows it shows: the first page of a
   // listing, as after the books are loaded again, and the pages of a list
@@ -108,16 +124,22 @@ export const AddressBookPage: React.FC = () => {
   const renderContent = (): React.ReactNode => {
     if (showTable) {
       return (
-        <ContactsTable
-          key={`${addressBookId ?? 'all'}-${scope ?? ''}`}
-          entries={entries}
-          onEndReached={loadMore}
-          sort={sort}
-          onSortChange={newSort => dispatch(setContactSort(newSort))}
-          loading={loading}
-          loadingMore={loadingMore || entries.length === 0}
-        />
+        <>
+          <ContactsTable
+            key={`${addressBookId ?? 'all'}-${scope ?? ''}`}
+            entries={entries}
+            onEndReached={loadMore}
+            sort={sort}
+            onSortChange={newSort => dispatch(setContactSort(newSort))}
+            loading={loading}
+            loadingMore={loadingMore || (entries.length === 0 && !loadFailed)}
+          />
+          {loadFailed && <ContactsLoadErrorState onRetry={retryLoad} />}
+        </>
       )
+    }
+    if (loadFailed) {
+      return <ContactsLoadErrorState onRetry={retryLoad} />
     }
     return (
       <NoContactsEmptyState
