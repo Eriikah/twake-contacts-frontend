@@ -79,7 +79,8 @@ export class ContactsPage {
     })
     this.sharedCaption = this.nav.getByText('Shared', { exact: true })
     this.addSharedBookButton = this.nav.getByRole('button', {
-      name: 'Add a shared address book'
+      name: 'Add a shared address book',
+      exact: true
     })
     this.searchBox = page.getByRole('combobox', { name: 'Search contacts...' })
     this.themeToggle = page.getByRole('button', {
