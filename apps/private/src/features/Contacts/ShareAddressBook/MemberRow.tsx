@@ -55,7 +55,8 @@ export const MemberRow: React.FC<MemberRowProps> = ({
             ariaLabel={t('contacts.share.roleOf', { name: member.name })}
             value={member.role || AddressBookAccessLevel.Viewer}
             onChange={role => onUpdateMember?.(member, role)}
-            disabled={isUpdating}
+            // read-only, not disabled: a disabled button would drop its focus
+            readOnly={isUpdating}
           />
           <Tooltip disableInteractive title={t('contacts.form.remove')}>
             <IconButton

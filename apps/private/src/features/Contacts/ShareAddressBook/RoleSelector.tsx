@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useRef, useState } from 'react'
+import React, { useId, useRef, useState } from 'react'
 import {
   ActionsMenu,
   ActionsMenuItem,
@@ -21,28 +21,21 @@ interface RoleSelectorProps {
   value: AddressBookAccessLevel
   onChange: (role: AddressBookAccessLevel) => void
   disabled?: boolean
+  // Keeps the button focusable, unlike disabled, but ignores any role pick
+  readOnly?: boolean
 }
 
 export const RoleSelector: React.FC<RoleSelectorProps> = ({
   ariaLabel,
   value,
   onChange,
-  disabled = false
+  disabled = false,
+  readOnly = false
 }) => {
   const { t } = useI18n()
   const anchorRef = useRef<HTMLButtonElement>(null)
   const [open, setOpen] = useState(false)
   const menuId = useId()
-  // Picking a role may disable the selector while it saves, which drops the
-  // focus to <body>: give it back once the selector is enabled again
-  const refocusOnEnableRef = useRef(false)
-
-  useEffect(() => {
-    if (!disabled && refocusOnEnableRef.current) {
-      refocusOnEnableRef.current = false
-      anchorRef.current?.focus()
-    }
-  }, [disabled])
   const roleKey = getRoleTranslationKey(value)
   const roles = [AddressBookAccessLevel.Editor, AddressBookAccessLevel.Viewer]
   // Only offer read-write for a sharee who already has it.
@@ -58,19 +51,20 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
         size="small"
         color="inherit"
         disabled={disabled}
+        aria-disabled={readOnly}
         aria-label={ariaLabel}
         aria-haspopup="menu"
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
         endIcon={<Icon icon={Dropdown} />}
-        onClick={() => setOpen(true)}
+        onClick={() => setOpen(!readOnly)}
       >
         {roleKey ? t(roleKey) : ''}
       </Button>
       <ActionsMenu
         ref={anchorRef}
         id={menuId}
-        open={open && !disabled}
+        open={open && !disabled && !readOnly}
         onClose={() => setOpen(false)}
       >
         {roles.map(role => (
@@ -79,7 +73,7 @@ export const RoleSelector: React.FC<RoleSelectorProps> = ({
             role="menuitemradio"
             aria-checked={value === role}
             onClick={() => {
-              refocusOnEnableRef.current = true
+              setOpen(false)
               onChange(role)
             }}
           >
